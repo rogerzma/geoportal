@@ -3,63 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geoportal Zacatecas</title>
+    <title>Geoportal Zacatecas - Mapa Satelital</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            transition: margin-left 0.4s ease-in-out;
         }
 
-        /* Contenedor del mapa */
-        #map-container {
+        #map {
             width: 100%;
-            height: 500px;
+            height: 590px;
+            transition: margin-left 0.4s ease-in-out;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
+        /* Sidebar fijo sin oscurecer */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #f4f4f4;
+            position: fixed;
+            left: -260px;
+            top: 0;
+            transition: left 0.4s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+        }
+
+        /* Ajustar el título del Geoportal */
+        .navbar-brand {
+            margin-left: 60px; /* Evita que el botón hamburguesa lo tape */
+        }
+
+        /* Ajustar la posición de los íconos en el menú */
+        .sidebar {
+            padding-top: 50px; /* Bajar los íconos dentro del menú */
+        }
+
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        /* Botón hamburguesa */
+        .menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #0078A8;
+            color: white;
+            padding: 10px;
             border: none;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 1000;
+        }
+
+        /* Contenedor de botones flotantes dentro del mapa */
+        .icon-container {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .icon-button {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
         }
     </style>
 </head>
 <body>
 
+    <!-- Botón hamburguesa -->
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <ul class="list-group">
+            <li class="list-group-item">Capas</li>
+            <li class="list-group-item">Búsquedas</li>
+            <li class="list-group-item">Herramientas</li>
+            <li class="list-group-item">Ayuda</li>
+        </ul>
+    </aside>
+
     <!-- Encabezado -->
     <nav class="navbar navbar-dark bg-success">
         <div class="container-fluid d-flex justify-content-start">
-            <button class="navbar-toggler me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                ☰
-            </button>
             <a class="navbar-brand" href="#">Geoportal Zacatecas</a>
         </div>
     </nav>
 
-    <!-- Barra lateral -->
-    <div class="offcanvas offcanvas-start bg-light" id="sidebar">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Menú</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-            <ul class="list-group">
-                <li class="list-group-item">Capas</li>
-                <li class="list-group-item">Búsquedas</li>
-                <li class="list-group-item">Herramientas</li>
-                <li class="list-group-item">Ayuda</li>
-            </ul>
+    <!-- Mapa -->
+    <div id="map">
+        <!-- Botones flotantes -->
+        <div class="icon-container">
+            <div class="icon-button" id="draw-parcela" title="Dibujar parcela">🖊️</div>
+            <div class="icon-button" id="delete-parcela" title="Eliminar última parcela">🗑️</div>
         </div>
     </div>
 
-    <!-- Contenedor del mapa con iframe de QGIS -->
-    <div id="map-container">
-        <iframe src="{{ asset('qgis2web_2025_04_20-21_28_11_136464/index.html') }}"></iframe>
-    </div>
+    
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <script>
+        // Inicializar el mapa en Zacatecas
+        var map = L.map('map').setView([22.775, -102.573], 12);
+        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=TU_API_KEY', {
+            attribution: '&copy; Google Maps'
+        }).addTo(map);
+
+        // Grupo de capas para parcelas
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        // Control de dibujo
+        var drawControl = new L.Control.Draw({
+            draw: {
+                polygon: {
+                    allowIntersection: false,
+                    showArea: true,
+                    shapeOptions: { color: '#00aaff' }
+                },
+                polyline: false,
+                rectangle: false,
+                circle: false,
+                marker: false,
+                circlemarker: false
+            },
+            edit: { featureGroup: drawnItems, remove: false }
+        });
+        map.addControl(drawControl);
+
+        // Evento al finalizar dibujo
+        map.on(L.Draw.Event.CREATED, function (e) {
+            drawnItems.addLayer(e.layer);
+        });
+
+        // Botón: Activar dibujo
+        document.getElementById("draw-parcela").addEventListener("click", function () {
+            new L.Draw.Polygon(map, drawControl.options.draw.polygon).enable();
+        });
+
+        // Botón: Eliminar última parcela
+        document.getElementById("delete-parcela").addEventListener("click", function () {
+            var layers = drawnItems.getLayers();
+            if (layers.length > 0) {
+                drawnItems.removeLayer(layers[layers.length - 1]);
+            }
+        });
+
+        // Botón hamburguesa: Desplazar mapa sin oscurecer
+        function toggleMenu() {
+            document.getElementById("sidebar").classList.toggle("active");
+            document.getElementById("map").style.marginLeft = document.getElementById("sidebar").classList.contains("active") ? "250px" : "0";
+        }
+    </script>
 
 </body>
 </html>
