@@ -45,7 +45,6 @@
             padding-top: 50px; /* Bajar los íconos dentro del menú */
         }
 
-
         .sidebar.active {
             left: 0;
         }
@@ -53,9 +52,9 @@
         /* Botón hamburguesa */
         .menu-btn {
             position: fixed;
-            top: 15px;
+            top: 10px;
             left: 15px;
-            background-color: #0078A8;
+            background-color: #198754;
             color: white;
             padding: 10px;
             border: none;
@@ -80,12 +79,23 @@
             background-color: white;
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px;
+            padding: 5px; /* Reducir el padding */
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            width: 50px; /* Ajustar el ancho */
+            height: 50px; /* Ajustar el alto */
+            font-size: 16px; /* Reducir el tamaño del ícono */
+        }
+
+        #polygon-color {
+            margin-bottom: 10px;
+            width: 50%; /* Reducir el ancho */
+            height: 50px; /* Reducir el alto */
+            border: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -113,14 +123,14 @@
 
     <!-- Mapa -->
     <div id="map">
-        <!-- Botones flotantes -->
+        <!-- Selector de color y botones flotantes -->
         <div class="icon-container">
+            <label for="polygon-color" style="margin-bottom: 5px;">Color del polígono:</label>
+            <input type="color" id="polygon-color" value="#00aaff">
             <div class="icon-button" id="draw-parcela" title="Dibujar parcela">🖊️</div>
             <div class="icon-button" id="delete-parcela" title="Eliminar última parcela">🗑️</div>
         </div>
     </div>
-
-    
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -144,7 +154,7 @@
                 polygon: {
                     allowIntersection: false,
                     showArea: true,
-                    shapeOptions: { color: '#00aaff' }
+                    shapeOptions: { color: '#00aaff' } // Color predeterminado
                 },
                 polyline: false,
                 rectangle: false,
@@ -163,7 +173,18 @@
 
         // Botón: Activar dibujo
         document.getElementById("draw-parcela").addEventListener("click", function () {
-            new L.Draw.Polygon(map, drawControl.options.draw.polygon).enable();
+            // Obtener el color seleccionado
+            var selectedColor = document.getElementById("polygon-color").value;
+
+            // Configurar el estilo del polígono con el color seleccionado
+            var polygonOptions = {
+                allowIntersection: false,
+                showArea: true,
+                shapeOptions: { color: selectedColor }
+            };
+
+            // Activar la herramienta de dibujo con el color seleccionado
+            new L.Draw.Polygon(map, polygonOptions).enable();
         });
 
         // Botón: Eliminar última parcela
