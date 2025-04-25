@@ -56,7 +56,7 @@
             left: 15px;
             background-color: #198754;
             color: white;
-            padding: 10px;
+            padding: 0px;
             border: none;
             cursor: pointer;
             font-size: 24px;
