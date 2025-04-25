@@ -179,7 +179,11 @@
                 polygon: {
                     allowIntersection: false,
                     showArea: true,
-                    shapeOptions: { color: '#00aaff' } // Color predeterminado
+                    shapeOptions: { 
+                            color: '#00aaff',
+                            fillOpacity: 1
+                         } // Color predeterminado
+                        
                 },
                 polyline: false,
                 rectangle: false,
@@ -205,7 +209,10 @@
             var polygonOptions = {
                 allowIntersection: false,
                 showArea: true,
-                shapeOptions: { color: selectedColor }
+                shapeOptions: { 
+                    color: selectedColor,
+                    fillOpacity: 1
+                }
             };
 
             // Activar la herramienta de dibujo con el color seleccionado
