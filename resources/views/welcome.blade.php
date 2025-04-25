@@ -32,7 +32,7 @@
             top: 0;
             transition: left 0.4s ease-in-out;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            padding: 15px;
+            padding: 25px;
         }
 
         /* Ajustar el título del Geoportal */
@@ -56,7 +56,6 @@
             left: 15px;
             background-color: #198754;
             color: white;
-            padding: 0px;
             border: none;
             cursor: pointer;
             font-size: 24px;
@@ -79,21 +78,21 @@
             background-color: white;
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 5px; /* Reducir el padding */
+            padding: 5px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-            width: 50px; /* Ajustar el ancho */
-            height: 50px; /* Ajustar el alto */
-            font-size: 16px; /* Reducir el tamaño del ícono */
+            width: 50px;
+            height: 50px;
+            font-size: 16px;
         }
 
         #polygon-color {
             margin-bottom: 10px;
-            width: 50%; /* Reducir el ancho */
-            height: 50px; /* Reducir el alto */
+            width: 50%;
+            height: 50px;
             border: none;
             cursor: pointer;
         }
@@ -136,6 +135,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
 
     <script>
         // Inicializar el mapa en Zacatecas
@@ -154,7 +154,7 @@
                 polygon: {
                     allowIntersection: false,
                     showArea: true,
-                    shapeOptions: { color: '#00aaff' } // Color predeterminado
+                    shapeOptions: { color: '#00aaff' }
                 },
                 polyline: false,
                 rectangle: false,
@@ -168,30 +168,22 @@
 
         // Evento al finalizar dibujo
         map.on(L.Draw.Event.CREATED, function (e) {
-            drawnItems.addLayer(e.layer);
-        });
+            var newLayer = e.layer; // Nuevo polígono trazado
+            var newPolygon = newLayer.toGeoJSON(); // Convertir a GeoJSON
 
-        // Botón: Activar dibujo
-        document.getElementById("draw-parcela").addEventListener("click", function () {
-            // Obtener el color seleccionado
-            var selectedColor = document.getElementById("polygon-color").value;
+            // Verificar intersección con polígonos existentes
+            var intersects = false;
+            drawnItems.eachLayer(function (layer) {
+                var existingPolygon = layer.toGeoJSON();
+                if (turf.intersect(existingPolygon, newPolygon)) {
+                    intersects = true; // Hay intersección
+                }
+            });
 
-            // Configurar el estilo del polígono con el color seleccionado
-            var polygonOptions = {
-                allowIntersection: false,
-                showArea: true,
-                shapeOptions: { color: selectedColor }
-            };
-
-            // Activar la herramienta de dibujo con el color seleccionado
-            new L.Draw.Polygon(map, polygonOptions).enable();
-        });
-
-        // Botón: Eliminar última parcela
-        document.getElementById("delete-parcela").addEventListener("click", function () {
-            var layers = drawnItems.getLayers();
-            if (layers.length > 0) {
-                drawnItems.removeLayer(layers[layers.length - 1]);
+            if (intersects) {
+                alert("No se permite que las parcelas se sobrepongan.");
+            } else {
+                drawnItems.addLayer(newLayer); // Agregar el polígono si no hay intersección
             }
         });
 
