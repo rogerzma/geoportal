@@ -96,6 +96,19 @@
             border: none;
             cursor: pointer;
         }
+
+        /* Contenedor de coordenadas */
+        #coordinates {
+            position: absolute;
+            top: 70px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            z-index: 1000;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -131,11 +144,16 @@
         </div>
     </div>
 
+    <!-- Contenedor de coordenadas -->
+    <div id="coordinates">
+        <strong>Coordenadas:</strong>
+        <div id="lat-lng">Lat: --, Lng: --</div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
 
     <script>
         // Inicializar el mapa en Zacatecas
@@ -148,13 +166,20 @@
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
 
+        // Mostrar coordenadas en tiempo real
+        map.on('mousemove', function (e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+            document.getElementById('lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
+        });
+
         // Control de dibujo
         var drawControl = new L.Control.Draw({
             draw: {
                 polygon: {
                     allowIntersection: false,
                     showArea: true,
-                    shapeOptions: { color: '#00aaff' }
+                    shapeOptions: { color: '#00aaff' } // Color predeterminado
                 },
                 polyline: false,
                 rectangle: false,
@@ -168,22 +193,30 @@
 
         // Evento al finalizar dibujo
         map.on(L.Draw.Event.CREATED, function (e) {
-            var newLayer = e.layer; // Nuevo polígono trazado
-            var newPolygon = newLayer.toGeoJSON(); // Convertir a GeoJSON
+            drawnItems.addLayer(e.layer);
+        });
 
-            // Verificar intersección con polígonos existentes
-            var intersects = false;
-            drawnItems.eachLayer(function (layer) {
-                var existingPolygon = layer.toGeoJSON();
-                if (turf.intersect(existingPolygon, newPolygon)) {
-                    intersects = true; // Hay intersección
-                }
-            });
+        // Botón: Activar dibujo
+        document.getElementById("draw-parcela").addEventListener("click", function () {
+            // Obtener el color seleccionado
+            var selectedColor = document.getElementById("polygon-color").value;
 
-            if (intersects) {
-                alert("No se permite que las parcelas se sobrepongan.");
-            } else {
-                drawnItems.addLayer(newLayer); // Agregar el polígono si no hay intersección
+            // Configurar el estilo del polígono con el color seleccionado
+            var polygonOptions = {
+                allowIntersection: false,
+                showArea: true,
+                shapeOptions: { color: selectedColor }
+            };
+
+            // Activar la herramienta de dibujo con el color seleccionado
+            new L.Draw.Polygon(map, polygonOptions).enable();
+        });
+
+        // Botón: Eliminar última parcela
+        document.getElementById("delete-parcela").addEventListener("click", function () {
+            var layers = drawnItems.getLayers();
+            if (layers.length > 0) {
+                drawnItems.removeLayer(layers[layers.length - 1]);
             }
         });
 
