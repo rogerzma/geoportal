@@ -12,6 +12,19 @@
     
 </head>
 <body>
+
+    <!-- Contenedor del toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 1100;">
+        <div id="toastMessage" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Mensaje de ejemplo
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Botón hamburguesa -->
     <button class="menu-btn" onclick="toggleMenu()">☰</button>
 
@@ -21,8 +34,7 @@
             <li class="list-group-item">Capas</li>
             <li class="list-group-item">Búsquedas</li>
             <li class="list-group-item">Herramientas</li>
-            <li class="list-group-item">Ayuda</li>
-            <button class="btn btn-sm btn-success m-3" onclick="abrirModalTecnico()">Nuevo técnico</button>
+            <li class="list-group-item list-group-item-action" onclick="abrirModalTecnico()">Nuevo técnico</li>
         </ul>
     </aside>
 

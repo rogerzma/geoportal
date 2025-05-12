@@ -25,6 +25,8 @@ class TecnicoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'usuario' => 'required|string|max:255|unique:tecnicos,usuario',
+            'email' => 'required|email|max:255|unique:tecnicos,email', // Validar el correo electrónico
+            'telefono' => 'required|string|max:15', // Validar el teléfono
             'contraseña' => 'required|string|min:6'
         ]);
 
@@ -32,6 +34,8 @@ class TecnicoController extends Controller
         $tecnico = Tecnico::create([
             'nombre' => $request->nombre,
             'usuario' => $request->usuario,
+            'email' => $request->email, // Guardar el correo electrónico
+            'telefono' => $request->telefono, // Guardar el teléfono
             'contraseña' => bcrypt($request->contraseña) // Encriptar la contraseña
         ]);
 
@@ -61,6 +65,8 @@ class TecnicoController extends Controller
         $request->validate([
             'nombre' => 'string|max:255',
             'usuario' => 'string|max:255|unique:tecnicos,usuario,' . $id,
+            'email' => 'email|max:255|unique:tecnicos,email,' . $id, // Validar el correo electrónico
+            'telefono' => 'string|max:15', // Validar el teléfono
             'contraseña' => 'string|min:6'
         ]);
 
@@ -70,6 +76,8 @@ class TecnicoController extends Controller
             $tecnico->update([
                 'nombre' => $request->nombre ?? $tecnico->nombre,
                 'usuario' => $request->usuario ?? $tecnico->usuario,
+                'email' => $request->email ?? $tecnico->email, // Actualizar el correo electrónico
+                'telefono' => $request->telefono ?? $tecnico->telefono, // Actualizar el teléfono
                 'contraseña' => $request->contraseña ? bcrypt($request->contraseña) : $tecnico->contraseña
             ]);
 

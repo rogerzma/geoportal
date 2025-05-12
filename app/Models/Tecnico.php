@@ -15,6 +15,8 @@ class Tecnico extends Model
     protected $fillable = [
         'nombre',
         'usuario',
+        'email',
+        'telefono',
         'contraseña'
     ]; // Campos que se pueden asignar masivamente
 

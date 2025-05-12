@@ -58,9 +58,9 @@ let deleteMode = false;
 document.getElementById("delete-parcela").addEventListener("click", function () {
     deleteMode = !deleteMode; // Alternar el modo de eliminación
     if (deleteMode) {
-        alert('Modo de eliminación activado. Haz clic en una parcela para eliminarla.');
+        mostrarToast('Modo de eliminación activado. Haz clic en una parcela para eliminarla.', 'primary');
     } else {
-        alert('Modo de eliminación desactivado.');
+        mostrarToast('Modo de eliminación desactivado.', 'primary');
     }
 });
 
@@ -70,6 +70,30 @@ function toggleMenu() {
     const main = document.getElementById("main-container");
 
     sidebar.classList.toggle("active");
+}
+
+// Función para mostrar un toast
+function mostrarToast(mensaje, tipo = 'primary') {
+    const toastContainer = document.getElementById('toastContainer');
+    const toastTemplate = document.getElementById('toastMessage');
+
+    // Clonar el template del toast
+    const toast = toastTemplate.cloneNode(true);
+    toast.classList.remove('text-bg-primary', 'text-bg-success', 'text-bg-danger');
+    toast.classList.add(`text-bg-${tipo}`); // Cambiar el color según el tipo
+    toast.querySelector('.toast-body').textContent = mensaje;
+
+    // Agregar el toast al contenedor
+    toastContainer.appendChild(toast);
+
+    // Inicializar el toast con Bootstrap
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+
+    // Eliminar el toast del DOM después de que desaparezca
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
 }
 
 // Guardar parcela
@@ -94,13 +118,13 @@ document.getElementById('parcelaForm').addEventListener('submit', function (e) {
     })
     .then(resp => resp.json())
     .then(json => {
-        alert(json.message || 'Parcela guardada correctamente');
+        mostrarToast(json.message || 'Parcela guardada correctamente', 'success');
         bootstrap.Modal.getInstance(document.getElementById('parcelaModal')).hide();
         document.getElementById('parcelaForm').reset();
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al guardar la parcela');
+        mostrarToast('Error al guardar la parcela', 'danger');
     });
 });
 
@@ -122,16 +146,16 @@ document.getElementById('tecnicoForm').addEventListener('submit', function (e) {
     .then(response => response.json())
     .then(data => {
         if (data.message) {
-            alert(data.message); // Mostrar mensaje de éxito
+            mostrarToast(data.message, 'success'); // Mostrar mensaje de éxito
             this.reset(); // Limpiar el formulario
             bootstrap.Modal.getInstance(document.getElementById('tecnicoModal')).hide(); // Cerrar el modal
         } else if (data.error) {
-            alert(data.error); // Mostrar mensaje de error
+            mostrarToast(data.error, 'danger'); // Mostrar mensaje de error
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Ocurrió un error al guardar el técnico.');
+        mostrarToast('Ocurrió un error al guardar el técnico.', 'danger');
     });
 });
 
@@ -139,3 +163,47 @@ function abrirModalTecnico() {
     const modal = new bootstrap.Modal(document.getElementById('tecnicoModal'));
     modal.show();
 }
+
+// Función para abrir el modal de inicio de sesión
+function abrirModalLogin() {
+    const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+    modal.show();
+}
+
+// Manejar el inicio de sesión
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const data = {
+        usuario: document.getElementById('usuario').value,
+        contraseña: document.getElementById('contraseña').value
+    };
+
+    fetch('/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const loginError = document.getElementById('loginError');
+
+        if (data.success) {
+            window.location.href = '/administrador'; // Redirigir a la vista de administrador
+        } else {
+            // Mostrar el mensaje de error
+            loginError.style.display = 'block';
+            loginError.textContent = data.message || 'Nombre de usuario o contraseña incorrectos.';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const loginError = document.getElementById('loginError');
+        loginError.style.display = 'block';
+        loginError.textContent = 'Ocurrió un error al iniciar sesión.';
+    });
+});

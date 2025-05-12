@@ -89,6 +89,16 @@ body {
     font-size: 16px;
 }
 
+.list-group-item-action {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item-action:hover {
+    background-color: #198754;
+    color: white;
+}
+
 #polygon-color {
     margin-bottom: 10px;
     width: 50%;
@@ -108,4 +118,10 @@ body {
     box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
     z-index: 1000;
     font-size: 14px;
+}
+
+#loginError {
+    font-size: 14px;
+    font-weight: bold;
+    color: #dc3545; /* Rojo Bootstrap */
 }
