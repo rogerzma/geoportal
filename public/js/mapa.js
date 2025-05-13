@@ -15,6 +15,49 @@ map.on('mousemove', function (e) {
     document.getElementById('lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
 });
 
+// Funcion para el color
+
+function generarColorAleatorio() {
+    const letras = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letras[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+//Funcion de carga de parcelas
+function cargarParcelas() {
+    fetch('/api/parcelas')
+        .then(response => response.json())
+        .then(parcelas => {
+            parcelas.forEach(parcela => {
+                // Convertir las coordenadas de la parcela en un polígono
+                const coords = JSON.parse(parcela.coordenadas).map(coord => [coord.lat, coord.lng]);
+                // Generar un color aleatorio para la parcela
+                const color = generarColorAleatorio();
+                // Crear un polígono con las coordenadas 
+                const polygon = L.polygon(coords, { 
+                    color: color,
+                    fillOpacity: 0.9
+                }).addTo(map);
+                
+                // Agregar un popup con información de la parcela
+                polygon.bindPopup(`
+                    <strong>Cultivo:</strong> ${parcela.cultivo}<br>
+                    <strong>Productor:</strong> ${parcela.nombre_productor}<br>
+                    <strong>Técnico:</strong> ${parcela.tecnico ? parcela.tecnico.nombre : 'N/A'}
+                `);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar las parcelas:', error);
+        });
+}
+
+// Llamar a la función para cargar las parcelas al cargar el mapa
+cargarParcelas();
+
 // Control de dibujo
 let drawnLayer = null;
 

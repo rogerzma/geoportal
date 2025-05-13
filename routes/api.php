@@ -22,6 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
-
+Route::get('/parcelas', [ParcelaController::class, 'index'])->name('parcelas.index');
 Route::post('/parcelas', [ParcelaController::class, 'store']);
 Route::post('/crear-tecnicos', [TecnicoController::class, 'store'])->name('tecnicos.store');
