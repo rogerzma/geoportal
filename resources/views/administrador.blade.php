@@ -142,6 +142,8 @@
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
     <script src="{{ asset('js/mapa.js') }}"></script>
+    <script src="{{ asset('js/mapa_tecnico.js') }}"></script>
+
 </body>
 
 </html>
