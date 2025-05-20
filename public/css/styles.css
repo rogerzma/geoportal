@@ -38,9 +38,20 @@ body {
     left: 0;
 }
 
-/* Botón hamburguesa */
+/* Contenedor principal que se desplaza con el menú */
+#main-container {
+    transition: margin-left 0.4s ease-in-out;
+}
+
+/* Desplazar cuando sidebar está activo */
+.sidebar.active + #main-container,
+.sidebar.active ~ #main-container {
+    margin-left: 250px;
+}
+
+/* Botón hamburguesa dentro del contenedor, ahora se moverá con el encabezado */
 .menu-btn {
-    position: fixed;
+    position: absolute; /* Cambiado de fixed a absolute */
     top: 10px;
     left: 15px;
     background-color: #198754;
@@ -48,7 +59,7 @@ body {
     border: none;
     cursor: pointer;
     font-size: 24px;
-    z-index: 1000;
+    z-index: 1001; /* Suficiente para estar encima del navbar */
 }
 
 /* Contenedor de botones flotantes dentro del mapa */
@@ -78,6 +89,16 @@ body {
     font-size: 16px;
 }
 
+.list-group-item-action {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item-action:hover {
+    background-color: #198754;
+    color: white;
+}
+
 #polygon-color {
     margin-bottom: 10px;
     width: 50%;
@@ -97,4 +118,10 @@ body {
     box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
     z-index: 1000;
     font-size: 14px;
+}
+
+#loginError {
+    font-size: 14px;
+    font-weight: bold;
+    color: #dc3545; /* Rojo Bootstrap */
 }

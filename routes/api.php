@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ParcelaController;
+use App\Http\Controllers\TecnicoController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+Route::get('/parcelas', [ParcelaController::class, 'index'])->name('parcelas.index');
+Route::post('/parcelas', [ParcelaController::class, 'store']);
+Route::post('/crear-tecnicos', [TecnicoController::class, 'store'])->name('tecnicos.store');
