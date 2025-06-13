@@ -20,3 +20,11 @@ Route::get('/', function () {
 Route::get('/administrador', function () {
     return view('administrador');
 });
+
+Route::get('/inicio-gob', function () {
+    return view('InicioGob');
+});
+
+Route::get('/admin-gob', function () {
+    return view('AdminGob');
+});
