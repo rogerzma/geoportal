@@ -20,7 +20,7 @@
         <div class="col-md-9">
             <h2>Menu Administrador</h2>
             <hr class="red">
-            <h4><p>Bienvenido al portal de geoportal INIFAP, seleccione las opciones que desee realizar:</p></h4>
+            <h4><p>Bienvenido al menú administrador de geoportal INIFAP, seleccione las opciones que desee realizar:</p></h4>
         </div>
         <div class="col-md-3">
             <div class="list-group">
