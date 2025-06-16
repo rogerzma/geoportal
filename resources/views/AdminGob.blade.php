@@ -42,19 +42,10 @@
     </nav>
     
 </head>
-<!-- Contenedor de Toasts -->
-<div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055"></div>
 
-<!-- Template del Toast -->
-<div id="toastMessage" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-        <div class="toast-body">
-            Parcela guardada correctamente.
-        </div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
-    </div>
-</div>
 <body>
+
+    <!-- Contenedor de la barra de navegación -->
     <div class="container">
         <ol class="breadcrumb top-buffer">
             <li><a href="http://www.gob.mx"><i class="icon icon-home"></i></a></li>
@@ -79,28 +70,27 @@
                     </div>
                 </div>
             </div>
-        <div class="row justify-content-end">
-            <div class="col-md-11 card-map-container">
-                <div class="map-wrapper">
-                    <!-- Mapa -->
-                    <div class="flex-grow-1 p-3">
-                        <div id="map">
-                            <div class="icon-container">
-                                <div class="icon-button" id="draw-parcela" title="Dibujar parcela">🖊️</div>
-                                <div class="icon-button" id="delete-parcela" title="Eliminar parcela">🗑️</div>
+            <!-- Contenedor de alertas -->
+            <div id="alertContainer" class="alert-position container mt-3"></div>
+                <div class="row justify-content-end">
+                    <div class="col-md-11 card-map-container">
+                        <div class="map-wrapper">
+                            <!-- Mapa -->
+                            <div class="flex-grow-1 p-3">
+                                <div id="map">
+                                    <div class="icon-container">
+                                        <div class="icon-button" id="draw-parcela" title="Dibujar parcela">🖊️</div>
+                                        <div class="icon-button" id="delete-parcela" title="Eliminar parcela">🗑️</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="coordinates">
+                                <strong>Coordenadas:</strong>
+                                <div id="lat-lng">Lat: --, Lng: --</div>
                             </div>
                         </div>
                     </div>
-                    <div id="coordinates">
-                        <strong>Coordenadas:</strong>
-                        <div id="lat-lng">Lat: --, Lng: --</div>
-                    </div>
                 </div>
-                <div class="col-md-4">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#parcelaModal">Descargar reporte</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Modal para guardar datos de la parcela -->
@@ -148,6 +138,6 @@
     </script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <script src="{{ asset('js/mapaGob.js') }}"></script>
+    <script src="{{ asset('js/mapaAdmin.js') }}"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@
     <link href="https://framework-gb.cdn.gob.mx/assets/styles/main.css" rel="stylesheet">
     <link rel="stylesheet" href="C://xampp//htdocs//geoportal//public//css//styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <style>
 
         .navbar-brand {
@@ -95,6 +95,10 @@
                     <!-- Mapa -->
                     <div class="flex-grow-1 p-3">
                         <div id="map"></div>
+                    </div>
+                    <div id="coordinates">
+                        <strong>Coordenadas:</strong>
+                        <div id="lat-lng">Lat: --, Lng: --</div>
                     </div>
                 </div>
             </div>
