@@ -30,7 +30,7 @@ Route::view('/inicio-gob', 'InicioGob')->name('inicio');
 
 Route::get('/admin-gob', function () {
     return view('AdminGob');
-});
+})->name('admin-gob');
 
 Route::get('/admin', function(){
     return view('InicioAdmin');
@@ -38,12 +38,12 @@ Route::get('/admin', function(){
 
 Route::get('/admin/registro-usuarios', function(){
     return view('RegistrarUsuario');
-});
+})->name('registrar-usuarios');
 
-Route::get('/admin/ranchos', function(){
-    return view('Ranchos');
-})->name('ranchos');
+Route::get('/admin/up', function(){
+    return view('UnidadesProduccion');
+})->name('unidades-produccion');
 
-Route::get('/admin/crear-rancho', function(){
-    return view('CrearRancho');
-})->name('crear-rancho');
+Route::get('/admin/crear-up', function(){
+    return view('CrearUP');
+})->name('crear-up');

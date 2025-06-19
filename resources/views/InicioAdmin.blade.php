@@ -30,7 +30,8 @@
 
         <div class="col-md-9">
             <div class="row">
-                <h4><a href="{{ route('ranchos') }}">Administrar ranchos</a><br></h4>
+                <h4><a href="{{ route('admin-gob') }}">Vista general del geoportal</a><br></h4>
+                <h4><a href="{{ route('unidades-produccion') }}">Unidades de producción</a><br></h4>
                 <h4><a href="#">Administrar usuarios</a><br></h4>
                 <h4><a href="#">Dar de alta a usuarios</a><br><br></h4>
         </div>

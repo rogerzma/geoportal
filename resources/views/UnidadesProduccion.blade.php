@@ -1,6 +1,6 @@
 @extends('layouts.appGOB')
 
-@section("title", "Ranchos")
+@section("title", "UnidadesProduccion")
 
 @section('content')
 
@@ -10,14 +10,14 @@
         <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
         <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
         <li><a href="{{ route('inicio') }}">Geoportal</a></li>
-        <li class="active">Administrar ranchos</li>
+        <li class="active">Administrar unidades de producción</li>
     </ol>
 </div>
 
 <div class="container">
     <div class="row">
         <div class="col-md-9">
-            <h2>Lista de ranchos</h2>
+            <h2>Lista de unidades de producción (UP)</h2>
             <hr class="red">
             <p>Aquí se muestran los cultivos registrados para las diferentes operaciones del sistema.</p>
         </div>

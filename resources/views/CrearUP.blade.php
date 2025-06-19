@@ -1,8 +1,8 @@
 @extends("layouts.appGOB")
 
-@section("title", "CrearRancho")
+@section("title", "CrearUP")
 
-@section("view-name", "CrearRancho")
+@section("view-name", "CrearUP")
 
 @section("content")
 
