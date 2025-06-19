@@ -1,11 +1,22 @@
-@extends('layouts.app')
+@extends('layouts.appGOB')
 
 @section('content')
+
+<div class="container">
+    <ol class="breadcrumb top-buffer">
+        <li><a href="http://www.gob.mx"><i class="icon icon-home"></i></a></li>
+        <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
+        <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
+        <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+        <li class="active">Iniciar sesión</li>
+    </ol>
+</div>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Iniciar sesión') }}</div>
+                <div class="card-header"><h2>{{ __('Iniciar sesión') }}</h2></div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
@@ -50,6 +61,7 @@
                                 </div>
                             </div>
                         </div>
+                        
 
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
@@ -59,11 +71,11 @@
 
                                 @if (Route::has('password.request'))
                                     <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Olvidaste tu contraseña?') }}
+                                        {{ __('¿Olvidaste tu contraseña?') }}
                                     </a>
                                 @endif
                             </div>
-                        </div>
+                        </div><br>
                     </form>
                 </div>
             </div>
