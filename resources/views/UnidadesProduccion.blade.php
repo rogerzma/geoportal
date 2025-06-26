@@ -44,16 +44,8 @@
                         <th colspan="1" style="background:#009933; color:#FFF;">Opciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Rancho Ejemplo 1</td>
-                        <td>Juan Pérez</td>
-                        <td>Localidad A</td>
-                        <td>1234567890</td>
-                        <td>
-                            <a href="#" span class="glyphicon glyphicon-pencil"></a>
-                            <a href="#" span class="glyphicon glyphicon-trash" style="color: #ff0000;"></a>
-                        </td>
+                <tbody id="tbody-up">
+                    <!-- Aquí se llenarán las filas dinámicamente -->
                 </tbody>
             </table>
         </div>
@@ -66,5 +58,8 @@
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/up.js') }}"></script>
 
 @endsection

@@ -101,6 +101,9 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const urlUnidadesProduccion = "{{ route('unidades-produccion') }}";
+</script>
 <script src="{{ asset('js/up.js') }}"></script>
 
 

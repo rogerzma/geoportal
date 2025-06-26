@@ -36,12 +36,7 @@ $(document).ready(function() {
                 responsable_tecnico: responsable_tecnico
             },
             success: function(response) {
-                alert(response.message || 'Unidad de producción registrada correctamente.');
-                // Limpia los campos
-                $('#nombre_up').val('');
-                $('#propietario').val('');
-                $('#localidad').val('');
-                $('#telefono').val('');
+                window.location.href = urlUnidadesProduccion;
             },
             error: function(xhr) {
                 console.error(xhr.responseText); // Aquí verás el error detallado en la consola del navegador
@@ -49,4 +44,38 @@ $(document).ready(function() {
             }
         });
     });
+});
+
+$(document).ready(function() {
+    // Cargar unidades de producción al cargar la página
+    cargarUnidadesProduccion();
+
+    function cargarUnidadesProduccion() {
+        $.ajax({
+            url: '/api/unidades-produccion',
+            method: 'GET',
+            success: function(response) {
+                let filas = '';
+                response.forEach(function(up) {
+                    filas += `
+                        <tr>
+                            <td>${up.nombre_up}</td>
+                            <td>${up.propietario}</td>
+                            <td>${up.localidad}</td>
+                            <td>${up.telefono}</td>
+                            <td>
+                                <a href="#" class="glyphicon glyphicon-pencil"></a>
+                                <a href="#" class="glyphicon glyphicon-trash" style="color: #ff0000;"></a>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#tbody-up').html(filas);
+            },
+            error: function(xhr) {
+                console.error('Error al cargar las unidades de producción:', xhr.responseText);
+                $('#tbody-up').html('<tr><td colspan="5">No se pudieron cargar los datos.</td></tr>');
+            }
+        });
+    }
 });
