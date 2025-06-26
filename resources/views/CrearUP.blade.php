@@ -28,8 +28,11 @@
         <div class="list-group">
           <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
           <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
           <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+          <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
+          </form>
         </div>
     </div>
     </div>
@@ -42,17 +45,17 @@
           <div class="col-md-4">
             <p>
               <p><h4>Nombre de la UP</h4></p>
-              <input class="form-control" placeholder="Ingrese el nombre de la UP" type="text" name="nombre">
+              <input class="form-control" placeholder="Ingrese el nombre de la UP" type="text" name="nombre" id="nombre_up">
             </p></div>
             <div class="col-md-4">
               <p>
                 <p><h4>Nombre del propietario</h4></p>
-                <input class="form-control" placeholder="Ingrese el nombre del propietario" type="text" name="propietario">
+                <input class="form-control" placeholder="Ingrese el nombre del propietario" type="text" name="propietario" id="propietario">
               </p></div>
               <div class="col-md-4">
                 <p>
                     <p><h4>Localidad</h4></p>
-                    <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="localidad">
+                    <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="localidad" id="localidad">
                 </p></div>
        </div>
 
@@ -60,7 +63,7 @@
             <div class="col-md-4">
                 <p>
                     <p><h4>Telefono</h4></p>
-                    <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="telefono">
+                    <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="telefono" id="telefono">
                 </p></div>
             <div class="col-md-4">
             <p>
@@ -68,6 +71,8 @@
                 <button type="button" class="btn btn-primary" id="validateReportButton">Registrar UP</button>
               </p>
             </p></div>
+            <input type="hidden" id="user_id" value="{{ Auth::id() }}">
+            <input type="hidden" id="responsable_tecnico" value="{{ Auth::user()->name }}">
 
      </div><br>
 
@@ -96,6 +101,8 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/up.js') }}"></script>
+
 
 
 

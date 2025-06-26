@@ -61,7 +61,7 @@
     <div class="row">
         <div class="col-md-4">
                 <p>
-                <a href="#" button class="btn btn-primary" type="button">Crear rancho</a>
+                <a href="{{'crear-up'}}" button class="btn btn-primary" type="button">Registrar Unidad de Producción</a>
                 </p>
         </div>
     </div>

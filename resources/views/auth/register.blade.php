@@ -50,6 +50,36 @@
                             </div>
                         </div>
 
+                        
+                        <div class="row mb-3">
+                            <label for="telefono" class="col-md-4 col-form-label text-md-end">{{ __('Teléfono') }}</label>
+                            <div class="col-md-6">
+                                <input id="telefono" type="text" class="form-control @error('telefono') is-invalid @enderror" name="telefono" value="{{ old('telefono') }}" required>
+                                @error('telefono')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Campo Tipo de Usuario -->
+                        <div class="row mb-3">
+                            <label for="tipo_usuario" class="col-md-4 col-form-label text-md-end">{{ __('Tipo de usuario') }}</label>
+                            <div class="col-md-6">
+                                <select id="tipo_usuario" class="form-control @error('tipo_usuario') is-invalid @enderror" name="tipo_usuario" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="administrador" {{ old('tipo_usuario') == 'administrador' ? 'selected' : '' }}>Administrador</option>
+                                    <option value="tecnico" {{ old('tipo_usuario') == 'tecnico' ? 'selected' : '' }}>Técnico</option>
+                                </select>
+                                @error('tipo_usuario')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="row mb-3">
                             <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Contraseña') }}</label>
 

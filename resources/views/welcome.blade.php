@@ -86,12 +86,17 @@
                     <!--SECCIÓN MODIFICABLE | MENU CONTEXTUAL -->
                     <div class="list-group">
                         <a class="list-group-item" style="text-decoration: none;" href="http://zacatecas.inifap.gob.mx/"><img src="images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-                        <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="images/templatemo_list.png" style="margin-right:10px;">Modo administrador</a>
+                        <a class="list-group-item" style="text-decoration: none;" href="{{ route('login') }}"><img src="images/templatemo_list.png" style="margin-right:10px;">Modo administrador</a>
                     </div>
                 </div>
             </div>
         <div class="row justify-content-end">
             <div class="col-md-11 card-map-container">
+                <p>El siguiente mapa muestra los diferentes poligonos utilizados por los
+                    agricultores de la región, así como los puntos de monitoreo
+                    de cultivos y las estaciones meteorológicas que se encuentran
+                    en el estado de Zacatecas.
+                </p>
                 <div class="map-wrapper">
                     <!-- Mapa -->
                     <div class="flex-grow-1 p-3">

@@ -61,6 +61,7 @@
                 <div class="col-md-9">
                     <h2>Geoportal</h2>
                     <hr class="red">
+                   <p>A continuación, seleccione un polígono para ver su información</p>
                 </div>
                 <div class="col-md-3">
                     <div class="list-group">
@@ -74,6 +75,9 @@
             <!-- Contenedor de alertas -->
             <div id="alertContainer" class="alert-position container mt-3"></div>
                 <div class="row justify-content-end">
+                    <div class="col-md-9">
+                        <p>Seleccione una parcela para ver sus datos o dibuje una nueva.</p>
+                    </div>
                     <div class="col-md-11 card-map-container">
                         <div class="map-wrapper">
                             <!-- Mapa -->
@@ -139,6 +143,6 @@
     </script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <script src="{{ asset('js/mapaAdmin.js') }}"></script>
+    <script src="{{ asset('js/poligono.js') }}"></script>
 </body>
 </html>
