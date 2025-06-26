@@ -44,12 +44,7 @@ $(document).ready(function() {
                 $('#telefono').val('');
             },
             error: function(xhr) {
-                console.error(xhr.responseText);
-                let mensaje = "Ocurrió un error inesperado.";
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    mensaje = xhr.responseJSON.message;
-                }
-                $('#errorModal .modal-body').text(mensaje);
+                console.error(xhr.responseText); // Aquí verás el error detallado en la consola del navegador
                 $('#errorModal').modal('show');
             }
         });

@@ -31,9 +31,6 @@ class UPController extends Controller
                 'user_id' => 'required|integer',
             ]);
 
-            // Para depuración: ver qué datos llegan
-            \Log::info('Datos recibidos:', $request->all());
-
             $unidad = UnidadProduccion::create([
                 'propietario' => $request->propietario,
                 'nombre_up' => $request->nombre_up,
