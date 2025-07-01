@@ -41,6 +41,7 @@
                         <th colspan="1" style="background:#009933; color:#FFF;">Propietario</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Localidad</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Telefono</th>
+                        <th colspan="1" style="background:#009933; color:#FFF;">Poligonos</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Opciones</th>
                     </tr>
                 </thead>

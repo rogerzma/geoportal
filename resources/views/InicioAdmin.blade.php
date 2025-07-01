@@ -25,7 +25,10 @@
             <div class="col-md-3">
                 <div class="list-group">
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('inicio') }}"><img src="images/templatemo_list.png" style="margin-right:10px;">Inicio</a>          
-                    <a class="list-group-item" style="text-decoration: none;" href="#"><img src="images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</a>     
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
+                    </form>     
                 </div>
             </div>
         </div>
@@ -34,7 +37,7 @@
             <div class="row">
                 <h4><a href="{{ route('mapa-gob') }}">Vista general del geoportal</a><br></h4>
                 <h4><a href="{{ route('unidades-produccion') }}">Unidades de producción</a><br></h4>
-                <h4><a href="#">Administrar usuarios</a><br></h4>
+                <h4><a href="{{ route('administrar-usuarios') }}">Administrar usuarios</a><br></h4>
                 <h4><a href="#">Dar de alta a usuarios</a><br><br></h4>
         </div>
         </div>

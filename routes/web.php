@@ -40,6 +40,10 @@ Route::middleware(['auth'])->group(function(){
         return view('RegistrarUsuario');
     })->name('registrar-usuarios');
 
+    Route::get('/admin/usuarios', function(){
+        return view('AdministrarUsuarios');
+    })->name('administrar-usuarios');
+
     Route::get('/admin/up', function(){
         return view('UnidadesProduccion');
     })->name('unidades-produccion');
