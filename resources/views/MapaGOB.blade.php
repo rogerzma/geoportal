@@ -68,7 +68,7 @@
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('admministrar-usuarios') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
                     </div>
                 </div>
             </div>
