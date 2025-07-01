@@ -61,5 +61,61 @@ $(document).ready(function () {
         });
     });
 
+    // Registrar usuario nuevo
+    $('#registrarUsuarioBtn').on('click', function () {
+        // Obtener valores
+        const name = $('#name').val();
+        const telefono = $('#telefono').val();
+        const email = $('#email').val();
+        const tipo_usuario = $('#tipo_usuario').val();
+        const password = $('#password').val();
+        const password_confirmation = $('#password_confirmation').val();
+
+        // Validar campos vacíos
+        if (!name || !telefono || !email || !tipo_usuario || !password || !password_confirmation) {
+            $('#emptyFieldsAlert').show();
+            return;
+        } else {
+            $('#emptyFieldsAlert').hide();
+        }
+
+        // Validar que las contraseñas coincidan
+        if (password !== password_confirmation) {
+            $('#errorMensaje').text('Las contraseñas no coinciden.');
+            $('#errorModal').modal('show');
+            return;
+        }
+
+        // Enviar petición AJAX para crear usuario
+        $.ajax({
+            url: '/api/usuarios',
+            method: 'POST',
+            data: {
+                name: name,
+                telefono: telefono,
+                email: email,
+                tipo_usuario: tipo_usuario,
+                password: password,
+                password_confirmation: password_confirmation
+            },
+            success: function (response) {
+                // Redirigir a la vista de administración de usuarios
+                window.location.href = '/admin/usuarios';
+            },
+            error: function (xhr) {
+                let mensaje = 'Ocurrió un error inesperado.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    mensaje = xhr.responseJSON.message;
+                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    // Mostrar el primer error de validación
+                    const errores = xhr.responseJSON.errors;
+                    mensaje = Object.values(errores).flat()[0];
+                }
+                $('#errorMensaje').text(mensaje);
+                $('#errorModal').modal('show');
+            }
+        });
+    });
+
     // Aquí podrías agregar funciones futuras (crear usuarios, edición, filtros, etc.)
 });

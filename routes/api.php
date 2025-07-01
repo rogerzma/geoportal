@@ -34,4 +34,5 @@ Route::post('/poligonos', [ParcelaController::class, 'store']);
     Route::delete('/unidades-produccion/{id}', [UPController::class, 'destroy']);
 // Rutas para usuarios
     Route::get('/usuarios', [UserController::class, 'index']);
+    Route::post('/usuarios', [UserController::class, 'store']);
     Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
