@@ -38,7 +38,7 @@
                 <h4><a href="{{ route('mapa-gob') }}">Vista general del geoportal</a><br></h4>
                 <h4><a href="{{ route('unidades-produccion') }}">Unidades de producción</a><br></h4>
                 <h4><a href="{{ route('administrar-usuarios') }}">Administrar usuarios</a><br></h4>
-                <h4><a href="{{ route('registro-usuarios') }}">Dar de alta a usuarios</a><br><br></h4>
+                <h4><a href="{{ route('registrar-usuarios') }}">Dar de alta a usuarios</a><br><br></h4>
         </div>
         </div>
     </div>
