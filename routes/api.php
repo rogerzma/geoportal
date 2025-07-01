@@ -26,11 +26,12 @@ Route::get('/parcelas', [ParcelaController::class, 'index'])->name('parcelas.ind
 Route::post('/parcelas', [ParcelaController::class, 'store']);
 Route::get('/poligonos', [ParcelaController::class, 'index'])->name('parcelas.index');
 Route::post('/poligonos', [ParcelaController::class, 'store']);
-
-
+// Rutas para unidades de producción
     Route::post('/unidades-produccion', [UPController::class, 'store']);
     Route::get('/unidades-produccion', [UPController::class, 'index']);
     Route::get('/unidades-produccion/{id}', [UPController::class, 'show']);
     Route::put('/unidades-produccion/{id}', [UPController::class, 'update']);
     Route::delete('/unidades-produccion/{id}', [UPController::class, 'destroy']);
+// Rutas para usuarios
     Route::get('/usuarios', [UserController::class, 'index']);
+    Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
