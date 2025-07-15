@@ -61,6 +61,22 @@
                 </p>
         </div>
     </div>
+    <div class="modal fade" id="modalEliminarUP" tabindex="-1" role="dialog" aria-labelledby="modalEliminarLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header" style="background:#990000; color:white;">
+                <h4 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h4>
+            </div>
+            <div class="modal-body">
+                La unidad de producción se eliminará definitivamente. ¿Desea continuar?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarEliminar" class="btn btn-danger">Eliminar</button>
+            </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

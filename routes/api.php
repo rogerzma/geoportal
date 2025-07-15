@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ParcelaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PoligonoController;
 use App\Http\Controllers\UPController;
 use App\Models\User;
 
@@ -22,10 +23,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/parcelas', [ParcelaController::class, 'index'])->name('parcelas.index');
-Route::post('/parcelas', [ParcelaController::class, 'store']);
-Route::get('/poligonos', [ParcelaController::class, 'index'])->name('parcelas.index');
-Route::post('/poligonos', [ParcelaController::class, 'store']);
+Route::get('/poligonos', [PoligonoController::class, 'index'])->name('poligonos.index');
+Route::post('/poligonos', [PoligonoController::class, 'store']);
 // Rutas para unidades de producción
     Route::post('/unidades-produccion', [UPController::class, 'store']);
     Route::get('/unidades-produccion', [UPController::class, 'index']);

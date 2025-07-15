@@ -7,6 +7,7 @@ use App\Models\Poligono;
 use App\Models\UnidadProduccion;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PoligonoController extends Controller
 {
@@ -24,27 +25,39 @@ class PoligonoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre'         => 'required|string|max:255',
-            'coordenadas'    => 'required|string',
-            'cultivo'        => 'required|string|max:255',
-            'geom'           => 'required|string',
-            'fecha_creacion' => 'required|date',
-            'up_id'          => 'required|exists:unidad_produccions,id',
-            'user_id'        => 'required|exists:users,id'
-        ]);
+        try {
+            $request->validate([
+                'nombre'         => 'required|string|max:255',
+                'coordenadas'    => 'required|json',
+                'cultivo'        => 'required|string|max:255',
+                'geom'           => 'required|string',
+                'fecha_creacion' => 'required|date',
+                'up_id'          => 'required|exists:unidad_produccion,id',
+                'user_id'        => 'required|exists:users,id'
+            ]);
 
-        $poligono = Poligono::create([
-            'nombre'         => $request->nombre,
-            'coordenadas'    => $request->coordenadas,
-            'cultivo'        => $request->cultivo,
-            'geom'           => DB::raw("ST_GeomFromText('{$request->geom}', 4326)"),
-            'fecha_creacion' => $request->fecha_creacion,
-            'up_id'          => $request->up_id,
-            'user_id'        => $request->user_id
-        ]);
+            $poligono = Poligono::create([
+                'nombre'         => $request->nombre,
+                'coordenadas'    => $request->coordenadas,
+                'cultivo'        => $request->cultivo,
+                'geom'           => DB::raw("ST_GeomFromText('{$request->geom}', 4326)"),
+                'fecha_creacion' => $request->fecha_creacion,
+                'up_id'          => $request->up_id,
+                'user_id'        => $request->user_id
+            ]);
 
-        return response()->json(['message' => 'Polígono guardado correctamente.', 'poligono' => $poligono], 201);
+            return response()->json([
+                'message' => 'Polígono guardado correctamente.',
+                'refresh' => true
+            ], 201);
+
+        } catch (\Exception $e) {
+            Log::error('Error al guardar polígono: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error interno del servidor.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -68,11 +81,11 @@ class PoligonoController extends Controller
     {
         $request->validate([
             'nombre'         => 'string|max:255',
-            'coordenadas'    => 'string',
+            'coordenadas'    => 'json',
             'cultivo'        => 'string|max:255',
             'geom'           => 'string',
             'fecha_creacion' => 'date',
-            'up_id'          => 'exists:unidad_produccions,id',
+            'up_id'          => 'exists:unidad_produccion,id',
             'user_id'        => 'exists:users,id'
         ]);
 

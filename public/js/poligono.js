@@ -46,6 +46,8 @@ function cargarPoligonos() {
                     <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
                 `);
             });
+            //console.log('UP ID:', document.getElementById('up_id').value);
+            //console.log('USER ID:', document.getElementById('user_id').value);
         })
         .catch(error => {
             console.error('Error al cargar los poligonos:', error);
@@ -70,11 +72,16 @@ map.on(L.Draw.Event.CREATED, function (event) {
     const coords = latlngs.map(coord => `${coord.lng} ${coord.lat}`).join(', ');
     const wktPolygon = `POLYGON((${coords}, ${latlngs[0].lng} ${latlngs[0].lat}))`;
 
+    // Llenar campos ocultos
     document.getElementById('geom').value = wktPolygon;
     document.getElementById('coordenadas').value = JSON.stringify(latlngs);
 
-    $("#poligonoModal").modal("show");
+    // Fecha actual
+    document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 10);
+
+    $("#parcelaModal").modal("show");
 });
+
 
 // Activar dibujo
 document.getElementById("draw-poligono").addEventListener("click", function () {
@@ -119,33 +126,65 @@ function mostrarAlerta(mensaje, tipo = 'success') {
     }, 5000);
 }
 
-// Guardar polígono
 document.getElementById('poligonoForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const data = {
-        nombre: document.getElementById('nombre').value,
-        cultivo: document.getElementById('cultivo').value,
+        nombre: document.getElementById('nombre').value.trim(),
+        cultivo: document.getElementById('cultivo').value.trim(),
         coordenadas: document.getElementById('coordenadas').value,
-        geom: document.getElementById('geom').value,
-        fecha_creacion: document.getElementById('fecha_creacion').value,
+        geom: document.getElementById('geom').value.trim(),
+        fecha_creacion: document.getElementById('fecha_creacion').value.trim(),
         up_id: parseInt(document.getElementById('up_id').value),
         user_id: parseInt(document.getElementById('user_id').value)
     };
+
+    // Desactivar botón para prevenir doble clic
+    const submitBtn = document.querySelector('#poligonoForm button[type="submit"]');
+    submitBtn.disabled = true;
 
     fetch('/api/poligonos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(resp => resp.json())
-        .then(json => {
-            mostrarAlerta(json.message || 'Polígono guardado correctamente.', 'success');
-            $("#poligonoModal").modal("hide");
-            document.getElementById('poligonoForm').reset();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarAlerta('Error al guardar el polígono.', 'danger');
-        });
+    .then(resp => {
+        if (!resp.ok) {
+            return resp.json().then(errorJson => {
+                throw errorJson;
+            });
+        }
+        return resp.json();
+    })
+    .then(json => {
+        const modalElement = document.getElementById('parcelaModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+        mostrarAlerta('✅ ' + json.message, 'success');
+
+        // Limpiar formulario y capa dibujada
+        document.getElementById('poligonoForm').reset();
+        if (drawnLayer) {
+            drawnItems.removeLayer(drawnLayer);
+            drawnLayer = null;
+        }
+
+        // Opcional: espera un par de segundos para que el usuario vea la alerta
+        setTimeout(() => {
+            if (json.refresh) {
+                window.location.reload(); // simula F5
+            }
+        }, 2000);
+
+        // Rehabilitar botón
+        submitBtn.disabled = false;
+    })
+    .catch(error => {
+        console.log('Error del backend:', error);
+        mostrarAlerta('❌ ' + (error.error || 'Error al guardar el polígono.'), 'danger');
+        submitBtn.disabled = false;
+    });
 });

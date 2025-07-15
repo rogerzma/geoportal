@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UPController;
 
 
 /*
@@ -51,4 +52,11 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/admin/crear-up', function(){
         return view('CrearUP');
     })->name('crear-up');
+
+    Route::get('/admin/up/poligonos', function () {
+        return view('MapaUP');
+    })->name('mapa-poligonos');
+
+    Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
+    Route::put('/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar');
 });
