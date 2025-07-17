@@ -36,22 +36,30 @@
     
 
     <div class="row">
-        <div class="col-sm-10 table-responsive" style="margin-bottom:2em;">
+        <!-- Contenedor de tabla -->
+        <div class="col-sm-10 table-responsive" id="tabla-up-wrapper" style="margin-bottom:2em;">
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
                         <th colspan="1" style="background:#009933; color:#FFF;">Nombre</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Propietario</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Localidad</th>
-                        <th colspan="1" style="background:#009933; color:#FFF;">Telefono</th>
-                        <th colspan="1" style="background:#009933; color:#FFF;">Poligonos</th>
+                        <th colspan="1" style="background:#009933; color:#FFF;">Teléfono</th>
+                        <th colspan="1" style="background:#009933; color:#FFF;">Polígonos</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Opciones</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-up">
-                    <!-- Aquí se llenarán las filas dinámicamente -->
+                    <!-- Datos dinámicos -->
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mensaje si no hay UPs -->
+        <div class="col-sm-10" id="mensaje-vacio" style="display:none; margin-bottom:2em;">
+            <div class="alert alert-info">
+                No existen unidades de producción registradas.
+            </div>
         </div>
     </div>
     <div class="row">

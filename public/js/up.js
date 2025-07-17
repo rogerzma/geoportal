@@ -43,36 +43,45 @@ $(document).ready(function () {
     });
 
     // 📦 Cargar tabla de UP
-    function cargarUnidadesProduccion() {
+        function cargarUnidadesProduccion() {
         $.ajax({
             url: '/api/unidades-produccion',
             method: 'GET',
             success: function (response) {
-                let filas = '';
-                response.forEach(function (up) {
-                    filas += `
-                        <tr>
-                            <td>${up.nombre_up}</td>
-                            <td>${up.propietario}</td>
-                            <td>${up.localidad}</td>
-                            <td>${up.telefono}</td>
-                            <td>
-                                <a href="/admin/up/poligonos?up_id=${up.id}" title="Ver mapa">
-                                    <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
-                                </a>
-                            </td>
-                            <td>
-                                <a href="/admin/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
-                                <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
-                            </td>
-                        </tr>
-                    `;
-                });
-                $('#tbody-up').html(filas);
+                if (response.length === 0) {
+                    $('#tabla-up-wrapper').hide();
+                    $('#mensaje-vacio').show();
+                } else {
+                    $('#tabla-up-wrapper').show();
+                    $('#mensaje-vacio').hide();
+
+                    let filas = '';
+                    response.forEach(function (up) {
+                        filas += `
+                            <tr>
+                                <td>${up.nombre_up}</td>
+                                <td>${up.propietario}</td>
+                                <td>${up.localidad}</td>
+                                <td>${up.telefono}</td>
+                                <td>
+                                    <a href="/admin/up/poligonos?up_id=${up.id}" title="Ver mapa">
+                                        <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/admin/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
+                                    <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    $('#tbody-up').html(filas);
+                }
             },
             error: function (xhr) {
                 console.error('Error al cargar las unidades de producción:', xhr.responseText);
-                $('#tbody-up').html('<tr><td colspan="6">No se pudieron cargar los datos.</td></tr>');
+                $('#tabla-up-wrapper').hide();
+                $('#mensaje-vacio').show().html('<div class="alert alert-danger">No se pudieron cargar los datos.</div>');
             }
         });
     }
