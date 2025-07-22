@@ -31,6 +31,25 @@ function getUpIdFromUrl() {
     return params.get('up_id');
 }
 
+// Modo de eliminación
+let deleteMode = false;
+let poligonoIdAEliminar = null;
+let poligonoLayerAEliminar = null;
+
+// Activar modo eliminación
+document.getElementById("delete-poligono").addEventListener("click", function () {
+    deleteMode = !deleteMode;
+    if (deleteMode) {
+        map.getContainer().style.cursor = "crosshair";
+        mostrarAlerta('Haz clic en un polígono para eliminarlo.', 'warning');
+    } else {
+        map.getContainer().style.cursor = "";
+        poligonoIdAEliminar = null;
+        poligonoLayerAEliminar = null;
+        mostrarAlerta('Modo de eliminación desactivado.', 'info');
+    }
+});
+
 // Cargar poligonos de una unidad de producción específica
 function cargarPoligonosPorUP(upId) {
     drawnItems.clearLayers(); // Limpia los polígonos previos
@@ -55,6 +74,16 @@ function cargarPoligonosPorUP(upId) {
                     <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
                     <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
                 `);
+
+                // Evento para eliminar
+                polygon.on('click', function (e) {
+                    if (deleteMode) {
+                        poligonoIdAEliminar = poligono.id;
+                        poligonoLayerAEliminar = polygon;
+                        const modal = new bootstrap.Modal(document.getElementById('modalEliminarPoligono'));
+                        $("#modalEliminarPoligono").modal("show");
+                    }
+                });
             });
 
             if (allCoords.length > 0) {
@@ -92,6 +121,16 @@ function cargarPoligonos() {
                     <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
                     <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
                 `);
+
+                // Evento para eliminar
+                polygon.on('click', function (e) {
+                    if (deleteMode) {
+                        poligonoIdAEliminar = poligono.id;
+                        poligonoLayerAEliminar = polygon;
+                        const modal = new bootstrap.Modal(document.getElementById('modalEliminarPoligono'));
+                        modal.show();
+                    }
+                });
             });
 
             if (allCoords.length > 0) {
@@ -138,7 +177,6 @@ map.on(L.Draw.Event.CREATED, function (event) {
     $("#parcelaModal").modal("show");
 });
 
-
 // Activar dibujo
 document.getElementById("draw-poligono").addEventListener("click", function () {
     var polygonOptions = {
@@ -149,17 +187,6 @@ document.getElementById("draw-poligono").addEventListener("click", function () {
         }
     };
     new L.Draw.Polygon(map, polygonOptions).enable();
-});
-
-// Modo de eliminación
-let deleteMode = false;
-document.getElementById("delete-poligono").addEventListener("click", function () {
-    deleteMode = !deleteMode;
-    if (deleteMode) {
-        mostrarAlerta('Modo de eliminación activado. Haz clic en un polígono para eliminarlo.', 'warning');
-    } else {
-        mostrarAlerta('Modo de eliminación desactivado.', 'info');
-    }
 });
 
 // Mostrar alertas (reemplazo de toasts)
@@ -181,6 +208,38 @@ function mostrarAlerta(mensaje, tipo = 'success') {
         setTimeout(() => alert.remove(), 500);
     }, 5000);
 }
+
+// Confirmar eliminación
+document.getElementById('btnConfirmarEliminarPoligono').addEventListener('click', function () {
+    if (!poligonoIdAEliminar) return;
+    fetch(`/api/poligonos/${poligonoIdAEliminar}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(resp => resp.json())
+    .then(json => {
+        // Oculta el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarPoligono'));
+        if (modal) modal.hide();
+
+        mostrarAlerta('✅ ' + json.message, 'success');
+        // Elimina el polígono del mapa
+        if (poligonoLayerAEliminar) {
+            drawnItems.removeLayer(poligonoLayerAEliminar);
+        }
+        // Recarga la página después de 2 segundos
+        setTimeout(() => window.location.reload(), 2000);
+
+        // Limpia variables
+        poligonoIdAEliminar = null;
+        poligonoLayerAEliminar = null;
+        deleteMode = false;
+        map.getContainer().style.cursor = "";
+    })
+    .catch(error => {
+        mostrarAlerta('❌ Error al eliminar el polígono.', 'danger');
+    });
+});
 
 document.getElementById('poligonoForm').addEventListener('submit', function (e) {
     e.preventDefault();

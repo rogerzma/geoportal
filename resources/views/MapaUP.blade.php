@@ -162,6 +162,25 @@
         </div>
         </div>
 
+    <!-- Modal de confirmación de eliminación -->
+    <div class="modal fade" id="modalEliminarPoligono" tabindex="-1" aria-labelledby="modalEliminarPoligonoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalEliminarPoligonoLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Seguro que deseas eliminar este polígono? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminarPoligono">Eliminar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
