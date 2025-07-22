@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/poligonos', [PoligonoController::class, 'index'])->name('poligonos.index');
+Route::get('/poligonos/up/{up_id}', [PoligonoController::class, 'porUP']);
 Route::post('/poligonos', [PoligonoController::class, 'store']);
 // Rutas para unidades de producción
     Route::post('/unidades-produccion', [UPController::class, 'store']);

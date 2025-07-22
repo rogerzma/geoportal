@@ -53,10 +53,8 @@ Route::middleware(['auth'])->group(function(){
         return view('CrearUP');
     })->name('crear-up');
 
-    Route::get('/admin/up/poligonos', function () {
-        return view('MapaUP');
-    })->name('mapa-poligonos');
-
+    Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos');
+    
     Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
     Route::put('/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar');
 });

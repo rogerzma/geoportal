@@ -92,6 +92,22 @@ class UPController extends Controller
         return view('ModificarUP', compact('unidad'));
     }
 
+
+    /**
+     * Mostrar el mapa de unidades de producción.
+     */
+    public function mapaUP(Request $request)
+    {
+        $upId = $request->query('up_id');
+        $unidadProduccion = null;
+        if ($upId) {
+            $unidadProduccion = \App\Models\UnidadProduccion::find($upId);
+        }
+        // Depuración
+        // dd($upId, $unidadProduccion);
+        return view('MapaUP', compact('unidadProduccion'));
+    }
+
     /**
      * Eliminar una unidad de producción.
      */

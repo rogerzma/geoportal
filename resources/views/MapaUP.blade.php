@@ -63,6 +63,7 @@
                 <div class="col-md-9">
                     <h2>Registrar polígonos</h2>
                     <hr class="red">
+                    <h3>{{ $unidadProduccion->nombre_up ?? 'Selecciona una UP' }}</h3>
                    <p>A continuación, seleccione las herramientas de dibujo para agregar o eliminar polígonos.</p>
                 </div>
                 <div class="col-md-3">
@@ -81,6 +82,7 @@
             <div id="alertContainer" class="alert-position container mt-3"></div>
                 <div class="row justify-content-end">
                     <div class="col-md-9">
+                        
                         <p>Seleccione una parcela para ver sus datos o dibuje una nueva.</p>
                     </div>
                     <div class="col-md-11 card-map-container">

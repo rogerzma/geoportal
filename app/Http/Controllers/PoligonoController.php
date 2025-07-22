@@ -21,6 +21,15 @@ class PoligonoController extends Controller
     }
 
     /**
+     * Mostrar los polígonos de una unidad de producción específica.
+     */
+    public function porUP($up_id)
+    {
+        $poligonos = Poligono::with(['user'])->where('up_id', $up_id)->get();
+        return response()->json($poligonos);
+    }
+
+    /**
      * Guardar un nuevo polígono.
      */
     public function store(Request $request)

@@ -25,18 +25,28 @@ function generarColorAleatorio() {
     return color;
 }
 
-// Cargar poligonos
-function cargarPoligonos() {
-    fetch('/api/poligonos')
+// Obtener el parámetro up_id de la URL
+function getUpIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('up_id');
+}
+
+// Cargar poligonos de una unidad de producción específica
+function cargarPoligonosPorUP(upId) {
+    drawnItems.clearLayers(); // Limpia los polígonos previos
+    fetch(`/api/poligonos/up/${upId}`)
         .then(response => response.json())
         .then(poligonos => {
+            let allCoords = [];
             poligonos.forEach(poligono => {
                 const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+                allCoords = allCoords.concat(coords);
+
                 const color = generarColorAleatorio();
                 const polygon = L.polygon(coords, {
                     color: color,
                     fillOpacity: 0.9
-                }).addTo(map);
+                }).addTo(drawnItems);
 
                 polygon.bindPopup(`
                     <strong>Nombre:</strong> ${poligono.nombre}<br>
@@ -46,8 +56,11 @@ function cargarPoligonos() {
                     <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
                 `);
             });
-            //console.log('UP ID:', document.getElementById('up_id').value);
-            //console.log('USER ID:', document.getElementById('user_id').value);
+
+            if (allCoords.length > 0) {
+                const bounds = L.latLngBounds(allCoords);
+                map.fitBounds(bounds);
+            }
         })
         .catch(error => {
             console.error('Error al cargar los poligonos:', error);
@@ -55,7 +68,50 @@ function cargarPoligonos() {
         });
 }
 
-cargarPoligonos();
+// Cargar todos los poligonos
+function cargarPoligonos() {
+    drawnItems.clearLayers(); // Limpia los polígonos previos
+    fetch('/api/poligonos')
+        .then(response => response.json())
+        .then(poligonos => {
+            let allCoords = [];
+            poligonos.forEach(poligono => {
+                const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+                allCoords = allCoords.concat(coords);
+
+                const color = generarColorAleatorio();
+                const polygon = L.polygon(coords, {
+                    color: color,
+                    fillOpacity: 0.9
+                }).addTo(drawnItems);
+
+                polygon.bindPopup(`
+                    <strong>Nombre:</strong> ${poligono.nombre}<br>
+                    <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                    <strong>Unidad de Producción:</strong> ${poligono.up_id}<br>
+                    <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
+                    <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
+                `);
+            });
+
+            if (allCoords.length > 0) {
+                const bounds = L.latLngBounds(allCoords);
+                map.fitBounds(bounds);
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar los poligonos:', error);
+            mostrarAlerta('Error al cargar los poligonos.', 'danger');
+        });
+}
+
+// Decidir qué función llamar según el parámetro up_id
+const upId = getUpIdFromUrl();
+if (upId) {
+    cargarPoligonosPorUP(upId);
+} else {
+    cargarPoligonos();
+}
 
 // Control de dibujo
 let drawnLayer = null;
