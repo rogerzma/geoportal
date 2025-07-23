@@ -125,6 +125,14 @@
                 <label for="contrasena_tecnico" class="form-label">Contraseña</label>
                 <input type="password" class="form-control" id="contrasena_tecnico" name="contraseña" required>
                 </div>
+                <div class="mb-3">
+                <label for="email_tecnico" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email_tecnico" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="telefono_tecnico" class="form-label">Teléfono</label>
+                    <input type="text" class="form-control" id="telefono_tecnico" name="telefono" required>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Guardar técnico</button>
@@ -143,7 +151,6 @@
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
     <script src="{{ asset('js/mapa.js') }}"></script>
     <script src="{{ asset('js/mapa_tecnico.js') }}"></script>
-
 </body>
 
 </html>

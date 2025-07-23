@@ -1,0 +1,77 @@
+/* Contenedor de botones flotantes dentro del mapa */
+        .icon-container {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .icon-button {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            width: 50px;
+            height: 50px;
+            font-size: 16px;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .navbar-nav > li > a {
+            color: white !important;
+        }
+
+        /* Corrige el mapa que podría verse afectado */
+        #map {
+            height: 500px;
+            width: 100%;
+            position: relative;
+            margin-bottom: 50px;
+            z-index: 1; /* Asegura que se renderice encima */
+        }
+
+                /* Contenedor de coordenadas */
+        #coordinates {
+            position: absolute;
+            top: 70px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            z-index: 1000;
+            font-size: 14px;
+        }
+
+        .modal {
+            z-index: 1050 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1049 !important;
+        }
+
+        .alert-position {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1060;
+            width: 90%;
+            max-width: 800px;
+        }
+
+                
