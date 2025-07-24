@@ -144,4 +144,3 @@ document.getElementById('parcelaForm').addEventListener('submit', function (e) {
             console.error('Error:', error);
             mostrarAlerta('Error al guardar la parcela.', 'danger');
         });
-});
