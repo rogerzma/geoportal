@@ -1,13 +1,13 @@
-$(document).ready(function() {
-    // Configurar CSRF para todas las peticiones AJAX
+$(document).ready(function () {
+    // 🛡 CSRF para todas las peticiones AJAX
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    $('#validateReportButton').on('click', function() {
-        // Obtener valores
+    // 🧩 Crear nueva UP
+    $('#validateReportButton').on('click', function () {
         const nombre_up = $('#nombre_up').val();
         const propietario = $('#propietario').val();
         const localidad = $('#localidad').val();
@@ -15,67 +15,102 @@ $(document).ready(function() {
         const user_id = $('#user_id').val();
         const responsable_tecnico = $('#responsable_tecnico').val();
 
-        // Validar campos vacíos
         if (!nombre_up || !propietario || !localidad || !telefono) {
             $('#emptyFieldsAlert').show();
             return;
-        } else {
-            $('#emptyFieldsAlert').hide();
         }
+        $('#emptyFieldsAlert').hide();
 
-        // Enviar petición AJAX
         $.ajax({
             url: '/api/unidades-produccion',
             method: 'POST',
             data: {
-                nombre_up: nombre_up,
-                propietario: propietario,
-                localidad: localidad,
-                telefono: telefono,
-                user_id: user_id,
-                responsable_tecnico: responsable_tecnico
+                nombre_up,
+                propietario,
+                localidad,
+                telefono,
+                user_id,
+                responsable_tecnico
             },
-            success: function(response) {
+            success: function (response) {
                 window.location.href = urlUnidadesProduccion;
             },
-            error: function(xhr) {
-                console.error(xhr.responseText); // Aquí verás el error detallado en la consola del navegador
+            error: function (xhr) {
+                console.error(xhr.responseText);
                 $('#errorModal').modal('show');
             }
         });
     });
-});
 
-$(document).ready(function() {
-    // Cargar unidades de producción al cargar la página
-    cargarUnidadesProduccion();
-
-    function cargarUnidadesProduccion() {
+    // 📦 Cargar tabla de UP
+        function cargarUnidadesProduccion() {
         $.ajax({
             url: '/api/unidades-produccion',
             method: 'GET',
-            success: function(response) {
-                let filas = '';
-                response.forEach(function(up) {
-                    filas += `
-                        <tr>
-                            <td>${up.nombre_up}</td>
-                            <td>${up.propietario}</td>
-                            <td>${up.localidad}</td>
-                            <td>${up.telefono}</td>
-                            <td>
-                                <a href="#" class="glyphicon glyphicon-pencil"></a>
-                                <a href="#" class="glyphicon glyphicon-trash" style="color: #ff0000;"></a>
-                            </td>
-                        </tr>
-                    `;
-                });
-                $('#tbody-up').html(filas);
+            success: function (response) {
+                if (response.length === 0) {
+                    $('#tabla-up-wrapper').hide();
+                    $('#mensaje-vacio').show();
+                } else {
+                    $('#tabla-up-wrapper').show();
+                    $('#mensaje-vacio').hide();
+
+                    let filas = '';
+                    response.forEach(function (up) {
+                        filas += `
+                            <tr>
+                                <td>${up.nombre_up}</td>
+                                <td>${up.propietario}</td>
+                                <td>${up.localidad}</td>
+                                <td>${up.telefono}</td>
+                                <td>
+                                    <a href="/admin/up/poligonos?up_id=${up.id}" title="Ver mapa">
+                                        <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/admin/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
+                                    <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    $('#tbody-up').html(filas);
+                }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error al cargar las unidades de producción:', xhr.responseText);
-                $('#tbody-up').html('<tr><td colspan="5">No se pudieron cargar los datos.</td></tr>');
+                $('#tabla-up-wrapper').hide();
+                $('#mensaje-vacio').show().html('<div class="alert alert-danger">No se pudieron cargar los datos.</div>');
             }
         });
     }
+
+    cargarUnidadesProduccion();
+
+    // 🗑️ Flujo para eliminar UP con modal de confirmación
+    let upIdParaEliminar = null;
+
+    $(document).on('click', '.btn-eliminar-up', function (e) {
+        e.preventDefault();
+        upIdParaEliminar = $(this).data('id'); // ← correcto
+        $('#modalEliminarUP').modal('show');
+    });
+
+    $('#btnConfirmarEliminar').on('click', function () {
+        if (!upIdParaEliminar) return;
+
+        $.ajax({
+            url: `/api/unidades-produccion/${upIdParaEliminar}`,
+            method: 'DELETE',
+            success: function (response) {
+                $('#modalEliminarUP').modal('hide');
+                upIdParaEliminar = null;
+                cargarUnidadesProduccion();
+            },
+            error: function (xhr) {
+                alert('Error al eliminar la unidad de producción: ' + xhr.responseText);
+            }
+        });
+    });
 });

@@ -79,10 +79,33 @@ class UPController extends Controller
                 'telefono' => $request->telefono ?? $unidad->telefono,
                 // responsable_tecnico y user_id normalmente no se actualizan aquí
             ]);
-            return response()->json(['message' => 'Unidad de producción actualizada correctamente.']);
+            return redirect()->route('unidades-produccion')->with('success', 'UP actualizada correctamente.');
         } else {
             return response()->json(['error' => 'Unidad de producción no encontrada.'], 404);
         }
+    }
+
+    // Funcion para retornar la vista de modificar UP
+    public function edit($id)
+    {
+        $unidad = UnidadProduccion::findOrFail($id);
+        return view('ModificarUP', compact('unidad'));
+    }
+
+
+    /**
+     * Mostrar el mapa de unidades de producción.
+     */
+    public function mapaUP(Request $request)
+    {
+        $upId = $request->query('up_id');
+        $unidadProduccion = null;
+        if ($upId) {
+            $unidadProduccion = \App\Models\UnidadProduccion::find($upId);
+        }
+        // Depuración
+        // dd($upId, $unidadProduccion);
+        return view('MapaUP', compact('unidadProduccion'));
     }
 
     /**

@@ -25,18 +25,47 @@ function generarColorAleatorio() {
     return color;
 }
 
-// Cargar poligonos
-function cargarPoligonos() {
-    fetch('/api/poligonos')
+// Obtener el parámetro up_id de la URL
+function getUpIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('up_id');
+}
+
+// Modo de eliminación
+let deleteMode = false;
+let poligonoIdAEliminar = null;
+let poligonoLayerAEliminar = null;
+
+// Activar modo eliminación
+document.getElementById("delete-poligono").addEventListener("click", function () {
+    deleteMode = !deleteMode;
+    if (deleteMode) {
+        map.getContainer().style.cursor = "crosshair";
+        mostrarAlerta('Haz clic en un polígono para eliminarlo.', 'warning');
+    } else {
+        map.getContainer().style.cursor = "";
+        poligonoIdAEliminar = null;
+        poligonoLayerAEliminar = null;
+        mostrarAlerta('Modo de eliminación desactivado.', 'info');
+    }
+});
+
+// Cargar poligonos de una unidad de producción específica
+function cargarPoligonosPorUP(upId) {
+    drawnItems.clearLayers(); // Limpia los polígonos previos
+    fetch(`/api/poligonos/up/${upId}`)
         .then(response => response.json())
         .then(poligonos => {
+            let allCoords = [];
             poligonos.forEach(poligono => {
                 const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+                allCoords = allCoords.concat(coords);
+
                 const color = generarColorAleatorio();
                 const polygon = L.polygon(coords, {
                     color: color,
                     fillOpacity: 0.9
-                }).addTo(map);
+                }).addTo(drawnItems);
 
                 polygon.bindPopup(`
                     <strong>Nombre:</strong> ${poligono.nombre}<br>
@@ -45,7 +74,22 @@ function cargarPoligonos() {
                     <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
                     <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
                 `);
+
+                // Evento para eliminar
+                polygon.on('click', function (e) {
+                    if (deleteMode) {
+                        poligonoIdAEliminar = poligono.id;
+                        poligonoLayerAEliminar = polygon;
+                        const modal = new bootstrap.Modal(document.getElementById('modalEliminarPoligono'));
+                        $("#modalEliminarPoligono").modal("show");
+                    }
+                });
             });
+
+            if (allCoords.length > 0) {
+                const bounds = L.latLngBounds(allCoords);
+                map.fitBounds(bounds);
+            }
         })
         .catch(error => {
             console.error('Error al cargar los poligonos:', error);
@@ -53,7 +97,60 @@ function cargarPoligonos() {
         });
 }
 
-cargarPoligonos();
+// Cargar todos los poligonos
+function cargarPoligonos() {
+    drawnItems.clearLayers(); // Limpia los polígonos previos
+    fetch('/api/poligonos')
+        .then(response => response.json())
+        .then(poligonos => {
+            let allCoords = [];
+            poligonos.forEach(poligono => {
+                const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+                allCoords = allCoords.concat(coords);
+
+                const color = generarColorAleatorio();
+                const polygon = L.polygon(coords, {
+                    color: color,
+                    fillOpacity: 0.9
+                }).addTo(drawnItems);
+
+                polygon.bindPopup(`
+                    <strong>Nombre:</strong> ${poligono.nombre}<br>
+                    <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                    <strong>Unidad de Producción:</strong> ${poligono.up_id}<br>
+                    <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
+                    <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
+                `);
+
+                // Evento para eliminar
+                polygon.on('click', function (e) {
+                    if (deleteMode) {
+                        poligonoIdAEliminar = poligono.id;
+                        poligonoLayerAEliminar = polygon;
+                        const modal = new bootstrap.Modal(document.getElementById('modalEliminarPoligono'));
+                        modal.show();
+                    }
+                });
+            });
+
+            if (allCoords.length > 0) {
+                const bounds = L.latLngBounds(allCoords);
+                map.fitBounds(bounds);
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar los poligonos:', error);
+            mostrarAlerta('Error al cargar los poligonos.', 'danger');
+        });
+}
+
+// Decidir qué función llamar según el parámetro up_id
+const upId = getUpIdFromUrl();
+if (upId) {
+    cargarPoligonosPorUP(upId);
+} else {
+    cargarPoligonos();
+}
 
 // Control de dibujo
 let drawnLayer = null;
@@ -70,10 +167,14 @@ map.on(L.Draw.Event.CREATED, function (event) {
     const coords = latlngs.map(coord => `${coord.lng} ${coord.lat}`).join(', ');
     const wktPolygon = `POLYGON((${coords}, ${latlngs[0].lng} ${latlngs[0].lat}))`;
 
+    // Llenar campos ocultos
     document.getElementById('geom').value = wktPolygon;
     document.getElementById('coordenadas').value = JSON.stringify(latlngs);
 
-    $("#poligonoModal").modal("show");
+    // Fecha actual
+    document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 10);
+
+    $("#parcelaModal").modal("show");
 });
 
 // Activar dibujo
@@ -86,17 +187,6 @@ document.getElementById("draw-poligono").addEventListener("click", function () {
         }
     };
     new L.Draw.Polygon(map, polygonOptions).enable();
-});
-
-// Modo de eliminación
-let deleteMode = false;
-document.getElementById("delete-poligono").addEventListener("click", function () {
-    deleteMode = !deleteMode;
-    if (deleteMode) {
-        mostrarAlerta('Modo de eliminación activado. Haz clic en un polígono para eliminarlo.', 'warning');
-    } else {
-        mostrarAlerta('Modo de eliminación desactivado.', 'info');
-    }
 });
 
 // Mostrar alertas (reemplazo de toasts)
@@ -119,33 +209,97 @@ function mostrarAlerta(mensaje, tipo = 'success') {
     }, 5000);
 }
 
-// Guardar polígono
+// Confirmar eliminación
+document.getElementById('btnConfirmarEliminarPoligono').addEventListener('click', function () {
+    if (!poligonoIdAEliminar) return;
+    fetch(`/api/poligonos/${poligonoIdAEliminar}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(resp => resp.json())
+    .then(json => {
+        // Oculta el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarPoligono'));
+        if (modal) modal.hide();
+
+        mostrarAlerta('✅ ' + json.message, 'success');
+        // Elimina el polígono del mapa
+        if (poligonoLayerAEliminar) {
+            drawnItems.removeLayer(poligonoLayerAEliminar);
+        }
+        // Recarga la página después de 2 segundos
+        setTimeout(() => window.location.reload(), 2000);
+
+        // Limpia variables
+        poligonoIdAEliminar = null;
+        poligonoLayerAEliminar = null;
+        deleteMode = false;
+        map.getContainer().style.cursor = "";
+    })
+    .catch(error => {
+        mostrarAlerta('❌ Error al eliminar el polígono.', 'danger');
+    });
+});
+
 document.getElementById('poligonoForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const data = {
-        nombre: document.getElementById('nombre').value,
-        cultivo: document.getElementById('cultivo').value,
+        nombre: document.getElementById('nombre').value.trim(),
+        cultivo: document.getElementById('cultivo').value.trim(),
         coordenadas: document.getElementById('coordenadas').value,
-        geom: document.getElementById('geom').value,
-        fecha_creacion: document.getElementById('fecha_creacion').value,
+        geom: document.getElementById('geom').value.trim(),
+        fecha_creacion: document.getElementById('fecha_creacion').value.trim(),
         up_id: parseInt(document.getElementById('up_id').value),
         user_id: parseInt(document.getElementById('user_id').value)
     };
+
+    // Desactivar botón para prevenir doble clic
+    const submitBtn = document.querySelector('#poligonoForm button[type="submit"]');
+    submitBtn.disabled = true;
 
     fetch('/api/poligonos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(resp => resp.json())
-        .then(json => {
-            mostrarAlerta(json.message || 'Polígono guardado correctamente.', 'success');
-            $("#poligonoModal").modal("hide");
-            document.getElementById('poligonoForm').reset();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarAlerta('Error al guardar el polígono.', 'danger');
-        });
+    .then(resp => {
+        if (!resp.ok) {
+            return resp.json().then(errorJson => {
+                throw errorJson;
+            });
+        }
+        return resp.json();
+    })
+    .then(json => {
+        const modalElement = document.getElementById('parcelaModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+        mostrarAlerta('✅ ' + json.message, 'success');
+
+        // Limpiar formulario y capa dibujada
+        document.getElementById('poligonoForm').reset();
+        if (drawnLayer) {
+            drawnItems.removeLayer(drawnLayer);
+            drawnLayer = null;
+        }
+
+        // Opcional: espera un par de segundos para que el usuario vea la alerta
+        setTimeout(() => {
+            if (json.refresh) {
+                window.location.reload(); // simula F5
+            }
+        }, 2000);
+
+        // Rehabilitar botón
+        submitBtn.disabled = false;
+    })
+    .catch(error => {
+        console.log('Error del backend:', error);
+        mostrarAlerta('❌ ' + (error.error || 'Error al guardar el polígono.'), 'danger');
+        submitBtn.disabled = false;
+    });
 });
