@@ -4,7 +4,7 @@ L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=TU_API_KEY',
     attribution: '&copy; Google Maps'
 }).addTo(map);
 
-// Grupo de capas para parcelas
+// Grupo de capas para poligonos
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
@@ -25,13 +25,13 @@ function generarColorAleatorio() {
     return color;
 }
 
-// Cargar parcelas
-function cargarParcelas() {
-    fetch('/api/parcelas')
+// Cargar poligonos
+function cargarPoligonos() {
+    fetch('/api/poligonos')
         .then(response => response.json())
-        .then(parcelas => {
-            parcelas.forEach(parcela => {
-                const coords = JSON.parse(parcela.coordenadas).map(coord => [coord.lat, coord.lng]);
+        .then(poligonos => {
+            poligonos.forEach(poligono => {
+                const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
                 const color = generarColorAleatorio();
                 const polygon = L.polygon(coords, {
                     color: color,
@@ -39,19 +39,21 @@ function cargarParcelas() {
                 }).addTo(map);
 
                 polygon.bindPopup(`
-                    <strong>Cultivo:</strong> ${parcela.cultivo}<br>
-                    <strong>Productor:</strong> ${parcela.nombre_productor}<br>
-                    <strong>Técnico:</strong> ${parcela.tecnico ? parcela.tecnico.nombre : 'N/A'}
+                    <strong>Nombre:</strong> ${poligono.nombre}<br>
+                    <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                    <strong>Unidad de Producción:</strong> ${poligono.up_id}<br>
+                    <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
+                    <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
                 `);
             });
         })
         .catch(error => {
-            console.error('Error al cargar las parcelas:', error);
-            mostrarAlerta('Error al cargar las parcelas.', 'danger');
+            console.error('Error al cargar los poligonos:', error);
+            mostrarAlerta('Error al cargar los poligonos.', 'danger');
         });
 }
 
-cargarParcelas();
+cargarPoligonos();
 
 // Control de dibujo
 let drawnLayer = null;
@@ -71,11 +73,11 @@ map.on(L.Draw.Event.CREATED, function (event) {
     document.getElementById('geom').value = wktPolygon;
     document.getElementById('coordenadas').value = JSON.stringify(latlngs);
 
-    $("#parcelaModal").modal("show");
+    $("#poligonoModal").modal("show");
 });
 
 // Activar dibujo
-document.getElementById("draw-parcela").addEventListener("click", function () {
+document.getElementById("draw-poligono").addEventListener("click", function () {
     var polygonOptions = {
         allowIntersection: false,
         showArea: true,
@@ -88,10 +90,10 @@ document.getElementById("draw-parcela").addEventListener("click", function () {
 
 // Modo de eliminación
 let deleteMode = false;
-document.getElementById("delete-parcela").addEventListener("click", function () {
+document.getElementById("delete-poligono").addEventListener("click", function () {
     deleteMode = !deleteMode;
     if (deleteMode) {
-        mostrarAlerta('Modo de eliminación activado. Haz clic en una parcela para eliminarla.', 'warning');
+        mostrarAlerta('Modo de eliminación activado. Haz clic en un polígono para eliminarlo.', 'warning');
     } else {
         mostrarAlerta('Modo de eliminación desactivado.', 'info');
     }
@@ -117,30 +119,33 @@ function mostrarAlerta(mensaje, tipo = 'success') {
     }, 5000);
 }
 
-// Guardar parcela
-document.getElementById('parcelaForm').addEventListener('submit', function (e) {
+// Guardar polígono
+document.getElementById('poligonoForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const data = {
+        nombre: document.getElementById('nombre').value,
         cultivo: document.getElementById('cultivo').value,
         coordenadas: document.getElementById('coordenadas').value,
         geom: document.getElementById('geom').value,
-        nombre_productor: document.getElementById('nombre_productor').value,
-        tecnico_id: parseInt(document.getElementById('tecnico_id').value)
+        fecha_creacion: document.getElementById('fecha_creacion').value,
+        up_id: parseInt(document.getElementById('up_id').value),
+        user_id: parseInt(document.getElementById('user_id').value)
     };
 
-    fetch('/api/parcelas', {
+    fetch('/api/poligonos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(data)
     })
         .then(resp => resp.json())
         .then(json => {
-            mostrarAlerta(json.message || 'Parcela guardada correctamente.', 'success');
-            $("#parcelaModal").modal("hide");
-            document.getElementById('parcelaForm').reset();
+            mostrarAlerta(json.message || 'Polígono guardado correctamente.', 'success');
+            $("#poligonoModal").modal("hide");
+            document.getElementById('poligonoForm').reset();
         })
         .catch(error => {
             console.error('Error:', error);
-            mostrarAlerta('Error al guardar la parcela.', 'danger');
+            mostrarAlerta('Error al guardar el polígono.', 'danger');
         });
+});

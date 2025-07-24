@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -13,37 +15,35 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Auth::routes();
+
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('inicio');
 
-Route::get('/administrador', function () {
-    return view('administrador');
-});
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/inicio-gob', function () {
-    return view('InicioGob');
-});
+Route::middleware(['auth'])->group(function(){
+    Route::get('/administrador', function () {
+        return view('administrador');
+    });
 
-Route::view('/inicio-gob', 'InicioGob')->name('inicio');
+    Route::get('/admin/mapa', function () {
+        return view('MapaGOB');
+    })->name('mapa-gob');
 
+    Route::get('/admin', function(){
+        return view('InicioAdmin');
+    })->name('admin');
 
-Route::get('/admin-gob', function () {
-    return view('AdminGob');
-})->name('admin-gob');
+    Route::get('/admin/registro-usuarios', function(){
+        return view('RegistrarUsuario');
+    })->name('registrar-usuarios');
 
-Route::get('/admin', function(){
-    return view('InicioAdmin');
-})->name('admin');
+    Route::get('/admin/usuarios', function(){
+        return view('AdministrarUsuarios');
+    })->name('administrar-usuarios');
 
-Route::get('/admin/registro-usuarios', function(){
-    return view('RegistrarUsuario');
-})->name('registrar-usuarios');
-
-Route::get('/admin/up', function(){
-    return view('UnidadesProduccion');
-})->name('unidades-produccion');
-
-Route::get('/admin/crear-up', function(){
-    return view('CrearUP');
-})->name('crear-up');
+    Route::get('/admin/up', function(){
+        return view('UnidadesProduccion');
+    })->name('unidades-produccion');

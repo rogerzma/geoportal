@@ -23,10 +23,6 @@
         </div>
         <div class="col-md-3">
             <div class="list-group">
-                <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            </div>
-        </div>
-    </div>
 
     <div class="row">
         <div class="col-sm-10 table-responsive" style="margin-bottom:2em;">
@@ -37,30 +33,13 @@
                         <th colspan="1" style="background:#009933; color:#FFF;">Propietario</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Localidad</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Telefono</th>
-                        <th colspan="1" style="background:#009933; color:#FFF;">Opciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Rancho Ejemplo 1</td>
-                        <td>Juan Pérez</td>
-                        <td>Localidad A</td>
-                        <td>1234567890</td>
-                        <td>
-                            <a href="#" span class="glyphicon glyphicon-pencil"></a>
-                            <a href="#" span class="glyphicon glyphicon-trash" style="color: #ff0000;"></a>
-                        </td>
                 </tbody>
             </table>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4">
-                <br><p>
-                <a href="#" button class="btn btn-primary" type="button">Crear rancho</a>
                 </p>
         </div>
     </div>
 </div>
-
-@endsection
