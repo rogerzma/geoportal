@@ -47,8 +47,3 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/admin/up', function(){
         return view('UnidadesProduccion');
     })->name('unidades-produccion');
-
-    Route::get('/admin/crear-up', function(){
-        return view('CrearUP');
-    })->name('crear-up');
-});
