@@ -4,18 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UPController;
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
 Auth::routes();
 
 Route::get('/', function () {
@@ -54,7 +42,11 @@ Route::middleware(['auth'])->group(function(){
     })->name('crear-up');
 
     Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos');
-    
     Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
     Route::put('/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar');
+});
+
+// Rutas para usuario técnico
+Route::middleware(['auth', 'role:tecnico'])->group(function(){
+    // Aquí puedes agregar rutas específicas para técnicos
 });
