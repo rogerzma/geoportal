@@ -95,6 +95,7 @@
                                         <div class="icon-button" id="delete-poligono" title="Eliminar poligono">🗑️</div>
                                     </div>
                                 </div>
+                                
                             </div>
                             <div id="coordinates">
                                 <strong>Coordenadas:</strong>
@@ -125,7 +126,13 @@
                         </div>
                         <div class="mb-3">
                             <label for="cultivo" class="form-label">Cultivo</label>
-                            <input type="text" class="form-control" id="cultivo" name="cultivo" required>
+                            <select class="form-control" name="cultivo" id="cultivo" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Frijol">Frijol</option>
+                                <option value="Chile">Chile</option>
+                                <option value="Maiz">Maiz</option>
+                                <option value="Ajo">Ajo</option>
+                            </select>
                         </div>
 
                         <!-- Ocultos -->
@@ -184,7 +191,7 @@
     <!-- Scripts -->
     <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         console.log(typeof bootstrap.Modal); // Ahora sí debería ser "function"
     </script>

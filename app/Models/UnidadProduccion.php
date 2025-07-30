@@ -12,9 +12,9 @@ class UnidadProduccion extends Model
     protected $table = 'unidad_produccion'; // <--- Agrega esta línea
 
     protected $fillable = [
-        'propietario',
         'nombre_up',
         'localidad',
+        'responsable',
         'telefono',
         'responsable_tecnico',
         'user_id'

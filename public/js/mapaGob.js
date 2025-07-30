@@ -4,7 +4,7 @@ L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=TU_API_KEY',
     attribution: '&copy; Google Maps'
 }).addTo(map);
 
-// Grupo de capas para parcelas
+// Grupo de capas para polígonos
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
@@ -15,7 +15,7 @@ map.on('mousemove', function (e) {
     document.getElementById('lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
 });
 
-// Funcion para el color
+// Función para el color
 function generarColorAleatorio() {
     const letras = '0123456789ABCDEF';
     let color = '#';
@@ -25,31 +25,60 @@ function generarColorAleatorio() {
     return color;
 }
 
-// Cargar parcelas
-function cargarParcelas() {
-    fetch('/api/parcelas')
+// Cargar polígonos
+function cargarPoligonos() {
+    fetch('/api/poligonos')
         .then(response => response.json())
-        .then(parcelas => {
-            parcelas.forEach(parcela => {
-                const coords = JSON.parse(parcela.coordenadas).map(coord => [coord.lat, coord.lng]);
+        .then(poligonos => {
+            poligonos.forEach(poligono => {
+                // Asegúrate que el campo 'coordenadas' es un JSON válido
+                let coords = [];
+                try {
+                    coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+                } catch (e) {
+                    return; // Si hay error, no dibuja ese polígono
+                }
                 const color = generarColorAleatorio();
-                const polygon = L.polygon(coords, {
+                // Solo visualización, sin popups ni eventos
+                L.polygon(coords, {
                     color: color,
-                    fillOpacity: 0.9
+                    fillOpacity: 0.7,
+                    weight: 2
                 }).addTo(map);
             });
         })
         .catch(error => {
-            console.error('Error al cargar las parcelas:', error);
-            mostrarAlerta('Error al cargar las parcelas.', 'danger');
+            console.error('Error al cargar los polígonos:', error);
+            mostrarAlerta('Error al cargar los polígonos.', 'danger');
         });
 }
 
-cargarParcelas();
+function cargarHectareasTotales() {
+    fetch('/api/poligonos/hectareas-totales')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('hectareas-totales').textContent = data.hectareas_totales ?? '--';
+        })
+        .catch(() => {
+            document.getElementById('hectareas-totales').textContent = '--';
+        });
+}
+
+cargarPoligonos();
+cargarHectareasTotales();
 
 // Mostrar alertas (reemplazo de toasts)
 function mostrarAlerta(mensaje, tipo = 'success') {
-    const alertContainer = document.getElementById('alertContainer');
+    let alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'alertContainer';
+        alertContainer.style.position = 'fixed';
+        alertContainer.style.top = '20px';
+        alertContainer.style.right = '20px';
+        alertContainer.style.zIndex = '9999';
+        document.body.appendChild(alertContainer);
+    }
     const alert = document.createElement('div');
     alert.className = `alert alert-${tipo} alert-dismissible fade show`;
     alert.role = 'alert';
@@ -59,7 +88,6 @@ function mostrarAlerta(mensaje, tipo = 'success') {
     `;
     alertContainer.appendChild(alert);
 
-    // Opcional: eliminar automáticamente después de 5 segundos
     setTimeout(() => {
         alert.classList.remove('show');
         alert.classList.add('fade');
