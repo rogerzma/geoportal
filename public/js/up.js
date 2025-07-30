@@ -9,13 +9,13 @@ $(document).ready(function () {
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
         const nombre_up = $('#nombre_up').val();
-        const propietario = $('#propietario').val();
+        const responsable = $('#responsable').val();
         const localidad = $('#localidad').val();
         const telefono = $('#telefono').val();
         const user_id = $('#user_id').val();
         const responsable_tecnico = $('#responsable_tecnico').val();
 
-        if (!nombre_up || !propietario || !localidad || !telefono) {
+        if (!nombre_up || !responsable || !localidad || !telefono) {
             $('#emptyFieldsAlert').show();
             return;
         }
@@ -26,7 +26,7 @@ $(document).ready(function () {
             method: 'POST',
             data: {
                 nombre_up,
-                propietario,
+                responsable,
                 localidad,
                 telefono,
                 user_id,
@@ -60,8 +60,8 @@ $(document).ready(function () {
                         filas += `
                             <tr>
                                 <td>${up.nombre_up}</td>
-                                <td>${up.propietario}</td>
                                 <td>${up.localidad}</td>
+                                <td>${up.responsable}</td>
                                 <td>${up.telefono}</td>
                                 <td>
                                     <a href="/admin/up/poligonos?up_id=${up.id}" title="Ver mapa">

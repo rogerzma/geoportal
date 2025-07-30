@@ -51,7 +51,8 @@
             <li><a href="http://www.gob.mx"><i class="icon icon-home"></i></a></li>
             <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
             <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
-            <li class="active">Geoportal</li>
+            <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+            <li class="active">Vista general del mapa</li>
         </ol>
     </div>
 
@@ -59,7 +60,7 @@
     <div class="container">
         <div class="row">
                 <div class="col-md-9">
-                    <h2>Geoportal</h2>
+                    <h2>Vista general de los polígonos</h2>
                     <hr class="red">
                    <p>A continuación, seleccione un polígono para ver su información</p>
                 </div>
@@ -77,19 +78,19 @@
             </div>
             <!-- Contenedor de alertas -->
             <div id="alertContainer" class="alert-position container mt-3"></div>
-                <div class="row justify-content-end">
-                    <div class="col-md-9">
-                        <p>Seleccione una parcela para ver sus datos o dibuje una nueva.</p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Numero de hectareas intervenidas: 
+                            <span id="hectareas-totales">--</span>
+                        </p>
                     </div>
+                </div>
+                <div class="row justify-content-end">
                     <div class="col-md-11 card-map-container">
                         <div class="map-wrapper">
                             <!-- Mapa -->
                             <div class="flex-grow-1 p-3">
                                 <div id="map">
-                                    <div class="icon-container">
-                                        <div class="icon-button" id="draw-parcela" title="Dibujar parcela">🖊️</div>
-                                        <div class="icon-button" id="delete-parcela" title="Eliminar parcela">🗑️</div>
-                                    </div>
                                 </div>
                             </div>
                             <div id="coordinates">
@@ -146,6 +147,6 @@
     </script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <script src="{{ asset('js/poligono.js') }}"></script>
+    <script src="{{ asset('js/mapaAdmin.js') }}"></script>
 </body>
 </html>

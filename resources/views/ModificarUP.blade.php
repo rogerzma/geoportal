@@ -46,21 +46,23 @@
                     <input class="form-control" type="text" name="nombre_up" value="{{ old('nombre_up', $unidad->nombre_up) }}">
                 </div>
                 <div class="col-md-4">
-                    <h4>Propietario</h4>
-                    <input class="form-control" type="text" name="propietario" value="{{ old('propietario', $unidad->propietario) }}">
-                </div>
-                <div class="col-md-4">
                     <h4>Localidad</h4>
                     <input class="form-control" type="text" name="localidad" value="{{ old('localidad', $unidad->localidad) }}">
                 </div>
             </div>
 
             <div class="row">
+              <div class="col-md-4">
+                    <h4>Responsable</h4>
+                    <input class="form-control" type="text" name="responsable" value="{{ old('responsable', $unidad->responsable) }}">
+                </div>
                 <div class="col-md-4">
                     <h4>Teléfono</h4>
                     <input class="form-control" type="text" name="telefono" value="{{ old('telefono', $unidad->telefono) }}">
                 </div>
-                <div class="col-md-4">
+            </div>
+            <div class = "row">
+              <div class="col-md-4">
                     <br>
                     <button type="submit" class="btn btn-success">Actualizar UP</button>
                 </div>

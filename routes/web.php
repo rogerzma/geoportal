@@ -48,5 +48,7 @@ Route::middleware(['auth'])->group(function(){
 
 // Rutas para usuario técnico
 Route::middleware(['auth', 'role:tecnico'])->group(function(){
-    // Aquí puedes agregar rutas específicas para técnicos
+    Route::get('/tecnico', function(){
+        return view('InicioTecnico');
+    })->name('tecnico');
 });

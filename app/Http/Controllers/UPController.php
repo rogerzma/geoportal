@@ -23,18 +23,18 @@ class UPController extends Controller
     public function store(Request $request)
         {
             $request->validate([
-                'propietario' => 'required|string|max:255',
                 'nombre_up' => 'required|string|max:255',
                 'localidad' => 'required|string|max:255',
+                'responsable' => 'required|string|max:255',
                 'telefono' => 'required|string|max:20',
                 'responsable_tecnico' => 'required|string|max:255',
                 'user_id' => 'required|integer',
             ]);
 
             $unidad = UnidadProduccion::create([
-                'propietario' => $request->propietario,
                 'nombre_up' => $request->nombre_up,
                 'localidad' => $request->localidad,
+                'responsable' => $request->responsable,
                 'telefono' => $request->telefono,
                 'responsable_tecnico' => $request->responsable_tecnico,
                 'user_id' => $request->user_id,
@@ -63,9 +63,9 @@ class UPController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'propietario' => 'string|max:255',
             'nombre_up' => 'string|max:255',
             'localidad' => 'string|max:255',
+            'responsable' => 'string|max:255',
             'telefono' => 'string|max:20',
         ]);
 
@@ -73,9 +73,9 @@ class UPController extends Controller
 
         if ($unidad) {
             $unidad->update([
-                'propietario' => $request->propietario ?? $unidad->propietario,
                 'nombre_up' => $request->nombre_up ?? $unidad->nombre_up,
                 'localidad' => $request->localidad ?? $unidad->localidad,
+                'responsable' => $request->responsable ?? $unidad->responsable,
                 'telefono' => $request->telefono ?? $unidad->telefono,
                 // responsable_tecnico y user_id normalmente no se actualizan aquí
             ]);

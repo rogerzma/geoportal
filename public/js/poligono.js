@@ -31,24 +31,70 @@ function getUpIdFromUrl() {
     return params.get('up_id');
 }
 
+
+// Modo de dibujo
+let drawMode = false;
+let drawControl = null;
+
+// Activar dibujo
+document.getElementById("draw-poligono").addEventListener("click", function () {
+    if (drawMode) {
+        // Si ya está activo, desactívalo
+        drawMode = false;
+        if (drawControl) {
+            drawControl.disable();
+            drawControl = null;
+        }
+        map.getContainer().style.cursor = "";
+        mostrarAlerta('Modo dibujo desactivado.', 'info');
+        return;
+    }
+    // Si estaba activo el modo eliminación, desactívalo aquí si lo necesitas
+    // deleteMode = false; // (opcional)
+
+    // Activa modo dibujo
+    drawMode = true;
+    const polygonOptions = {
+        allowIntersection: false,
+        showArea: true,
+        shapeOptions: { fillOpacity: 1 }
+    };
+    drawControl = new L.Draw.Polygon(map, polygonOptions);
+    drawControl.enable();
+    mostrarAlerta('Modo dibujo activado.', 'info');
+});
+
 // Modo de eliminación
 let deleteMode = false;
 let poligonoIdAEliminar = null;
 let poligonoLayerAEliminar = null;
+let modoActivo = null; // 'dibujo' | 'eliminacion' | null
 
-// Activar modo eliminación
+// Eliminar polígono
 document.getElementById("delete-poligono").addEventListener("click", function () {
-    deleteMode = !deleteMode;
     if (deleteMode) {
-        map.getContainer().style.cursor = "crosshair";
-        mostrarAlerta('Haz clic en un polígono para eliminarlo.', 'warning');
-    } else {
+        // Si ya está activo, desactívalo
+        deleteMode = false;
         map.getContainer().style.cursor = "";
         poligonoIdAEliminar = null;
         poligonoLayerAEliminar = null;
         mostrarAlerta('Modo de eliminación desactivado.', 'info');
+        return;
     }
+    // Si estaba activo el modo dibujo, desactívalo
+    if (drawMode) {
+        drawMode = false;
+        if (drawControl) {
+            drawControl.disable();
+            drawControl = null;
+        }
+    }
+    // Activa modo eliminación
+    deleteMode = true;
+    map.getContainer().style.cursor = "crosshair";
+    mostrarAlerta('Haz clic en un polígono para eliminarlo.', 'warning');
 });
+
 
 // Cargar poligonos de una unidad de producción específica
 function cargarPoligonosPorUP(upId) {
@@ -68,20 +114,19 @@ function cargarPoligonosPorUP(upId) {
                 }).addTo(drawnItems);
 
                 polygon.bindPopup(`
-                    <strong>Nombre:</strong> ${poligono.nombre}<br>
-                    <strong>Cultivo:</strong> ${poligono.cultivo}<br>
-                    <strong>Unidad de Producción:</strong> ${poligono.up_id}<br>
-                    <strong>Usuario:</strong> ${poligono.user ? poligono.user.name : 'N/A'}<br>
-                    <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}
+                    <div class="popup-poligono">
+                        <strong>Nombre:</strong> ${poligono.nombre}<br>
+                        <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                        <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
+                        <strong>Productor:</strong> ${poligono.user?.name ?? 'N/A'}
+                    </div>
                 `);
 
                 // Evento para eliminar
                 polygon.on('click', function (e) {
                     if (deleteMode) {
                         poligonoIdAEliminar = poligono.id;
-                        poligonoLayerAEliminar = polygon;
-                        const modal = new bootstrap.Modal(document.getElementById('modalEliminarPoligono'));
-                        $("#modalEliminarPoligono").modal("show");
+                        $('#modalEliminarPoligono').modal('show');
                     }
                 });
             });
@@ -174,12 +219,22 @@ map.on(L.Draw.Event.CREATED, function (event) {
     // Fecha actual
     document.getElementById('fecha_creacion').value = new Date().toISOString().slice(0, 10);
 
-    $("#parcelaModal").modal("show");
+    $('#parcelaModal').modal('show');
 });
 
-// Activar dibujo
-document.getElementById("draw-poligono").addEventListener("click", function () {
-    var polygonOptions = {
+// Cerrar el modal y eliminar el polígono no guardado si se cancela
+document.querySelector('#parcelaModal .btn-secondary').addEventListener('click', function () {
+    // Cierra el modal vía jQuery
+    $('#parcelaModal').modal('hide');
+
+    // Elimina el polígono si fue trazado
+    if (drawnLayer) {
+        drawnItems.removeLayer(drawnLayer);
+        drawnLayer = null;
+    }
+
+    // Reactiva el modo dibujo automáticamente
+    const polygonOptions = {
         allowIntersection: false,
         showArea: true,
         shapeOptions: {
@@ -187,6 +242,26 @@ document.getElementById("draw-poligono").addEventListener("click", function () {
         }
     };
     new L.Draw.Polygon(map, polygonOptions).enable();
+
+    // Opcional: alerta visual
+    mostrarAlerta('Modo dibujo activado nuevamente.', 'info');
+});
+
+// Manejo del modal de eliminación
+document.querySelector('#modalEliminarPoligono .btn-secondary').addEventListener('click', function () {
+    // Cierra el modal
+    $('#modalEliminarPoligono').modal('hide');
+
+    // Mantén el modo eliminación activo
+    deleteMode = true;
+    map.getContainer().style.cursor = "crosshair";
+
+    // Limpia variables de selección
+    poligonoIdAEliminar = null;
+    poligonoLayerAEliminar = null;
+
+    // Alerta de retorno al modo activo
+    mostrarAlerta('Modo eliminación reactivado.', 'info');
 });
 
 // Mostrar alertas (reemplazo de toasts)
@@ -270,6 +345,7 @@ document.getElementById('poligonoForm').addEventListener('submit', function (e) 
             });
         }
         return resp.json();
+        
     })
     .then(json => {
         const modalElement = document.getElementById('parcelaModal');
@@ -296,6 +372,7 @@ document.getElementById('poligonoForm').addEventListener('submit', function (e) 
 
         // Rehabilitar botón
         submitBtn.disabled = false;
+        
     })
     .catch(error => {
         console.log('Error del backend:', error);

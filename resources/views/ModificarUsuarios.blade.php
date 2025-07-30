@@ -1,8 +1,8 @@
 @extends("layouts.appGOB")
 
-@section("title", "RegistrarUsuario")
+@section("title", "Modificar Usuario")
 
-@section("view-name", "RegistrarUsuario")
+@section("view-name", "Modificar Usuario")
 
 @section("content")
 

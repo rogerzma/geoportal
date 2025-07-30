@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/poligonos/up/{up_id}', [PoligonoController::class, 'porUP']);
     Route::post('/poligonos', [PoligonoController::class, 'store']);
     Route::delete('/poligonos/{id}', [PoligonoController::class, 'destroy']);
+    Route::get('/poligonos/hectareas-totales', [PoligonoController::class, 'hectareasTotales']);
 // Rutas para unidades de producción
     Route::post('/unidades-produccion', [UPController::class, 'store']);
     Route::get('/unidades-produccion', [UPController::class, 'index']);

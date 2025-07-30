@@ -47,11 +47,6 @@
               <p><h4>Nombre de la UP</h4></p>
               <input class="form-control" placeholder="Ingrese el nombre de la UP" type="text" name="nombre" id="nombre_up">
             </p></div>
-            <div class="col-md-4">
-              <p>
-                <p><h4>Nombre del propietario</h4></p>
-                <input class="form-control" placeholder="Ingrese el nombre del propietario" type="text" name="propietario" id="propietario">
-              </p></div>
               <div class="col-md-4">
                 <p>
                     <p><h4>Localidad</h4></p>
@@ -60,12 +55,20 @@
        </div>
 
        <div class="row">
+        <div class="col-md-4">
+              <p>
+                <p><h4>Responsable de la UP</h4></p>
+                <input class="form-control" placeholder="Ingrese el nombre del responsable" type="text" name="responsable" id="responsable">
+              </p></div>
             <div class="col-md-4">
                 <p>
                     <p><h4>Telefono</h4></p>
                     <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="telefono" id="telefono">
                 </p></div>
-            <div class="col-md-4">
+     </div>
+     
+     <div class="row">
+          <div class="col-md-4">
             <p>
               <p><br>
                 <button type="button" class="btn btn-primary" id="validateReportButton">Registrar UP</button>
@@ -73,8 +76,7 @@
             </p></div>
             <input type="hidden" id="user_id" value="{{ Auth::id() }}">
             <input type="hidden" id="responsable_tecnico" value="{{ Auth::user()->name }}">
-
-     </div><br>
+      </div><br>
 
     <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">

@@ -16,7 +16,7 @@ class PoligonoController extends Controller
      */
     public function index()
     {
-        $poligonos = Poligono::with(['user'])->get();
+        $poligonos = Poligono::with(['user', 'unidadProduccion'])->get();
         return response()->json($poligonos);
     }
 
@@ -130,5 +130,20 @@ class PoligonoController extends Controller
         } else {
             return response()->json(['error' => 'Polígono no encontrado.'], 404);
         }
+    }
+
+    /**
+     * Obtener el total de hectáreas de todos los polígonos.
+     */
+    public function hectareasTotales()
+    {
+        // Calcula el área total en hectáreas (ST_Area en metros cuadrados / 10,000)
+        $total = DB::table('poligono')
+            ->selectRaw('SUM(ST_Area(geom::geography) / 10000) as hectareas')
+            ->value('hectareas');
+
+        return response()->json([
+            'hectareas_totales' => round($total, 2)
+        ]);
     }
 }

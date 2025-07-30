@@ -97,6 +97,13 @@
                     de cultivos y las estaciones meteorológicas que se encuentran
                     en el estado de Zacatecas.
                 </p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Numero de hectareas intervenidas: 
+                            <span id="hectareas-totales">--</span>
+                        </p>
+                    </div>
+                </div>
                 <div class="map-wrapper">
                     <!-- Mapa -->
                     <div class="flex-grow-1 p-3">
@@ -107,7 +114,6 @@
                         <div id="lat-lng">Lat: --, Lng: --</div>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 
