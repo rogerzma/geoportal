@@ -65,7 +65,6 @@
                 <option value="">Seleccione...</option>
                 <option value="administrador">Administrador</option>
                 <option value="tecnico">Técnico</option>
-                <option value="productor">Productor</option>
             </select>
             </div>
 
