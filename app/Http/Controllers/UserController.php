@@ -43,7 +43,17 @@ class UserController extends Controller
             'tipo_usuario' => $request->tipo_usuario
         ]);
 
-        return response()->json(['message' => 'Usuario creado correctamente', 'user' => $user], 201);
+        // Redirigir según el rol
+        if ($user->tipo_usuario === 'administrador') {
+            return redirect()->route('admin');
+        } elseif ($user->tipo_usuario === 'tecnico') {
+            return view('UsuarioTecnico');
+        } elseif ($user->tipo_usuario === 'productor') {
+            return redirect()->route('productor');
+        }
+
+        // Si no coincide con ningún rol
+        abort(403, 'No tienes permisos para acceder aquí.');
     }
 
     // Actualizar un usuario existente
@@ -83,5 +93,11 @@ class UserController extends Controller
         }
         $user->delete();
         return response()->json(['message' => 'Usuario eliminado correctamente']);
+    }
+
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.ModificarUsuarioAdmin', compact('user'));
     }
 }

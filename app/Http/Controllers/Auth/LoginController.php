@@ -39,7 +39,18 @@ class LoginController extends Controller
     }
 
     public function redirectTo()
-        {
+    {
+        $user = auth()->user();
+
+        if ($user->tipo_usuario === 'administrador') {
             return '/admin';
+        } elseif ($user->tipo_usuario === 'tecnico') {
+            return '/tecnico';
+        } elseif ($user->tipo_usuario === 'productor') {
+            return '/productor';
         }
+
+        // En caso de que no coincida con ninguno
+        return '/home';
+    }
 }

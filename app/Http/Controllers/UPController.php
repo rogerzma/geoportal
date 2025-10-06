@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\UnidadProduccion;
 use Illuminate\Support\Facades\Auth;
 
+
 class UPController extends Controller
 {
     /**
@@ -77,9 +78,20 @@ class UPController extends Controller
                 'localidad' => $request->localidad ?? $unidad->localidad,
                 'responsable' => $request->responsable ?? $unidad->responsable,
                 'telefono' => $request->telefono ?? $unidad->telefono,
-                // responsable_tecnico y user_id normalmente no se actualizan aquí
             ]);
-            return redirect()->route('unidades-produccion')->with('success', 'UP actualizada correctamente.');
+
+            // Detecta el rol y redirige
+            $user = auth()->user();
+
+            if ($user->role === 'administrador') {
+                return view('admin.ModificarUPAdmin', compact('unidad'));
+            } elseif ($user->role === 'productor') {
+                return view('productor.ModificarUPProductor', compact('unidad'));
+            } elseif ($user->role === 'tecnico') {
+                return view('tecnico.ModificarUPTecnico', compact('unidad'));
+            } else {
+                return view('ModificarUP', compact('unidad'));
+            }
         } else {
             return response()->json(['error' => 'Unidad de producción no encontrada.'], 404);
         }
@@ -89,7 +101,18 @@ class UPController extends Controller
     public function edit($id)
     {
         $unidad = UnidadProduccion::findOrFail($id);
-        return view('ModificarUP', compact('unidad'));
+        $user = auth()->user();
+
+        if ($user->role === 'administrador') {
+            return view('admin.ModificarUPAdmin', compact('unidad'));
+        } elseif ($user->role === 'productor') {
+            return view('productor.ModificarUPProductor', compact('unidad'));
+        } elseif ($user->role === 'tecnico') {
+            return view('tecnico.ModificarUPTecnico', compact('unidad'));
+        } else {
+            // Vista genérica o error
+            return view('ModificarUP', compact('unidad'));
+        }
     }
 
 

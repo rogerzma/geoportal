@@ -59,16 +59,6 @@ $(document).ready(function () {
 
                     let filas = '';
                     response.forEach(function (up) {
-                        let editarUrl = '';
-                        if (window.userRole === 'administrador') {
-                            editarUrl = `/admin/modificar-up/${up.id}`;
-                        } else if (window.userRole === 'tecnico') {
-                            editarUrl = `/tecnico/modificar-up/${up.id}`;
-                        } else if (window.userRole === 'productor') {
-                            editarUrl = `/productor/modificar-up/${up.id}`;
-                        } else {
-                            editarUrl = `/modificar-up/${up.id}`;
-                        }
 
                         filas += `
                             <tr>
@@ -82,7 +72,7 @@ $(document).ready(function () {
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="${editarUrl}" class="glyphicon glyphicon-pencil"></a>
+                                    <a href="/admin/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
                                     <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
                                 </td>
                             </tr>
