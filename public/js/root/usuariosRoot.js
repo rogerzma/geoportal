@@ -21,7 +21,7 @@ $(document).ready(function () {
                             <td>${usuario.telefono || ''}</td>
                             <td>${usuario.tipo_usuario ? usuario.tipo_usuario.charAt(0).toUpperCase() + usuario.tipo_usuario.slice(1) : ''}</td>
                             <td>
-                                <a href="/admin/modificar-usuario/${usuario.id}" class="glyphicon glyphicon-pencil"></a>
+                                <a href="/root/modificar-usuario/${usuario.id}" class="glyphicon glyphicon-pencil"></a>
                                 <a href="#" class="glyphicon glyphicon-trash btn-eliminar" data-id="${usuario.id}" style="color: #ff0000;"></a>
                             </td>
                         </tr>
@@ -101,7 +101,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 // Redirigir a la vista de administración de usuarios
-                window.location.href = '/admin/usuarios';
+                window.location.href = '/root/usuarios';
             },
             error: function (xhr) {
                 let mensaje = 'Ocurrió un error inesperado.';
@@ -140,7 +140,7 @@ $(document).ready(function () {
                 password_confirmation
             },
             success: function (response) {
-                window.location.href = '/admin/usuarios'; // vuelve a lista
+                window.location.href = '/root/usuarios'; // vuelve a lista
             },
             error: function (xhr) {
                 let mensaje = 'Ocurrió un error inesperado.';

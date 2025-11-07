@@ -27,8 +27,8 @@
     <div class="col-md-3">
         <div class="list-group">
           <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+          <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+          <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion-admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
           <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
@@ -63,8 +63,8 @@
             <h4>Tipo de usuario</h4>
             <select class="form-control" name="tipo_usuario" id="tipo_usuario" required>
                 <option value="">Seleccione...</option>
-                <option value="administrador">Administrador</option>
                 <option value="tecnico">Técnico</option>
+                <option value="productor">Productor</option>
             </select>
             </div>
 
@@ -109,7 +109,7 @@
 
 <!-- Scripts -->
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="{{ asset('js/usuarios.js') }}"></script>
+   <script src="{{ asset('js/admin/usuariosAdmin.js') }}"></script>
 
 
 @endsection

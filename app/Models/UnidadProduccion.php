@@ -16,8 +16,8 @@ class UnidadProduccion extends Model
         'localidad',
         'responsable',
         'telefono',
-        'responsable_tecnico',
-        'user_id'
+        'productor',
+        'user_id'        
     ]; // Campos que se pueden asignar masivamente
 
     /**

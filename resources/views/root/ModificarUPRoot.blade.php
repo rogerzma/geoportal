@@ -36,7 +36,7 @@
     </div>
 
     <div class="container">
-        <form method="POST" action="{{ route('up.actualizar.admin', $unidad->id) }}">
+        <form method="POST" action="{{ route('up.actualizar.root', $unidad->id) }}">
             @csrf
             @method('PUT')
 

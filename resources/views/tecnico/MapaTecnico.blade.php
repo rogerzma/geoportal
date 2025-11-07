@@ -52,6 +52,7 @@
             <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
             <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
             <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+            <li><a href="{{ route('tecnico') }}">Tecnico</a></li>
             <li class="active">Vista general del mapa</li>
         </ol>
     </div>
@@ -67,8 +68,8 @@
                 <div class="col-md-3">
                     <div class="list-group">
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('usuarios-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>

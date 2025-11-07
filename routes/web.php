@@ -7,11 +7,50 @@ use App\Http\Controllers\UserController;
 
 Auth::routes();
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
+    Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
+    Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+});
+
 Route::get('/', function () {
     return view('welcome');
 })->name('inicio');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::middleware(['auth', 'role:root'])->group(function(){
+    
+    Route::get('/root', function(){
+        return view('root/InicioRoot');
+    })->name('root');
+
+    Route::get('/root/mapa', function () {
+        return view('root/MapaRoot');
+    })->name('mapa-root');
+
+    Route::get('/root/registro-usuarios', function(){
+        return view('root/RegistrarUsuario');
+    })->name('registrar-usuarios-root');
+
+    Route::get('/root/usuarios', function(){
+        return view('root/AdministrarUsuariosRoot');
+    })->name('administrar-usuarios-root');
+
+    Route::get('/root/up', function(){
+        return view('root/UnidadesProduccion');
+    })->name('unidades-produccion-root');
+
+    Route::get('/root/crear-up', [UPController::class, 'create'])->name('crear-up-root');
+
+    Route::get('/root/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-root');
+    Route::get('/root/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up-root');
+    Route::put('/root/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.root');
+    Route::get('/root/modificar-usuario/{id}', [UserController::class, 'edit'])->name('root.modificar-usuario');
+    Route::put('/root/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.root');
+});
 
 Route::middleware(['auth', 'role:administrador'])->group(function(){
     
@@ -39,7 +78,7 @@ Route::middleware(['auth', 'role:administrador'])->group(function(){
         return view('admin/CrearUP');
     })->name('crear-up-admin');
 
-    Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos');
+    Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-admin');
     Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
     Route::put('/admin/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.admin');
     Route::get('/admin/modificar-usuario/{id}', [UserController::class, 'edit'])->name('admin.modificar-usuario');

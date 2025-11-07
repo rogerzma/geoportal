@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\UnidadProduccion;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -28,7 +29,7 @@ class UPController extends Controller
                 'localidad' => 'required|string|max:255',
                 'responsable' => 'required|string|max:255',
                 'telefono' => 'required|string|max:20',
-                'responsable_tecnico' => 'required|string|max:255',
+                'productor' => 'nullable|string|max:255',
                 'user_id' => 'required|integer',
             ]);
 
@@ -37,12 +38,18 @@ class UPController extends Controller
                 'localidad' => $request->localidad,
                 'responsable' => $request->responsable,
                 'telefono' => $request->telefono,
-                'responsable_tecnico' => $request->responsable_tecnico,
+                'productor' => $request->productor,
                 'user_id' => $request->user_id,
             ]);
 
             return response()->json(['message' => 'Unidad de producción guardada correctamente.', 'unidad' => $unidad], 201);
         }
+
+    public function create()
+    {
+        $productores = User::where('tipo_usuario', 'productor')->get(['id', 'name']);
+        return view('root.CrearUP', compact('productores'));
+    }
 
     /**
      * Mostrar una unidad de producción específica.
@@ -83,12 +90,14 @@ class UPController extends Controller
             // Detecta el rol y redirige
             $user = auth()->user();
 
-            if ($user->role === 'administrador') {
+            if ($user->tipo_usuario === 'administrador') {
                 return view('admin.ModificarUPAdmin', compact('unidad'));
-            } elseif ($user->role === 'productor') {
+            } elseif ($user->tipo_usuario === 'productor') {
                 return view('productor.ModificarUPProductor', compact('unidad'));
-            } elseif ($user->role === 'tecnico') {
+            } elseif ($user->tipo_usuario === 'tecnico') {
                 return view('tecnico.ModificarUPTecnico', compact('unidad'));
+            } elseif ($user->tipo_usuario === 'root') {
+                return view('root.UnidadesProduccion', compact('unidad'));
             } else {
                 return view('ModificarUP', compact('unidad'));
             }
@@ -102,13 +111,16 @@ class UPController extends Controller
     {
         $unidad = UnidadProduccion::findOrFail($id);
         $user = auth()->user();
+       // dd($user);
 
-        if ($user->role === 'administrador') {
+        if ($user && $user->tipo_usuario === 'root') {
+            return view('root.ModificarUPRoot', compact('unidad'));
+        } elseif ($user && $user->tipo_usuario === 'administrador') {
             return view('admin.ModificarUPAdmin', compact('unidad'));
-        } elseif ($user->role === 'productor') {
-            return view('productor.ModificarUPProductor', compact('unidad'));
-        } elseif ($user->role === 'tecnico') {
+        } elseif ($user && $user->tipo_usuario === 'tecnico') {
             return view('tecnico.ModificarUPTecnico', compact('unidad'));
+        } elseif ($user && $user->tipo_usuario === 'productor') {
+            return view('productor.ModificarUPProductor', compact('unidad'));
         } else {
             // Vista genérica o error
             return view('ModificarUP', compact('unidad'));
@@ -119,17 +131,32 @@ class UPController extends Controller
     /**
      * Mostrar el mapa de unidades de producción.
      */
-    public function mapaUP(Request $request)
-    {
-        $upId = $request->query('up_id');
-        $unidadProduccion = null;
-        if ($upId) {
-            $unidadProduccion = \App\Models\UnidadProduccion::find($upId);
-        }
-        // Depuración
-        // dd($upId, $unidadProduccion);
-        return view('MapaUP', compact('unidadProduccion'));
+public function mapaUP(Request $request)
+{
+    $upId = $request->query('up_id');
+    $unidadProduccion = null;
+    $user = auth()->user();
+
+    if ($upId) {
+        $unidadProduccion = UnidadProduccion::find($upId);
     }
+
+    // Obtener rol del usuario actual
+    $rol = auth()->user()->rol ?? null;
+
+    if ($user && $user->tipo_usuario === 'root') {
+            return view('root.MapaUPRoot', compact('unidadProduccion'));
+        } elseif ($user && $user->tipo_usuario === 'administrador') {
+            return view('admin.MapaUPAdmin', compact('unidadProduccion'));
+        } elseif ($user && $user->tipo_usuario === 'tecnico') {
+            return view('tecnico.MapaUPTecnico', compact('unidadProduccion'));
+        } elseif ($user && $user->tipo_usuario === 'productor') {
+            return view('productor.MapaUPProductor', compact('unidadProduccion'));
+        } else {
+            // Vista genérica o error
+            return view('MapaUP', compact('unidadProduccion'));
+        }
+}
 
     /**
      * Eliminar una unidad de producción.

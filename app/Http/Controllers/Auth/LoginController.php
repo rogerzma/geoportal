@@ -46,6 +46,8 @@ class LoginController extends Controller
             return '/admin';
         } elseif ($user->tipo_usuario === 'tecnico') {
             return '/tecnico';
+        } elseif ($user->tipo_usuario === 'root') {
+            return '/root';
         } elseif ($user->tipo_usuario === 'productor') {
             return '/productor';
         }

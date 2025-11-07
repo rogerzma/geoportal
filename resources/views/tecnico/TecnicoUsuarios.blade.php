@@ -23,9 +23,9 @@
         </div>
         <div class="col-md-3">
             <div class="list-group">
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
             <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
@@ -80,6 +80,6 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ asset('js/usuarios.js') }}"></script>
+<script src="{{ asset('js/tecnico/usuarioTecnico.js') }}"></script>
 
 @endsection

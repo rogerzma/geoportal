@@ -11,7 +11,8 @@
 			<li><a href="http://www.gob.mx"><i class="icon icon-home"></i></a></li>
 			<li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
 			<li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
-			<li class="active">Geoportal</li>
+            <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+            <li class="active">Tecnico</li>
 		</ol>
 	</div>
 
@@ -35,7 +36,7 @@
 
         <div class="col-md-9">
             <div class="row">
-                <h4><a href="{{ route('mapa-gob') }}">Vista general del geoportal</a><br></h4>
+                <h4><a href="{{ route('mapa-tecnico') }}">Vista general del geoportal</a><br></h4>
                 <h4><a href="{{ route('tecnico-up') }}">Unidades de producción</a><br></h4>
                 <h4><a href="{{ route('usuarios-tecnico') }}">Administrar usuarios</a><br></h4>
                 <h4><a href="{{ route('registrar-usuarios-tecnico') }}">Dar de alta a usuarios</a><br><br></h4>

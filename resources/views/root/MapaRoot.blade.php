@@ -66,9 +66,9 @@
                 </div>
                 <div class="col-md-3">
                     <div class="list-group">
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion-admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
@@ -147,6 +147,6 @@
     </script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <script src="{{ asset('js/mapaAdmin.js') }}"></script>
+    <script src="{{ asset('js/root/mapaRoot.js') }}"></script>
 </body>
 </html>

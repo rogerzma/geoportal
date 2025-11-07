@@ -26,9 +26,9 @@
       </div>
       <div class="col-md-3">
           <div class="list-group">
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
               <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
@@ -52,6 +52,17 @@
                     <p><h4>Localidad</h4></p>
                     <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="localidad" id="localidad">
                 </p></div>
+                <div class="col-md-4">
+                  <p>
+                      <p><h4>Nombre del productor</h4></p>
+                      <select class="form-control" id="productor">
+                          <option value="">No aplica</option>
+                          @foreach($productores as $prod)
+                              <option value="{{ $prod->name }}">{{ $prod->name }}</option>
+                          @endforeach
+                      </select>
+                  </p>
+                </div>
        </div>
 
        <div class="row">
@@ -76,7 +87,6 @@
               </p>
             </p></div>
             <input type="hidden" id="user_id" value="{{ Auth::id() }}">
-            <input type="hidden" id="responsable_tecnico" value="{{ Auth::user()->name }}">
      </div>
      <br>
 
@@ -106,9 +116,9 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    const urlUnidadesProduccion = "{{ route('unidades-produccion') }}";
+    const urlUnidadesProduccion = "{{ route('unidades-produccion-root') }}";
 </script>
-<script src="{{ asset('js/up.js') }}"></script>
+<script src="{{ asset('js/root/upRoot.js') }}"></script>
 
 
 

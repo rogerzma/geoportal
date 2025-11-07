@@ -11,7 +11,15 @@ class UserController extends Controller
     // Obtener todos los usuarios
     public function index()
     {
-        return User::all();
+        $auth = auth()->user();
+
+        // Si el autenticado es root, mostrar todos
+        if ($auth && $auth->tipo_usuario === 'root') {
+            return User::all();
+        }
+
+        // Si no, mostrar solo los que creó ese usuario (o ninguno si no autenticado)
+        return User::where('created_by', $auth ? $auth->id : 0)->get();
     }
 
     // Obtener un usuario por ID
@@ -40,20 +48,11 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'telefono' => $request->telefono,
-            'tipo_usuario' => $request->tipo_usuario
+            'tipo_usuario' => $request->tipo_usuario,
+            'created_by' => auth()->id(), // Se guarda el usuario que lo creó
         ]);
 
-        // Redirigir según el rol
-        if ($user->tipo_usuario === 'administrador') {
-            return redirect()->route('admin');
-        } elseif ($user->tipo_usuario === 'tecnico') {
-            return view('UsuarioTecnico');
-        } elseif ($user->tipo_usuario === 'productor') {
-            return redirect()->route('productor');
-        }
-
-        // Si no coincide con ningún rol
-        abort(403, 'No tienes permisos para acceder aquí.');
+        return response()->json(['message' => 'Usuario creado correctamente', 'user' => $user]);
     }
 
     // Actualizar un usuario existente
@@ -98,6 +97,23 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('admin.ModificarUsuarioAdmin', compact('user'));
+        $authUser = auth()->user();
+
+        // Si el usuario autenticado es root, siempre muestra la vista de root
+        if ($authUser && $authUser->tipo_usuario === 'root') {
+            return view('root.ModificarUsuarioRoot', compact('user'));
+        }
+        // Si el usuario autenticado es admin, muestra la vista de admin
+        elseif ($authUser && $authUser->tipo_usuario === 'administrador') {
+            return view('admin.ModificarUsuariosAdmin', compact('user'));
+        }
+        // Si el usuario autenticado es tecnico, muestra la vista de tecnico
+        elseif ($authUser && $authUser->tipo_usuario === 'tecnico') {
+            return view('tecnico.ModificarUsuarioTecnico', compact('user'));
+        }
+        // Vista genérica o error
+        else {
+            return view('ModificarUsuarios', compact('user'));
+        }
     }
 }

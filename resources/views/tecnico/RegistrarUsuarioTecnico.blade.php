@@ -108,7 +108,7 @@
 
 <!-- Scripts -->
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="{{ asset('js/usuarios.js') }}"></script>
+   <script src="{{ asset('js/tecnico/usuarioTecnico.js') }}"></script>
 
 
 @endsection

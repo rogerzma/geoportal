@@ -18,9 +18,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-9">
-                <h2>Menu Administrador</h2>
+                <h2>Menu Superusuario</h2>
                 <hr class="red">
-                <h4><p>Bienvenido al menú administrador de geoportal INIFAP, seleccione las opciones que desee realizar:</p></h4>
+                <h4><p>Bienvenido al menú superusuario de geoportal INIFAP, seleccione las opciones que desee realizar:</p></h4>
             </div>
             <div class="col-md-3">
                 <div class="list-group">
@@ -35,10 +35,10 @@
 
         <div class="col-md-9">
             <div class="row">
-                <h4><a href="{{ route('mapa-admin') }}">Vista general del geoportal</a><br></h4>
-                <h4><a href="{{ route('unidades-produccion-admin') }}">Unidades de producción</a><br></h4>
-                <h4><a href="{{ route('administrar-usuarios-admin') }}">Administrar usuarios</a><br></h4>
-                <h4><a href="{{ route('registrar-usuarios-admin') }}">Dar de alta a usuarios</a><br><br></h4>
+                <h4><a href="{{ route('mapa-root') }}">Vista general del geoportal</a><br></h4>
+                <h4><a href="{{ route('unidades-produccion-root') }}">Unidades de producción</a><br></h4>
+                <h4><a href="{{ route('administrar-usuarios-root') }}">Administrar usuarios</a><br></h4>
+                <h4><a href="{{ route('registrar-usuarios-root') }}">Dar de alta a usuarios</a><br><br></h4>
         </div>
         </div>
     </div>
@@ -47,6 +47,6 @@
     window.userRole = "{{ auth()->user()->role }}";
 </script>
 <!-- Tu archivo JS -->
-<script src="{{ asset('js/admin/upAdmin.js') }}"></script>
+<script src="{{ asset('js/root/upRoot.js') }}"></script>
 
 @endsection
