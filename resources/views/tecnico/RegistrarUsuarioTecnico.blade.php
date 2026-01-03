@@ -63,6 +63,7 @@
             <h4>Tipo de usuario</h4>
             <select class="form-control" name="tipo_usuario" id="tipo_usuario" required>
                 <option value="">Seleccione...</option>
+                <option value="jefe_operativo">Jefe operativo</option>
                 <option value="productor">Productor</option>
             </select>
             </div>

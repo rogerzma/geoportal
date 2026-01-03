@@ -43,6 +43,7 @@
                     <tr>
                         <th colspan="1" style="background:#009933; color:#FFF;">Nombre</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Localidad</th>
+                        <th colspan="1" style="background:#009933; color:#FFF;">Capturista</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Responsable</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Teléfono</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Polígonos</th>

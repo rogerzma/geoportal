@@ -1,6 +1,6 @@
 @extends('layouts.appGOB')
 
-@section("title", "ProductorUP")
+@section("title", "CapturistaUP")
 
 @section('content')
 
@@ -87,6 +87,6 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ asset('js/productor/upProductor.js') }}"></script>
+<script src="{{ asset('js/capturista/upCapturista.js') }}"></script>
 
 @endsection

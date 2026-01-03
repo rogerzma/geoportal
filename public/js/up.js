@@ -24,7 +24,7 @@ $(document).ready(function () {
         $('#emptyFieldsAlert').hide();
 
         $.ajax({
-            url: '/api/unidades-produccion',
+            url: '/unidades-produccion',
             method: 'POST',
             data: {
                 nombre_up,
@@ -47,7 +47,7 @@ $(document).ready(function () {
     // 📦 Cargar tabla de UP
         function cargarUnidadesProduccion() {
         $.ajax({
-            url: '/api/unidades-produccion',
+            url: '/unidades-produccion',
             method: 'GET',
             success: function (response) {
                 if (response.length === 0) {
@@ -114,7 +114,7 @@ $(document).ready(function () {
         if (!upIdParaEliminar) return;
 
         $.ajax({
-            url: `/api/unidades-produccion/${upIdParaEliminar}`,
+            url: `/unidades-produccion/${upIdParaEliminar}`,
             method: 'DELETE',
             success: function (response) {
                 $('#modalEliminarUP').modal('hide');

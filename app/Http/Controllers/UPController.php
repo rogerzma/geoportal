@@ -5,171 +5,263 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UnidadProduccion;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-
 
 class UPController extends Controller
 {
     /**
-     * Mostrar todas las unidades de producción.
+     * ============================
+     * LISTAR UNIDADES DE PRODUCCIÓN
+     * ============================
      */
     public function index()
     {
-        $unidades = UnidadProduccion::with('usuario')->get();
-        return response()->json($unidades);
-    }
-
-    /**
-     * Guardar una nueva unidad de producción.
-     */
-    public function store(Request $request)
-        {
-            $request->validate([
-                'nombre_up' => 'required|string|max:255',
-                'localidad' => 'required|string|max:255',
-                'responsable' => 'required|string|max:255',
-                'telefono' => 'required|string|max:20',
-                'productor' => 'nullable|string|max:255',
-                'user_id' => 'required|integer',
-            ]);
-
-            $unidad = UnidadProduccion::create([
-                'nombre_up' => $request->nombre_up,
-                'localidad' => $request->localidad,
-                'responsable' => $request->responsable,
-                'telefono' => $request->telefono,
-                'productor' => $request->productor,
-                'user_id' => $request->user_id,
-            ]);
-
-            return response()->json(['message' => 'Unidad de producción guardada correctamente.', 'unidad' => $unidad], 201);
+        $auth = auth()->user();
+        if (!$auth) {
+            return response()->json([]);
         }
 
+        // ROOT → ve todas las UP
+        if ($auth->tipo_usuario === 'root') {
+            return UnidadProduccion::with(['capturista', 'creador'])->get();
+        }
+
+        // ADMINISTRADOR → UP de sus CAPTURISTAS (directos o vía técnicos)
+        if ($auth->tipo_usuario === 'administrador') {
+
+            // Técnicos creados por el admin
+            $tecnicos = User::where('tipo_usuario', 'tecnico')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            // Capturistas creados por el admin o por sus técnicos
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where(function ($q) use ($auth, $tecnicos) {
+                    $q->where('created_by', $auth->id)
+                      ->orWhereIn('created_by', $tecnicos);
+                })
+                ->pluck('id');
+
+            return UnidadProduccion::with(['capturista', 'creador'])
+                ->whereIn('capturista_id', $capturistas)
+                ->get();
+        }
+
+        // TÉCNICO → UP de sus capturistas
+        if ($auth->tipo_usuario === 'tecnico') {
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            return UnidadProduccion::with(['capturista', 'creador'])
+                ->whereIn('capturista_id', $capturistas)
+                ->get();
+        }
+
+        // CAPTURISTA → ve SUS UP aunque no las haya creado
+        if ($auth->tipo_usuario === 'capturista') {
+            return UnidadProduccion::with(['capturista', 'creador'])
+                ->where('capturista_id', $auth->id)
+                ->get();
+        }
+
+        return response()->json([]);
+    }
+
+    // Guardar nueva UP
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nombre_up'    => 'required|string|max:255',
+            'localidad'    => 'required|string|max:255',
+            'responsable'  => 'required|string|max:255',
+            'telefono'     => 'required|string|max:20',
+            'capturista_id' => 'required|exists:users,id',
+        ]);
+
+        $unidad = UnidadProduccion::create([
+            'nombre_up'    => $request->nombre_up,
+            'localidad'    => $request->localidad,
+            'responsable'  => $request->responsable,
+            'telefono'     => $request->telefono,
+            'capturista_id' => $request->capturista_id,
+            'created_by'   => auth()->id(), // 👈 siempre el usuario autenticado
+        ]);
+
+        return response()->json([
+            'message' => 'Unidad de producción creada correctamente',
+            'unidad'  => $unidad
+        ], 201);
+    }
+
+    // Crear UP
     public function create()
     {
-        $productores = User::where('tipo_usuario', 'productor')->get(['id', 'name']);
-        return view('root.CrearUP', compact('productores'));
-    }
+        $auth = auth()->user();
 
-    /**
-     * Mostrar una unidad de producción específica.
-     */
+        // ROOT → todos los capturistas
+        if ($auth->tipo_usuario === 'root') {
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->get(['id', 'name']);
+
+            return view('root.CrearUP', compact('capturistas'));
+        }
+
+        // ADMINISTRADOR → capturistas propios, de sus técnicos, o de los jefes operativos de sus técnicos
+        if ($auth->tipo_usuario === 'administrador') {
+            $tecnicos = User::where('tipo_usuario', 'tecnico')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
+                ->whereIn('created_by', $tecnicos)
+                ->pluck('id');
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where(function ($q) use ($auth, $tecnicos, $jefesOperativos) {
+                    $q->where('created_by', $auth->id)
+                    ->orWhereIn('created_by', $tecnicos)
+                    ->orWhereIn('created_by', $jefesOperativos);
+                })
+                ->get(['id', 'name']);
+
+            return view('admin.CrearUP', compact('capturistas'));
+        }
+
+        // TÉCNICO → capturistas propios, o de sus jefes operativos
+        if ($auth->tipo_usuario === 'tecnico') {
+            $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where(function ($q) use ($auth, $jefesOperativos) {
+                    $q->where('created_by', $auth->id)
+                    ->orWhereIn('created_by', $jefesOperativos);
+                })
+                ->get(['id', 'name']);
+
+            return view('tecnico.CrearUP', compact('capturistas'));
+        }
+
+        // JEFE OPERATIVO → capturistas creados por él
+        if ($auth->tipo_usuario === 'jefe_operativo') {
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where('created_by', $auth->id)
+                ->get(['id', 'name']);
+
+            return view('jefe_operativo.CrearUP', compact('capturistas'));
+        }
+
+        // CAPTURISTA → no puede crear UP para otros
+        if ($auth->tipo_usuario === 'capturista') {
+            return view('capturista.CrearUPCapturista');
+        }
+
+        return abort(403, 'No autorizado');
+    }
+    //Mostrar UP
+
     public function show($id)
     {
-        $unidad = UnidadProduccion::with('usuario')->find($id);
+        $unidad = UnidadProduccion::with(['capturista', 'creador'])->find($id);
 
-        if ($unidad) {
-            return response()->json($unidad);
-        } else {
-            return response()->json(['error' => 'Unidad de producción no encontrada.'], 404);
+        if (!$unidad) {
+            return response()->json(['error' => 'Unidad no encontrada'], 404);
         }
+
+        return response()->json($unidad);
     }
 
-    /**
-     * Actualizar una unidad de producción existente.
-     */
+    //Actualizar UP
+
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nombre_up' => 'string|max:255',
-            'localidad' => 'string|max:255',
-            'responsable' => 'string|max:255',
-            'telefono' => 'string|max:20',
+            'nombre_up'   => 'nullable|string|max:255',
+            'localidad'   => 'nullable|string|max:255',
+            'responsable' => 'nullable|string|max:255',
+            'telefono'    => 'nullable|string|max:20',
         ]);
 
-        $unidad = UnidadProduccion::find($id);
+        $unidad = UnidadProduccion::findOrFail($id);
 
-        if ($unidad) {
-            $unidad->update([
-                'nombre_up' => $request->nombre_up ?? $unidad->nombre_up,
-                'localidad' => $request->localidad ?? $unidad->localidad,
-                'responsable' => $request->responsable ?? $unidad->responsable,
-                'telefono' => $request->telefono ?? $unidad->telefono,
-            ]);
+        $unidad->update($request->only([
+            'nombre_up',
+            'localidad',
+            'responsable',
+            'telefono'
+        ]));
 
-            // Detecta el rol y redirige
-            $user = auth()->user();
+        $user = auth()->user();
 
-            if ($user->tipo_usuario === 'administrador') {
-                return view('admin.ModificarUPAdmin', compact('unidad'));
-            } elseif ($user->tipo_usuario === 'productor') {
-                return view('productor.ModificarUPProductor', compact('unidad'));
-            } elseif ($user->tipo_usuario === 'tecnico') {
-                return view('tecnico.ModificarUPTecnico', compact('unidad'));
-            } elseif ($user->tipo_usuario === 'root') {
-                return view('root.UnidadesProduccion', compact('unidad'));
-            } else {
-                return view('ModificarUP', compact('unidad'));
-            }
-        } else {
-            return response()->json(['error' => 'Unidad de producción no encontrada.'], 404);
-        }
+        // 🔁 REDIRECCIÓN SEGÚN ROL
+        return match ($user->tipo_usuario) {
+            'root'          => redirect()->route('unidades-produccion-root')
+                                ->with('success', 'UP actualizada correctamente'),
+            'administrador' => redirect()->route('unidades-produccion-admin')
+                                ->with('success', 'UP actualizada correctamente'),
+            'tecnico'       => redirect()->route('tecnico-up')
+                                ->with('success', 'UP actualizada correctamente'),
+            'jefe_operativo' => redirect()->route('jefe-operativo-up')
+                                ->with('success', 'UP actualizada correctamente'),
+            'capturista'     => redirect()->route('capturista-up')
+                                ->with('success', 'UP actualizada correctamente'),
+            default         => redirect()->route('inicio'),
+        };
     }
 
-    // Funcion para retornar la vista de modificar UP
+    //Editar UP
     public function edit($id)
     {
         $unidad = UnidadProduccion::findOrFail($id);
         $user = auth()->user();
-       // dd($user);
 
-        if ($user && $user->tipo_usuario === 'root') {
-            return view('root.ModificarUPRoot', compact('unidad'));
-        } elseif ($user && $user->tipo_usuario === 'administrador') {
-            return view('admin.ModificarUPAdmin', compact('unidad'));
-        } elseif ($user && $user->tipo_usuario === 'tecnico') {
-            return view('tecnico.ModificarUPTecnico', compact('unidad'));
-        } elseif ($user && $user->tipo_usuario === 'productor') {
-            return view('productor.ModificarUPProductor', compact('unidad'));
-        } else {
-            // Vista genérica o error
-            return view('ModificarUP', compact('unidad'));
-        }
+        return match ($user->tipo_usuario) {
+            'root'          => view('root.ModificarUPRoot', compact('unidad')),
+            'administrador' => view('admin.ModificarUPAdmin', compact('unidad')),
+            'tecnico'       => view('tecnico.ModificarUPTecnico', compact('unidad')),
+            'jefe_operativo' => view('jefe_operativo.ModificarUPJefeOperativo', compact('unidad')),
+            'capturista'     => view('capturista.ModificarUPCapturista', compact('unidad')),
+            default         => abort(403),
+        };
     }
 
+    // Mapa de Unidades de producción 
+    public function mapaUP(Request $request)
+    {
+        $unidadProduccion = $request->up_id
+            ? UnidadProduccion::find($request->up_id)
+            : null;
 
-    /**
-     * Mostrar el mapa de unidades de producción.
-     */
-public function mapaUP(Request $request)
-{
-    $upId = $request->query('up_id');
-    $unidadProduccion = null;
-    $user = auth()->user();
+        $user = auth()->user();
 
-    if ($upId) {
-        $unidadProduccion = UnidadProduccion::find($upId);
+        return match ($user->tipo_usuario) {
+            'root'          => view('root.MapaUPRoot', compact('unidadProduccion')),
+            'administrador' => view('admin.MapaUPAdmin', compact('unidadProduccion')),
+            'tecnico'       => view('tecnico.MapaUPTecnico', compact('unidadProduccion')),
+            'jefe_operativo' => view('jefe_operativo.MapaUPJefeOperativo', compact('unidadProduccion')),
+            'capturista'     => view('capturista.MapaUPCapturista', compact('unidadProduccion')),
+            default         => abort(403),
+        };
     }
 
-    // Obtener rol del usuario actual
-    $rol = auth()->user()->rol ?? null;
-
-    if ($user && $user->tipo_usuario === 'root') {
-            return view('root.MapaUPRoot', compact('unidadProduccion'));
-        } elseif ($user && $user->tipo_usuario === 'administrador') {
-            return view('admin.MapaUPAdmin', compact('unidadProduccion'));
-        } elseif ($user && $user->tipo_usuario === 'tecnico') {
-            return view('tecnico.MapaUPTecnico', compact('unidadProduccion'));
-        } elseif ($user && $user->tipo_usuario === 'productor') {
-            return view('productor.MapaUPProductor', compact('unidadProduccion'));
-        } else {
-            // Vista genérica o error
-            return view('MapaUP', compact('unidadProduccion'));
-        }
-}
-
     /**
-     * Eliminar una unidad de producción.
+     * ============================
+     * ELIMINAR UP
+     * ============================
      */
     public function destroy($id)
     {
         $unidad = UnidadProduccion::find($id);
 
-        if ($unidad) {
-            $unidad->delete();
-            return response()->json(['message' => 'Unidad de producción eliminada correctamente.']);
-        } else {
-            return response()->json(['error' => 'Unidad de producción no encontrada.'], 404);
+        if (!$unidad) {
+            return response()->json(['error' => 'Unidad no encontrada'], 404);
         }
+
+        $unidad->delete();
+
+        return response()->json(['message' => 'Unidad eliminada correctamente']);
     }
 }

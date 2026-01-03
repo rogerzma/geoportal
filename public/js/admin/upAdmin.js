@@ -6,33 +6,29 @@ $(document).ready(function () {
         }
     });
 
-    console.log('Rol del usuario:', window.userRole);
-
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
         const nombre_up = $('#nombre_up').val();
         const responsable = $('#responsable').val();
         const localidad = $('#localidad').val();
         const telefono = $('#telefono').val();
-        const user_id = $('#user_id').val();
-        const responsable_tecnico = $('#responsable_tecnico').val();
+        const capturista_id = $('#capturista').val();
 
-        if (!nombre_up || !responsable || !localidad || !telefono) {
+        if (!nombre_up || !responsable || !localidad || !telefono || !capturista) {
             $('#emptyFieldsAlert').show();
             return;
         }
         $('#emptyFieldsAlert').hide();
 
         $.ajax({
-            url: '/api/unidades-produccion',
+            url: '/unidades-produccion',
             method: 'POST',
             data: {
                 nombre_up,
                 responsable,
                 localidad,
                 telefono,
-                user_id,
-                responsable_tecnico
+                capturista_id
             },
             success: function (response) {
                 window.location.href = urlUnidadesProduccion;
@@ -47,7 +43,7 @@ $(document).ready(function () {
     // 📦 Cargar tabla de UP
         function cargarUnidadesProduccion() {
         $.ajax({
-            url: '/api/unidades-produccion',
+            url: '/unidades-produccion',
             method: 'GET',
             success: function (response) {
                 if (response.length === 0) {
@@ -59,7 +55,6 @@ $(document).ready(function () {
 
                     let filas = '';
                     response.forEach(function (up) {
-
                         filas += `
                             <tr>
                                 <td>${up.nombre_up}</td>
@@ -104,7 +99,7 @@ $(document).ready(function () {
         if (!upIdParaEliminar) return;
 
         $.ajax({
-            url: `/api/unidades-produccion/${upIdParaEliminar}`,
+            url: `/unidades-produccion/${upIdParaEliminar}`,
             method: 'DELETE',
             success: function (response) {
                 $('#modalEliminarUP').modal('hide');

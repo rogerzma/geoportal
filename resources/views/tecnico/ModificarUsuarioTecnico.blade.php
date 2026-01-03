@@ -62,9 +62,8 @@
             <div class="col-md-4">
                 <h4>Tipo de usuario</h4>
                 <select class="form-control" name="tipo_usuario" id="tipo_usuario">
-                    <option value="administrador" {{ $user->tipo_usuario == 'administrador' ? 'selected' : '' }}>Administrador</option>
-                    <option value="tecnico" {{ $user->tipo_usuario == 'tecnico' ? 'selected' : '' }}>Técnico</option>
-                    <option value="productor" {{ $user->tipo_usuario == 'productor' ? 'selected' : '' }}>Productor</option>
+                    <option value="jefe_operativo" {{ $user->tipo_usuario == 'jefe_operativo' ? 'selected' : '' }}>Jefe operativo</option>
+                    <option value="capturista" {{ $user->tipo_usuario == 'capturista' ? 'selected' : '' }}>Capturista</option>
                 </select>
             </div>
 
@@ -110,7 +109,7 @@
 
 <!-- Scripts -->
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="{{ asset('js/root/usuariosRoot.js') }}"></script>
+   <script src="{{ asset('js/tecnico/usuarioTecnico.js') }}"></script>
 
 
 @endsection

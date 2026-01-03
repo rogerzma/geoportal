@@ -52,17 +52,20 @@
                     <p><h4>Localidad</h4></p>
                     <input class="form-control" placeholder="Localidad donde se ubica la UP" type="text" name="localidad" id="localidad">
                 </p></div>
-                <div class="col-md-4">
-                  <p>
-                      <p><h4>Nombre del capturista</h4></p>
-                      <select class="form-control" id="capturista">
-                          <option value="">No aplica</option>
-                          @foreach($capturistas as $capturista)
-                              <option value="{{ $capturista->id }}">{{ $capturista->name }}</option>
-                          @endforeach
-                      </select>
-                  </p>
-                </div>
+                @if($auth->tipo_usuario !== 'productor')
+                    <div class="col-md-4">
+                        <h4>Nombre del productor</h4>
+                        <select class="form-control" id="productor">
+                            <option value="">Seleccione...</option>
+                            @foreach($productores as $prod)
+                                <option value="{{ $prod->id }}">{{ $prod->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @else
+                        {{-- Productor: se asigna solo --}}
+                        <input type="hidden" id="productor" value="{{ $auth->id }}">
+                    @endif
        </div>
 
        <div class="row">
@@ -116,9 +119,9 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    const urlUnidadesProduccion = "{{ route('unidades-produccion-admin') }}";
+    const urlUnidadesProduccion = "{{ route('unidades-produccion-productor') }}";
 </script>
-<script src="{{ asset('js/admin/upAdmin.js') }}"></script>
+<script src="{{ asset('js/productor/upProductor.js') }}"></script>
 
 
 

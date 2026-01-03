@@ -6,17 +6,15 @@ $(document).ready(function () {
         }
     });
 
-    console.log('Rol del usuario:', window.userRole);
-
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
         const nombre_up = $('#nombre_up').val();
         const responsable = $('#responsable').val();
         const localidad = $('#localidad').val();
         const telefono = $('#telefono').val();
-        const capturista_id = $('#capturista').val();
+        const capturista = $('#capturista').val();
 
-        if (!nombre_up || !responsable || !localidad || !telefono || !capturista_id) {
+        if (!nombre_up || !responsable || !localidad || !telefono || !capturista) {
             $('#emptyFieldsAlert').show();
             return;
         }
@@ -57,7 +55,6 @@ $(document).ready(function () {
 
                     let filas = '';
                     response.forEach(function (up) {
-
                         filas += `
                             <tr>
                                 <td>${up.nombre_up}</td>
@@ -65,12 +62,12 @@ $(document).ready(function () {
                                 <td>${up.responsable}</td>
                                 <td>${up.telefono}</td>
                                 <td>
-                                    <a href="/tecnico/up/poligonos?up_id=${up.id}" title="Ver mapa">
+                                    <a href="/capturista/up/poligonos?up_id=${up.id}" title="Ver mapa">
                                         <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="/tecnico/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
+                                    <a href="/capturista/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
                                     <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
                                 </td>
                             </tr>

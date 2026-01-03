@@ -111,8 +111,8 @@
                     <input type="text" class="form-control" id="cultivo" name="cultivo" required>
                 </div>
                 <div class="mb-3">
-                    <label for="nombre_productor" class="form-label">Nombre del productor</label>
-                    <input type="text" class="form-control" id="nombre_productor" name="nombre_productor" required>
+                    <label for="nombre_capturista" class="form-label">Nombre del capturista</label>
+                    <input type="text" class="form-control" id="nombre_capturista" name="nombre_capturista" required>
                 </div>
                 <div class="mb-3">
                     <label for="tecnico_id" class="form-label">ID del técnico</label>

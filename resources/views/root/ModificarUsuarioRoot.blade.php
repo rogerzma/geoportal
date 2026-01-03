@@ -60,6 +60,7 @@
                         <option value="root" {{ $user->tipo_usuario == 'root' ? 'selected' : '' }}>Root</option>
                         <option value="administrador" {{ $user->tipo_usuario == 'administrador' ? 'selected' : '' }}>Administrador</option>
                         <option value="tecnico" {{ $user->tipo_usuario == 'tecnico' ? 'selected' : '' }}>Técnico</option>
+                        <option value="jefe_operativo" {{ $user->tipo_usuario == 'jefe_operativo' ? 'selected' : '' }}>Jefe operativo</option>
                         <option value="productor" {{ $user->tipo_usuario == 'productor' ? 'selected' : '' }}>Productor</option>
                     </select>
                 </div>

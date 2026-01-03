@@ -16,15 +16,19 @@ class UnidadProduccion extends Model
         'localidad',
         'responsable',
         'telefono',
-        'productor',
-        'user_id'        
+        'capturista_id',
+        'created_by'        
     ]; // Campos que se pueden asignar masivamente
 
-    /**
-     * Relación: Unidad de Producción pertenece a un usuario (quien la registró)
-     */
-    public function usuario()
+    // 🔹 Capturista dueño de la UP
+    public function capturista()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'capturista_id');
+    }
+
+    // 🔹 Usuario que creó la UP (admin / técnico)
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

@@ -25,8 +25,8 @@
          <div class="col-md-3">
           <div class="list-group">
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
               <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>

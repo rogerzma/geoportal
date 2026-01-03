@@ -14,9 +14,10 @@ $(document).ready(function () {
         const responsable = $('#responsable').val();
         const localidad = $('#localidad').val();
         const telefono = $('#telefono').val();
-        const capturista_id = $('#capturista').val();
+        const user_id = $('#user_id').val();
+        const responsable_tecnico = $('#responsable_tecnico').val();
 
-        if (!nombre_up || !responsable || !localidad || !telefono || !capturista_id) {
+        if (!nombre_up || !responsable || !localidad || !telefono) {
             $('#emptyFieldsAlert').show();
             return;
         }
@@ -30,7 +31,8 @@ $(document).ready(function () {
                 responsable,
                 localidad,
                 telefono,
-                capturista_id
+                user_id,
+                responsable_tecnico
             },
             success: function (response) {
                 window.location.href = urlUnidadesProduccion;
@@ -65,12 +67,12 @@ $(document).ready(function () {
                                 <td>${up.responsable}</td>
                                 <td>${up.telefono}</td>
                                 <td>
-                                    <a href="/tecnico/up/poligonos?up_id=${up.id}" title="Ver mapa">
+                                    <a href="/productor/up/poligonos?up_id=${up.id}" title="Ver mapa">
                                         <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="/tecnico/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
+                                    <a href="/productor/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
                                     <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
                                 </td>
                             </tr>

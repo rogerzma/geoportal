@@ -60,7 +60,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], 404);
+            return redirect()->back()->withErrors('Usuario no encontrado');
         }
 
         $request->validate([
@@ -73,14 +73,30 @@ class UserController extends Controller
 
         $user->name = $request->name ?? $user->name;
         $user->email = $request->email ?? $user->email;
+
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
+
         $user->telefono = $request->telefono ?? $user->telefono;
         $user->tipo_usuario = $request->tipo_usuario ?? $user->tipo_usuario;
         $user->save();
 
-        return response()->json(['message' => 'Usuario actualizado correctamente', 'user' => $user]);
+        $authUser = auth()->user();
+
+        // 🔁 Redirección según rol
+        return match ($authUser->tipo_usuario) {
+            'root'            => redirect()->route('administrar-usuarios-root')
+                                    ->with('success', 'Usuario actualizado correctamente'),
+            'administrador'   => redirect()->route('administrar-usuarios-admin')
+                                    ->with('success', 'Usuario actualizado correctamente'),
+            'tecnico'         => redirect()->route('usuarios-tecnico')
+                                    ->with('success', 'Usuario actualizado correctamente'),
+            'jefe_operativo'  => redirect()->route('usuarios-jefe_operativo')
+                                    ->with('success', 'Usuario actualizado correctamente'),
+            default           => redirect()->route('inicio')
+                                    ->with('success', 'Usuario actualizado correctamente'),
+        };
     }
 
     // Eliminar un usuario

@@ -1,6 +1,6 @@
 @extends('layouts.appGOB')
 
-@section("title", "ProductorUP")
+@section("title", "TecnicoUP")
 
 @section('content')
 

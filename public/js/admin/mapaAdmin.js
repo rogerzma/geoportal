@@ -52,7 +52,7 @@ function cargarPoligonos() {
                         <strong>Cultivo:</strong> ${poligono.cultivo}<br>
                         <strong>Unidad de producción:</strong> ${poligono.unidad_produccion?.nombre_up ?? 'N/A'}<br>
                         <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
-                        <strong>Productor:</strong> ${poligono.user?.name ?? 'N/A'}
+                        <strong>Capturista:</strong> ${poligono.user?.name ?? 'N/A'}
                     </div>
                 `;
                 polygon.bindPopup(popupContent, { className: 'popup-poligono-leaflet' });

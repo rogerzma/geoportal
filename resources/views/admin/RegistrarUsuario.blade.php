@@ -64,7 +64,8 @@
             <select class="form-control" name="tipo_usuario" id="tipo_usuario" required>
                 <option value="">Seleccione...</option>
                 <option value="tecnico">Técnico</option>
-                <option value="productor">Productor</option>
+                <option value="jefe_operativo">Jefe operativo</option>
+                <option value="capturista">Capturista</option>
             </select>
             </div>
 

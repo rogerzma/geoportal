@@ -24,9 +24,9 @@
         </div>
          <div class="col-md-3">
           <div class="list-group">
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('usuarios-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
               <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
@@ -36,7 +36,7 @@
     </div>
 
     <div class="container">
-        <form method="POST" action="{{ route('up.actualizar', $unidad->id) }}">
+        <form method="POST" action="{{ route('up.actualizar.tecnico', $unidad->id) }}">
             @csrf
             @method('PUT')
 
