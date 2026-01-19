@@ -8,8 +8,6 @@ L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=TU_API_KEY',
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
-
-
 // Mostrar coordenadas en tiempo real
 map.on('mousemove', function (e) {
     var lat = e.latlng.lat.toFixed(6);
@@ -18,7 +16,6 @@ map.on('mousemove', function (e) {
 });
 
 // Genera un color para cada cultivo
-
 const COLORES_CULTIVO = {
     'Frijol': '#57352B',   // cafe
     'Chile':  '#1A6E0D',   // verde
@@ -27,10 +24,11 @@ const COLORES_CULTIVO = {
     'Tomate': '#FF0000', // rojo
 };
 
+const COLOR_DEFAULT = '#3388ff';
+
 function colorPorCultivo(cultivo) {
     return COLORES_CULTIVO[cultivo] || COLOR_DEFAULT;
 }
-
 // Cargar polígonos
 function cargarPoligonos() {
     fetch('/poligonos')
@@ -48,9 +46,8 @@ function cargarPoligonos() {
                 try {
                     const coords = JSON.parse(poligono.coordenadas)
                         .map(c => [c.lat, c.lng]);
-                    
-                    const color = colorPorCultivo(poligono.cultivo);
 
+                    const color = colorPorCultivo(poligono.cultivo);
                     const polygon = L.polygon(coords, {
                         color: color,
                         fillOpacity: 0.7,
@@ -82,7 +79,7 @@ function cargarPoligonos() {
 
 
 function cargarHectareasTotales() {
-    fetch('/api/poligonos/hectareas-totales')
+    fetch('/poligonos/hectareas-totales-usuario')
         .then(response => response.json())
         .then(data => {
             document.getElementById('hectareas-totales').textContent = data.hectareas_totales ?? '--';

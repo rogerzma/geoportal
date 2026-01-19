@@ -14,7 +14,7 @@ $(document).ready(function () {
         const telefono = $('#telefono').val();
         const capturista_id = $('#capturista').val();
 
-        if (!nombre_up || !responsable || !localidad || !telefono || !capturista) {
+        if (!nombre_up || !responsable || !localidad || !telefono) {
             $('#emptyFieldsAlert').show();
             return;
         }
@@ -28,7 +28,7 @@ $(document).ready(function () {
                 responsable,
                 localidad,
                 telefono,
-                capturista_id
+                capturista_id: capturista_id || null
             },
             success: function (response) {
                 window.location.href = urlUnidadesProduccion;
@@ -55,10 +55,12 @@ $(document).ready(function () {
 
                     let filas = '';
                     response.forEach(function (up) {
+                        const capturista = up.capturista ? up.capturista.name : '—';
                         filas += `
                             <tr>
                                 <td>${up.nombre_up}</td>
                                 <td>${up.localidad}</td>
+                                <td>${capturista}</td>
                                 <td>${up.responsable}</td>
                                 <td>${up.telefono}</td>
                                 <td>

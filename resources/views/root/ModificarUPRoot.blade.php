@@ -11,7 +11,7 @@
             <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
             <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
             <li><a href="{{ route('inicio') }}">Geoportal</a></li>
-            <li><a href="{{ route('admin') }}">Administrador</a></li>
+            <li><a href="{{ route('root') }}">Superusuario</a></li>
             <li class="active">Modificar UP</li>
         </ol>
     </div>
@@ -24,13 +24,9 @@
         </div>
          <div class="col-md-3">
           <div class="list-group">
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('admin') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-gob') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-            </form>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
           </div>
       </div>
     </div>
@@ -49,6 +45,18 @@
                     <h4>Localidad</h4>
                     <input class="form-control" type="text" name="localidad" value="{{ old('localidad', $unidad->localidad) }}">
                 </div>
+                <div class="col-md-4">
+                  <h4>Nombre del capturista</h4>
+                  <select class="form-control" name="capturista_id">
+                      <option value="">No aplica</option>
+                      @foreach($capturistas as $capturista)
+                          <option value="{{ $capturista->id }}"
+                              {{ old('capturista_id', $unidad->capturista_id) == $capturista->id ? 'selected' : '' }}>
+                              {{ $capturista->name }}
+                          </option>
+                      @endforeach
+                  </select>
+              </div>
             </div>
 
             <div class="row">
@@ -64,7 +72,7 @@
             <div class = "row">
               <div class="col-md-4">
                     <br>
-                    <button type="submit" class="btn btn-success">Actualizar UP</button>
+                    <button type="submit" class="btn btn-primary">Actualizar UP</button>
                 </div>
             </div>
         </form>

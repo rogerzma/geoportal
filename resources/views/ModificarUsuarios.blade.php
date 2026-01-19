@@ -63,8 +63,6 @@
             <h4>Tipo de usuario</h4>
             <select class="form-control" name="tipo_usuario" id="tipo_usuario" required>
                 <option value="">Seleccione...</option>
-                <option value="administrador">Administrador</option>
-                <option value="tecnico">Técnico</option>
                 <option value="capturista">Capturista</option>
             </select>
             </div>

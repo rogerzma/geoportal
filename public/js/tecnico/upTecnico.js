@@ -16,7 +16,7 @@ $(document).ready(function () {
         const telefono = $('#telefono').val();
         const capturista_id = $('#capturista').val();
 
-        if (!nombre_up || !responsable || !localidad || !telefono || !capturista_id) {
+        if (!nombre_up || !responsable || !localidad || !telefono) {
             $('#emptyFieldsAlert').show();
             return;
         }
@@ -30,7 +30,7 @@ $(document).ready(function () {
                 responsable,
                 localidad,
                 telefono,
-                capturista_id
+                capturista_id : capturista_id || null
             },
             success: function (response) {
                 window.location.href = urlUnidadesProduccion;

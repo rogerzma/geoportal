@@ -121,6 +121,7 @@ function cargarPoligonosPorUP(upId) {
                         <strong>Nombre:</strong> ${poligono.nombre}<br>
                         <strong>Cultivo:</strong> ${poligono.cultivo}<br>
                         <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
+                        <strong>Productor:</strong> ${poligono.user?.name ?? 'N/A'}
                     </div>
                 `);
 
@@ -155,7 +156,7 @@ function cargarPoligonos() {
                 const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
                 allCoords = allCoords.concat(coords);
 
-                const color = generarColorAleatorio();
+                const color = colorPorCultivo(poligono.cultivo);
                 const polygon = L.polygon(coords, {
                     color: color,
                     fillOpacity: 0.9

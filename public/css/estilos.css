@@ -35,6 +35,10 @@
             color: white !important;
         }
 
+        .map-wrapper {
+            position: relative;
+        }
+
         /* Corrige el mapa que podría verse afectado */
         #map {
             height: 500px;

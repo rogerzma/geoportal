@@ -57,8 +57,8 @@
                         <h4>Nombre del productor</h4>
                         <select class="form-control" id="productor">
                             <option value="">Seleccione...</option>
-                            @foreach($productores as $prod)
-                                <option value="{{ $prod->id }}">{{ $prod->name }}</option>
+                            @foreach($capturistas as $capturista)
+                                <option value="{{ $capturista->id }}">{{ $capturista->name }}</option>
                             @endforeach
                         </select>
                     </div>

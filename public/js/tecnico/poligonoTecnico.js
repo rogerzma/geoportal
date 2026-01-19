@@ -15,14 +15,17 @@ map.on('mousemove', function (e) {
     document.getElementById('lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
 });
 
-// Funcion para el color
-function generarColorAleatorio() {
-    const letras = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letras[Math.floor(Math.random() * 16)];
-    }
-    return color;
+// Genera un color para cada cultivo
+const COLORES_CULTIVO = {
+    'Frijol': '#57352B',   // cafe
+    'Chile':  '#1A6E0D',   // verde
+    'Maiz':   '#F9A825',   // amarillo
+    'Ajo':    '#FFE880',    // amarillo claro
+    'Tomate': '#FF0000', // rojo
+};
+
+function colorPorCultivo(cultivo) {
+    return COLORES_CULTIVO[cultivo] || COLOR_DEFAULT;
 }
 
 // Obtener el parámetro up_id de la URL
@@ -107,7 +110,7 @@ function cargarPoligonosPorUP(upId) {
                 const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
                 allCoords = allCoords.concat(coords);
 
-                const color = generarColorAleatorio();
+                const color = colorPorCultivo(poligono.cultivo);
                 const polygon = L.polygon(coords, {
                     color: color,
                     fillOpacity: 0.9
@@ -118,7 +121,6 @@ function cargarPoligonosPorUP(upId) {
                         <strong>Nombre:</strong> ${poligono.nombre}<br>
                         <strong>Cultivo:</strong> ${poligono.cultivo}<br>
                         <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
-                        <strong>Capturista:</strong> ${poligono.user?.name ?? 'N/A'}
                     </div>
                 `);
 

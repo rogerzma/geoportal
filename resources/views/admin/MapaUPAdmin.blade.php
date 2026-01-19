@@ -52,6 +52,7 @@
             <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
             <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
             <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+            <li><a href="{{ route('admin') }}">Administrador</a></li>
             <li><a href="{{ route('unidades-produccion-admin') }}">Administrar unidades de producción</a></li>
             <li class="active">Registrar poligonos</li>
         </ol>

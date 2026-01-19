@@ -52,6 +52,7 @@
             <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
             <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
             <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+            <li><a href="{{ route('root') }}">Superusuario</a></li>
             <li><a href="{{ route('unidades-produccion-root') }}">Administrar unidades de producción</a></li>
             <li class="active">Registrar poligonos</li>
         </ol>
@@ -70,11 +71,7 @@
                     <div class="list-group">
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
-                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-                    </form> 
+                    <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a> 
                     </div>
                 </div>
             </div>
@@ -132,6 +129,7 @@
                                 <option value="Chile">Chile</option>
                                 <option value="Maiz">Maiz</option>
                                 <option value="Ajo">Ajo</option>
+                                <option value="Tomate">Tomate</option>
                             </select>
                         </div>
 

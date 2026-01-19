@@ -50,9 +50,35 @@
                 <li class="landing-btn"><a href="https://www.gob.mx/inifap/archivo/documentos">Documentos</a></li>
                 <li class="landing-btn"><a href="https://vun.inifap.gob.mx/portalweb/_Transparencia">Transparencia</a></li>
                 <li class="landing-btn"><a href="https://www.gob.mx/agricultura/es/#344">Contacto</a></li>
+                @auth
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-user" style="font-size:15px;"></span>
+                        {{ Auth::user()->name }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                                @csrf
+                                <button type="submit" style="
+                                    background:none;
+                                    border:none;
+                                    width:100%;
+                                    text-align:left;
+                                    padding:8px 20px;
+                                    color:#333;">
+                                    <i class="fa fa-sign-out"></i> Cerrar sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                @endauth
             </ul>
         </div>
         </div>
+    </div>
     </nav>
 
 
@@ -61,12 +87,43 @@
 
         @yield('content')
 
+        <div class="modal fade" id="modalDir" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Directorio</h5></button>
+                    </div><div class="modal-body">
+                        <table class="table table-striped table-responsive" style="font-size:12px;">
+                            <tr>
+                                <td align="center" valign="middle"><strong>NOMBRE</strong></td>
+                                <td align="center" valign="middle"><strong>CARGO</strong></td>
+                                <td align="center" valign="middle"><strong>CORREO</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Zamarripa Martínez Rogelio, I.S.C.</td>
+                                <td>Desarrollador</td>
+                                <td>rzamarripam2001@gmail.com</td>
+                            </tr>
+                            <tr>
+                                <td>Rivas Aranda Alejandro, I.S.C.</td>
+                                <td>Desarrollador</td>
+                                <td>alekeyrivas@gmail.com</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- JS -->
     <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-
+    <script>
+	   $gmx(document).ready(function() {
+		
+	   });
+	</script>
 
 
 </body>

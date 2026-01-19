@@ -6,28 +6,83 @@ $(document).ready(function () {
 
     // 📄 Definición de funciones
 
+    // Paginación
+    let usuariosGlobal = [];
+    let paginaActual = 1;
+    const usuariosPorPagina = 5;
+
+    function renderTablaUsuarios() {
+        let filas = '';
+        const inicio = (paginaActual - 1) * usuariosPorPagina;
+        const fin = inicio + usuariosPorPagina;
+        const usuariosPagina = usuariosGlobal.slice(inicio, fin);
+        usuariosPagina.forEach(function (usuario) {
+            filas += `
+                <tr>
+                    <td>${usuario.name}</td>
+                    <td>${usuario.email}</td>
+                    <td>${usuario.telefono || ''}</td>
+                    <td>${usuario.tipo_usuario ? usuario.tipo_usuario.charAt(0).toUpperCase() + usuario.tipo_usuario.slice(1) : ''}</td>
+                    <td>
+                        <a href="/tecnico/modificar-usuario/${usuario.id}" class="glyphicon glyphicon-pencil"></a>
+                        <a href="#" class="glyphicon glyphicon-trash btn-eliminar" data-id="${usuario.id}" style="color: #ff0000;"></a>
+                    </td>
+                </tr>
+            `;
+        });
+        $('#tbody-up').html(filas);
+        renderControlesPaginacion();
+    }
+
+    function renderControlesPaginacion() {
+        let totalPaginas = Math.ceil(usuariosGlobal.length / usuariosPorPagina);
+        let paginacionHtml = '<nav><ul class="pagination">';
+        paginacionHtml += `<li class="page-item${paginaActual === 1 ? ' disabled' : ''}"><a class="page-link" href="#" id="anterior">&laquo;</a></li>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+            paginacionHtml += `<li class="page-item${paginaActual === i ? ' active' : ''}"><a class="page-link page-num" href="#" data-pagina="${i}">${i}</a></li>`;
+        }
+        paginacionHtml += `<li class="page-item${paginaActual === totalPaginas ? ' disabled' : ''}"><a class="page-link" href="#" id="siguiente">&raquo;</a></li>`;
+        paginacionHtml += '</ul></nav>';
+        if ($('#paginacion-usuarios').length === 0) {
+            $('#tbody-up').parent().after('<div id="paginacion-usuarios" class="text-center"></div>');
+        }
+        $('#paginacion-usuarios').html(paginacionHtml);
+
+        // Eventos
+        $('#anterior').off('click').on('click', function(e) {
+            e.preventDefault();
+            if (paginaActual > 1) {
+                paginaActual--;
+                renderTablaUsuarios();
+            }
+        });
+        $('#siguiente').off('click').on('click', function(e) {
+            e.preventDefault();
+            let totalPaginas = Math.ceil(usuariosGlobal.length / usuariosPorPagina);
+            if (paginaActual < totalPaginas) {
+                paginaActual++;
+                renderTablaUsuarios();
+            }
+        });
+        $('.page-num').off('click').on('click', function(e) {
+            e.preventDefault();
+            const pag = parseInt($(this).data('pagina'));
+            if (pag !== paginaActual) {
+                paginaActual = pag;
+                renderTablaUsuarios();
+            }
+        });
+    }
+
     // Cargar la lista de usuarios y renderizar la tabla
     function cargarUsuarios() {
         $.ajax({
             url: '/usuarios',
             method: 'GET',
             success: function (usuarios) {
-                let filas = '';
-                usuarios.forEach(function (usuario) {
-                    filas += `
-                        <tr>
-                            <td>${usuario.name}</td>
-                            <td>${usuario.email}</td>
-                            <td>${usuario.telefono || ''}</td>
-                            <td>${usuario.tipo_usuario ? usuario.tipo_usuario.charAt(0).toUpperCase() + usuario.tipo_usuario.slice(1) : ''}</td>
-                            <td>
-                                <a href="/tecnico/modificar-usuario/${usuario.id}" class="glyphicon glyphicon-pencil"></a>
-                                <a href="#" class="glyphicon glyphicon-trash btn-eliminar" data-id="${usuario.id}" style="color: #ff0000;"></a>
-                            </td>
-                        </tr>
-                    `;
-                });
-                $('#tbody-up').html(filas);
+                usuariosGlobal = usuarios;
+                paginaActual = 1;
+                renderTablaUsuarios();
             },
             error: function (xhr) {
                 console.error('Error al cargar los usuarios:', xhr.responseText);

@@ -1,8 +1,8 @@
 @extends("layouts.appGOB")
 
-@section("title", "RegistrarUsuario")
+@section("title", "UsuarioJefeOperativo")
 
-@section("view-name", "RegistrarUsuario")
+@section("view-name", "UsuarioJefeOperativo")
 
 @section("content")
 
@@ -12,7 +12,7 @@
         <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
         <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
         <li><a href="{{ route('inicio') }}">Geoportal</a></li>
-        <li><a href="{{ route('root') }}">Superusuario</a></li>
+        <li><a href="{{ route('jefe_operativo') }}">Jefe operativo</a></li>
         <li class="active">Registrar usuario</li>
     </ol>
 </div>
@@ -26,9 +26,9 @@
     </div>
     <div class="col-md-3">
         <div class="list-group">
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+          <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+          <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+          <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe-operativo-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
           <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
@@ -63,9 +63,6 @@
             <h4>Tipo de usuario</h4>
             <select class="form-control" name="tipo_usuario" id="tipo_usuario" required>
                 <option value="">Seleccione...</option>
-                <option value="administrador">Administrador</option>
-                <option value="tecnico">Técnico</option>
-                <option value="jefe_operativo">Jefe operativo</option>
                 <option value="capturista">Capturista</option>
             </select>
             </div>
@@ -111,7 +108,7 @@
 
 <!-- Scripts -->
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="{{ asset('js/root/usuariosRoot.js') }}"></script>
+   <script src="{{ asset(path: 'js/jefe_operativo/usuariosJefeOperativo.js') }}"></script>
 
 
 @endsection

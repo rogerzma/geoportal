@@ -15,43 +15,57 @@ map.on('mousemove', function (e) {
     document.getElementById('lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
 });
 
-// Función para el color
-function generarColorAleatorio() {
-    const letras = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letras[Math.floor(Math.random() * 16)];
-    }
-    return color;
+// Genera un color para cada cultivo
+const COLORES_CULTIVO = {
+    'Frijol': '#57352B',   // cafe
+    'Chile':  '#1A6E0D',   // verde
+    'Maiz':   '#F9A825',   // amarillo
+    'Ajo':    '#7E12B8',    // morado
+    'Tomate': '#FF0000', // rojo
+};
+
+function colorPorCultivo(cultivo) {
+    return COLORES_CULTIVO[cultivo] || COLOR_DEFAULT;
 }
 
-// Cargar polígonos
-function cargarPoligonos() {
-    fetch('/api/poligonos')
+// Variables globales para polígonos y cultivos
+let poligonosGlobal = [];
+let poligonosLayerGroup = L.layerGroup().addTo(map);
+
+// Cargar polígonos y guardarlos globalmente
+function cargarPoligonos(callback) {
+    fetch('/api/mapa-inicial')
         .then(response => response.json())
         .then(poligonos => {
-            poligonos.forEach(poligono => {
-                // Asegúrate que el campo 'coordenadas' es un JSON válido
-                let coords = [];
-                try {
-                    coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
-                } catch (e) {
-                    return; // Si hay error, no dibuja ese polígono
-                }
-                const color = generarColorAleatorio();
-                // Solo visualización, sin popups ni eventos
-                L.polygon(coords, {
-                    color: color,
-                    fillOpacity: 0.7,
-                    weight: 2
-                }).addTo(map);
-            });
+            poligonosGlobal = poligonos;
+            if (callback) callback();
         })
         .catch(error => {
             console.error('Error al cargar los polígonos:', error);
             mostrarAlerta('Error al cargar los polígonos.', 'danger');
         });
 }
+
+// Dibuja solo los polígonos de los cultivos seleccionados
+function mostrarPoligonosPorCultivo(cultivosSeleccionados) {
+    poligonosLayerGroup.clearLayers();
+    poligonosGlobal.forEach(poligono => {
+        if (!cultivosSeleccionados.includes(poligono.cultivo)) return;
+        let coords = [];
+        try {
+            coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+        } catch (e) {
+            return;
+        }
+        const color = colorPorCultivo(poligono.cultivo);
+        L.polygon(coords, {
+            color: color,
+            fillOpacity: 0.7,
+            weight: 2
+        }).addTo(poligonosLayerGroup);
+    });
+}
+
 
 function cargarHectareasTotales() {
     fetch('/api/poligonos/hectareas-totales')
@@ -64,7 +78,54 @@ function cargarHectareasTotales() {
         });
 }
 
-cargarPoligonos();
+// Cargar hectáreas por cultivo y llenar la tabla
+function cargarHectareasPorCultivo() {
+    fetch('/api/poligonos/hectareas-por-cultivo')
+        .then(response => response.json())
+        .then(data => {
+            const cultivos = ['Frijol', 'Chile', 'Maiz', 'Ajo', 'Tomate'];
+            const tabla = document.getElementById('tabla-cultivos-body');
+            if (!tabla) return;
+            tabla.innerHTML = '';
+            cultivos.forEach(cultivo => {
+                const item = data.find(d => d.cultivo === cultivo);
+                const hectareas = item ? Number(item.hectareas).toFixed(2) : '0.00';
+                const idCheck = `check-cultivo-${cultivo}`;
+                const color = COLORES_CULTIVO[cultivo] || '#000';
+                tabla.innerHTML += `
+                    <tr>
+                        <td><span style="color:${color}; font-weight:bold;">${cultivo}</span></td>
+                        <td id="hectareas-${cultivo}">${hectareas}</td>
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="check-cultivo" id="${idCheck}" value="${cultivo}" checked>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Evento para checkboxes
+            document.querySelectorAll('.check-cultivo').forEach(chk => {
+                chk.addEventListener('change', function() {
+                    const seleccionados = Array.from(document.querySelectorAll('.check-cultivo:checked')).map(c => c.value);
+                    mostrarPoligonosPorCultivo(seleccionados);
+                });
+            });
+
+            // Mostrar todos los polígonos al inicio
+            const seleccionados = cultivos;
+            mostrarPoligonosPorCultivo(seleccionados);
+        })
+        .catch(() => {
+            const tabla = document.getElementById('tabla-cultivos-body');
+            if (tabla) tabla.innerHTML = '<tr><td colspan="3">--</td></tr>';
+        });
+}
+
+
+// Cargar polígonos y luego tabla de cultivos
+cargarPoligonos(() => {
+    cargarHectareasPorCultivo();
+});
 cargarHectareasTotales();
 
 // Mostrar alertas (reemplazo de toasts)

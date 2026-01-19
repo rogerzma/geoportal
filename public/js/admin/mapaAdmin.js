@@ -15,52 +15,64 @@ map.on('mousemove', function (e) {
     document.getElementById('lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
 });
 
-// Función para el color
-function generarColorAleatorio() {
-    const letras = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letras[Math.floor(Math.random() * 16)];
-    }
-    return color;
+// Genera un color para cada cultivo
+const COLORES_CULTIVO = {
+    'Frijol': '#57352B',   // cafe
+    'Chile':  '#1A6E0D',   // verde
+    'Maiz':   '#F9A825',   // amarillo
+    'Ajo':    '#FFE880',    // amarillo claro
+    'Tomate': '#FF0000', // rojo
+};
+
+function colorPorCultivo(cultivo) {
+    return COLORES_CULTIVO[cultivo] || COLOR_DEFAULT;
 }
 
 // Cargar polígonos
 function cargarPoligonos() {
-    fetch('/api/poligonos')
+    fetch('/poligonos')
         .then(response => response.json())
         .then(poligonos => {
-            poligonos.forEach(poligono => {
-                let coords = [];
-                try {
-                    coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
-                } catch (e) {
-                    return;
-                }
-                const color = generarColorAleatorio();
-                // Crea el polígono y agrega un popup con la información
-                const polygon = L.polygon(coords, {
-                    color: color,
-                    fillOpacity: 0.7,
-                    weight: 2
-                }).addTo(map);
 
-                // Personaliza aquí la información que quieres mostrar
-                let popupContent = `
-                    <div class="popup-poligono">
-                        <strong>Nombre:</strong> ${poligono.nombre}<br>
-                        <strong>Cultivo:</strong> ${poligono.cultivo}<br>
-                        <strong>Unidad de producción:</strong> ${poligono.unidad_produccion?.nombre_up ?? 'N/A'}<br>
-                        <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
-                        <strong>Capturista:</strong> ${poligono.user?.name ?? 'N/A'}
-                    </div>
-                `;
-                polygon.bindPopup(popupContent, { className: 'popup-poligono-leaflet' });
+            if (!poligonos.length) {
+                console.warn('No hay polígonos para mostrar');
+                return;
+            }
+
+            let bounds = L.latLngBounds([]);
+
+            poligonos.forEach(poligono => {
+                try {
+                    const coords = JSON.parse(poligono.coordenadas)
+                        .map(c => [c.lat, c.lng]);
+
+                    const color = colorPorCultivo(poligono.cultivo);
+                    const polygon = L.polygon(coords, {
+                        color: color,
+                        fillOpacity: 0.7,
+                        weight: 2
+                    }).addTo(map);
+
+                    polygon.bindPopup(`
+                        <div class="popup-poligono">
+                            <strong>Nombre:</strong> ${poligono.nombre}<br>
+                            <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                            <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
+                        </div>
+                    `);
+
+                    bounds.extend(polygon.getBounds());
+
+                } catch (e) {
+                    console.warn('Polígono inválido', e);
+                }
             });
+
+            // 🔥 ESTO ES CLAVE
+            map.fitBounds(bounds, { padding: [30, 30] });
         })
         .catch(error => {
             console.error('Error al cargar los polígonos:', error);
-            mostrarAlerta('Error al cargar los polígonos.', 'danger');
         });
 }
 

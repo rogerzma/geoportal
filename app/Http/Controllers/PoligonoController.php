@@ -14,11 +14,101 @@ class PoligonoController extends Controller
     /**
      * Mostrar todos los polígonos.
      */
+
     public function index()
     {
-        $poligonos = Poligono::with(['user', 'unidadProduccion'])->get();
-        return response()->json($poligonos);
+        $auth = auth()->user();
+
+        if (!$auth) {
+            return response()->json([]);
+        }
+
+        // ROOT
+        if ($auth->tipo_usuario === 'root') {
+            return Poligono::with(['user', 'unidadProduccion'])->get();
+        }
+
+        // ADMINISTRADOR
+        if ($auth->tipo_usuario === 'administrador') {
+
+            $tecnicos = User::where('tipo_usuario', 'tecnico')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
+                ->where(function ($q) use ($auth, $tecnicos) {
+                    $q->where('created_by', $auth->id)
+                    ->orWhereIn('created_by', $tecnicos);
+                })
+                ->pluck('id');
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where(function ($q) use ($auth, $tecnicos, $jefesOperativos) {
+                    $q->where('created_by', $auth->id)
+                    ->orWhereIn('created_by', $tecnicos)
+                    ->orWhereIn('created_by', $jefesOperativos);
+                })
+                ->pluck('id');
+
+            $usuariosPermitidos = collect([$auth->id])
+                ->merge($tecnicos)
+                ->merge($jefesOperativos)
+                ->merge($capturistas)
+                ->unique();
+
+            return Poligono::with(['user', 'unidadProduccion'])
+                ->whereIn('user_id', $usuariosPermitidos)
+                ->get();
+        }
+
+        // TÉCNICO
+        if ($auth->tipo_usuario === 'tecnico') {
+
+            $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->whereIn('created_by', $jefesOperativos)
+                ->pluck('id');
+
+            return Poligono::with(['user', 'unidadProduccion'])
+                ->whereIn('user_id', collect([$auth->id])->merge($jefesOperativos)->merge($capturistas))
+                ->get();
+        }
+
+        // JEFE OPERATIVO
+        if ($auth->tipo_usuario === 'jefe_operativo') {
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            return Poligono::with(['user', 'unidadProduccion'])
+                ->whereIn('user_id', collect([$auth->id])->merge($capturistas))
+                ->get();
+        }
+
+        // CAPTURISTA
+        if ($auth->tipo_usuario === 'capturista') {
+            return Poligono::with(['user', 'unidadProduccion'])
+                ->where('user_id', $auth->id)
+                ->get();
+        }
+
+        return response()->json([]);
     }
+
+
+
+    /** 
+     * Mostrar los polígonos para la vista inicial.
+     */
+
+    public function mapaInicial(){
+        return Poligono::with(['user', 'unidadProduccion'])->get();
+    }
+
 
     /**
      * Mostrar los polígonos de una unidad de producción específica.
@@ -146,4 +236,117 @@ class PoligonoController extends Controller
             'hectareas_totales' => round($total, 2)
         ]);
     }
+
+    // Obtener hectareas por cada cultivo
+    public function hectareasPorCultivo()
+    {
+        $resultados = DB::table('poligono')
+        ->select('cultivo', DB::raw('SUM(ST_Area(geom::geography) / 10000) as hectareas'))
+        ->groupBy('cultivo')
+        ->get();
+
+        return response()->json($resultados);
+    }
+
+        /**
+     * Obtener el total de hectáreas de los polígonos creados por el usuario autenticado y sus usuarios a cargo.
+     */
+    public function hectareasTotalesUsuario()
+    {
+        $auth = auth()->user();
+
+        if (!$auth) {
+            return response()->json(['hectareas_totales' => 0]);
+        }
+
+        /* ===============================
+        ROOT → TODO
+        =============================== */
+        if ($auth->tipo_usuario === 'root') {
+            $total = DB::table('poligono')
+                ->selectRaw('SUM(ST_Area(geom::geography) / 10000)')
+                ->value('sum');
+
+            return response()->json([
+                'hectareas_totales' => round($total ?? 0, 2)
+            ]);
+        }
+
+        /* ===============================
+        USUARIOS PERMITIDOS
+        =============================== */
+        $usuariosPermitidos = collect([$auth->id]);
+
+        if ($auth->tipo_usuario === 'administrador') {
+
+            $tecnicos = User::where('tipo_usuario', 'tecnico')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
+                ->whereIn('created_by', $tecnicos)
+                ->orWhere('created_by', $auth->id)
+                ->pluck('id');
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->whereIn('created_by', $jefesOperativos)
+                ->orWhereIn('created_by', $tecnicos)
+                ->orWhere('created_by', $auth->id)
+                ->pluck('id');
+
+            $usuariosPermitidos = $usuariosPermitidos
+                ->merge($tecnicos)
+                ->merge($jefesOperativos)
+                ->merge($capturistas)
+                ->unique();
+        }
+
+        if ($auth->tipo_usuario === 'tecnico') {
+
+            $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->whereIn('created_by', $jefesOperativos)
+                ->pluck('id');
+
+            $usuariosPermitidos = $usuariosPermitidos
+                ->merge($jefesOperativos)
+                ->merge($capturistas)
+                ->unique();
+        }
+
+        if ($auth->tipo_usuario === 'jefe_operativo') {
+
+            $capturistas = User::where('tipo_usuario', 'capturista')
+                ->where('created_by', $auth->id)
+                ->pluck('id');
+
+            $usuariosPermitidos = $usuariosPermitidos
+                ->merge($capturistas)
+                ->unique();
+        }
+
+        /* ===============================
+        SUMA REAL DE HECTÁREAS
+        =============================== */
+        $total = DB::table('poligono')
+            ->whereIn('user_id', $usuariosPermitidos)
+            ->selectRaw('SUM(ST_Area(geom::geography) / 10000)')
+            ->value('sum');
+
+        return response()->json([
+            'hectareas_totales' => round($total ?? 0, 2)
+        ]);
+    }
+
+    /**
+     * Obtener el numero total de polígonos
+     */
+
+    public function poligonosTotales(){
+        
+    }
+
 }

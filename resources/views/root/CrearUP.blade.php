@@ -29,10 +29,6 @@
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-            </form>
           </div>
       </div>
     </div>
@@ -54,11 +50,11 @@
                 </p></div>
                 <div class="col-md-4">
                   <p>
-                      <p><h4>Nombre del productor</h4></p>
-                      <select class="form-control" id="productor">
+                      <p><h4>Nombre del capturista</h4></p>
+                      <select class="form-control" id="capturista">
                           <option value="">No aplica</option>
-                          @foreach($productores as $prod)
-                              <option value="{{ $prod->name }}">{{ $prod->name }}</option>
+                          @foreach($capturistas as $capturista)
+                              <option value="{{ $capturista->name }}">{{ $capturista->name }}</option>
                           @endforeach
                       </select>
                   </p>

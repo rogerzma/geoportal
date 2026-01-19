@@ -13,9 +13,9 @@ class UserController extends Controller
     {
         $auth = auth()->user();
 
-        // Si el autenticado es root, mostrar todos
+        // Si el autenticado es root, mostrar todos, con excepcion de los superusuarios
         if ($auth && $auth->tipo_usuario === 'root') {
-            return User::all();
+            return User::where('tipo_usuario', '!=', 'superusuario')->get();
         }
 
         // Si no, mostrar solo los que creó ese usuario (o ninguno si no autenticado)

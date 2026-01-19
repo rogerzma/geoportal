@@ -12,7 +12,7 @@
         <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
         <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
         <li><a href="{{ route('inicio') }}">Geoportal</a></li>
-        <li><a href="{{ route('admin') }}">Administrador</a></li>
+        <li><a href="{{ route('tecnico') }}">Técnico</a></li>
         <li class="active">Registrar UP</li>
     </ol>
 </div>

@@ -11,9 +11,12 @@
 			<li><a href="http://www.gob.mx"><i class="icon icon-home"></i></a></li>
 			<li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
 			<li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
-			<li class="active">Geoportal</li>
+            <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+			<li class="active">Superusuario</li>
 		</ol>
 	</div>
+
+    
 
     <div class="container">
         <div class="row">
@@ -25,10 +28,7 @@
             <div class="col-md-3">
                 <div class="list-group">
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('inicio') }}"><img src="images/templatemo_list.png" style="margin-right:10px;">Inicio</a>          
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-                    </form>     
+                    <a class="list-group-item" style="text-decoration: none;" data-toggle="modal" data-target="#modalDir"><img src="/images/templatemo_list.png" style="margin-right:10px;">Créditos</a>
                 </div>
             </div>
         </div>

@@ -98,11 +98,32 @@
                     en el estado de Zacatecas.
                 </p>
                 <div class="row">
-                    <div class="col-md-12">
-                        <p>Numero de hectareas intervenidas: 
-                            <span id="hectareas-totales">--</span>
-                        </p>
+                    
+                    <div class="col-sm-9 table-responsive" id="tabla-up-wrapper" style="margin-bottom:2em;">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="background:#009933; color:#FFF;">Cultivo</th>
+                                    <th style="background:#009933; color:#FFF;">No. de hectáreas</th>
+                                    <th style="background:#009933; color:#FFF;">Visualizar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-cultivos-body">
+                                <!-- Las filas se llenarán dinámicamente con JS -->
+                            </tbody>
+                        </table>
+                        <div class="col-md-12">
+                            <p>Numero de hectareas intervenidas: 
+                                <span id="hectareas-totales">--</span>
+                            </p>
+                        </div>
+                        <div class="col-md-12">
+                            <p>Numero de polígonos intervenidos: 
+                                <span id="hectareas-totales">--</span>
+                            </p>
+                        </div>
                     </div>
+                    
                 </div>
                 <div class="map-wrapper">
                     <!-- Mapa -->
@@ -110,11 +131,12 @@
                         <div id="map"></div>
                     </div>
                     <div id="coordinates">
-                        <strong>Coordenadas:</strong>
-                        <div id="lat-lng">Lat: --, Lng: --</div>
+                            <strong>Coordenadas:</strong>
+                            <div id="lat-lng">Lat: --, Lng: --</div>
                     </div>
                 </div>
         </div>
+    </div>
     </div>
 
     <!-- Scripts -->

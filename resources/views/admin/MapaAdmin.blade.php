@@ -36,6 +36,31 @@
                 <li class="landing-btn"><a href="https://www.gob.mx/inifap/archivo/documentos">Documentos</a></li>
                 <li class="landing-btn"><a href="https://vun.inifap.gob.mx/portalweb/_Transparencia">Transparencia</a></li>
                 <li class="landing-btn"><a href="https://www.gob.mx/agricultura/es/#344">Contacto</a></li>
+                @auth
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-user" style="font-size:15px;"></span>
+                        {{ Auth::user()->name }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                                @csrf
+                                <button type="submit" style="
+                                    background:none;
+                                    border:none;
+                                    width:100%;
+                                    text-align:left;
+                                    padding:8px 20px;
+                                    color:#333;">
+                                    <i class="fa fa-sign-out"></i> Cerrar sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                @endauth
             </ul>
         </div>
         </div>
@@ -52,6 +77,7 @@
             <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
             <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
             <li><a href="{{ route('inicio') }}">Geoportal</a></li>
+            <li><a href="{{ route('admin') }}">Administrador</a></li>
             <li class="active">Vista general del mapa</li>
         </ol>
     </div>
