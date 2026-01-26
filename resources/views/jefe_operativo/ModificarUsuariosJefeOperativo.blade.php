@@ -10,7 +10,7 @@
         <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
         <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
         <li><a href="{{ route('inicio') }}">Geoportal</a></li>
-        <li><a href="{{ route('root') }}">Superusuario</a></li>
+        <li><a href="{{ route('jefe_operativo') }}">Jefe operativo</a></li>
         <li class="active">Modificar usuario</li>
     </ol>
 </div>
@@ -24,15 +24,15 @@
         </div>
         <div class="col-md-3">
             <div class="list-group">
-                <a class="list-group-item" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-                <a class="list-group-item" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-                <a class="list-group-item" href="{{ route('unidades-produccion-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+                <a class="list-group-item" href="{{ route('jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+                <a class="list-group-item" href="{{ route('mapa-jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+                <a class="list-group-item" href="{{ route('jefe-operativo-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
             </div>
         </div>
     </div>
 
     <div class="container">
-        <form method="POST" action="{{ route('actualizar.usuario.root', $user->id) }}">
+        <form method="POST" action="{{ route('actualizar.usuario.jefe_operativo', $user->id) }}">
             @csrf
             @method('PUT')
             <div class="row">
@@ -53,9 +53,6 @@
                 <div class="col-md-4">
                     <h4>Tipo de usuario</h4>
                     <select class="form-control" name="tipo_usuario">
-                        <option value="administrador" {{ $user->tipo_usuario == 'administrador' ? 'selected' : '' }}>Administrador</option>
-                        <option value="tecnico" {{ $user->tipo_usuario == 'tecnico' ? 'selected' : '' }}>Técnico</option>
-                        <option value="jefe_operativo" {{ $user->tipo_usuario == 'jefe_operativo' ? 'selected' : '' }}>Jefe operativo</option>
                         <option value="capturista" {{ $user->tipo_usuario == 'capturista' ? 'selected' : '' }}>Capturista</option>
                     </select>
                 </div>
@@ -67,18 +64,19 @@
                     <h4>Confirmar contraseña</h4>
                     <input class="form-control" type="password" name="password_confirmation" placeholder="Repita la contraseña">
                 </div>
+
                 <div class="col-md-4" style="margin-top:2.5em;">
-                    <button type="submit" class="btn btn-success">Actualizar usuario</button>
-                    <a href="{{ route('administrar-usuarios-root') }}" class="btn btn-default">Cancelar</a>
-                </div>
-            </div>
+                    <button type="submit" class="btn btn-primary" id="registrarUsuarioBtn">Actualizar usuario</button>
+                    <a href="{{ route('usuarios-jefe_operativo') }}" class="btn btn-default">Cancelar</a>
+                 </div>
+            </div><br>
         </form>
     </div>
 </div>
 
 <!-- Scripts -->
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="{{ asset('js/root/usuariosRoot.js') }}"></script>
+   <script src="{{ asset(path: 'js/jefe_operativo/usuariosJefeOperativo.js') }}"></script>
 
 
 @endsection

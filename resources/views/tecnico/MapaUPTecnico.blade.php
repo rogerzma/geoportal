@@ -36,6 +36,31 @@
                 <li class="landing-btn"><a href="https://www.gob.mx/inifap/archivo/documentos">Documentos</a></li>
                 <li class="landing-btn"><a href="https://vun.inifap.gob.mx/portalweb/_Transparencia">Transparencia</a></li>
                 <li class="landing-btn"><a href="https://www.gob.mx/agricultura/es/#344">Contacto</a></li>
+                @auth
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-user" style="font-size:15px;"></span>
+                        {{ Auth::user()->name }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                                @csrf
+                                <button type="submit" style="
+                                    background:none;
+                                    border:none;
+                                    width:100%;
+                                    text-align:left;
+                                    padding:8px 20px;
+                                    color:#333;">
+                                    <i class="fa fa-sign-out"></i> Cerrar sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                @endauth
             </ul>
         </div>
         </div>
@@ -71,10 +96,6 @@
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
                     <a class="list-group-item" style="text-decoration: none;" href="{{ route('usuarios-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-                    </form> 
                     </div>
                 </div>
             </div>

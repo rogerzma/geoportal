@@ -12,7 +12,7 @@
         <li><a href="http://www.gob.mx/inifap">Instituto Nacional de Investigaciones Forestales, Agrícolas y Pecuarias</a></li>
         <li><a href="http://zacatecas.inifap.gob.mx/">Inifap C.E. Zacatecas</a></li>
         <li><a href="{{ route('inicio') }}">Geoportal</a></li>
-        <li><a href="{{ route('admin') }}">Administrador</a></li>
+        <li><a href="{{ route('jefe_operativo') }}">Jefe operativo</a></li>
         <li class="active">Registrar UP</li>
     </ol>
 </div>
@@ -26,13 +26,9 @@
       </div>
       <div class="col-md-3">
           <div class="list-group">
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-            <a class="list-group-item" style="text-decoration: none;" href="{{ route('usuarios-tecnico') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-            </form>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('usuarios-jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a>
           </div>
       </div>
     </div>

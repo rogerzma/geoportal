@@ -19,22 +19,18 @@
 
 <div class="container">
     <div class="row">
-    <div class="col-md-9">
-        <h2>Registrar un nuevo usuario</h2>
-        <hr class="red">
-        <p>Ingrese los datos del usuario a registrar.</p>
-    </div>
-    <div class="col-md-3">
-        <div class="list-group">
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
-          <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe-operativo-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
-          <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="list-group-item" style="text-decoration: none;"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cerrar sesión</button>
-          </form>
+        <div class="col-md-9">
+            <h2>Registrar un nuevo usuario</h2>
+            <hr class="red">
+            <p>Ingrese los datos del usuario a registrar.</p>
         </div>
-    </div>
+        <div class="col-md-3">
+            <div class="list-group">
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-jefe_operativo') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('jefe-operativo-up') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Unidades de producción</a>
+            </div>
+        </div>
     </div>
 
     <div class="container">

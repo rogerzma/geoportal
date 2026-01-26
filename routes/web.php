@@ -127,6 +127,7 @@ Route::middleware(['auth', 'role:tecnico'])->group(function(){
     Route::get('/tecnico/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
     Route::get('/tecnico/modificar-usuario/{id}', [UserController::class, 'edit'])->name('tecnico.modificar-usuario');
     Route::put('/tecnico/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.tecnico');
+    Route::put('/tecnico/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.tecnico');
 });
 
 // Rutas para usuario jefe operativo
@@ -156,28 +157,9 @@ Route::middleware(['auth', 'role:jefe_operativo'])->group(function(){
 
     Route::get('/jefe_operativo/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos');
     Route::get('/jefe_operativo/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
+    Route::get('/jefe_operativo/modificar-usuario/{id}', [UserController::class, 'edit'])->name('jefe_operativo.modificar-usuario');
     Route::put('/jefe_operativo/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.jefe_operativo');
-});
-
-// Rutas para usuario productor
-Route::middleware(['auth', 'role:productor'])->group(function(){
-    Route::get('/productor', function(){
-        return view('productor/InicioProductor');
-    })->name('productor');
-
-    Route::get('/productor/mapa', function () {
-        return view('MapaGOB');
-    })->name('mapa-gob');
-
-    Route::get('/productor/up', function(){
-        return view('productor/ProductorUP');
-    })->name('productor-up');
-
-    Route::get('/productor/crear-up', [UPController::class, 'create'])->name('crear-up-productor');
-
-    Route::get('/productor/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
-    Route::put('/productor/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.productor');
-
+    Route::put('/jefe_operativo/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.jefe_operativo');
 });
 
 // Rutas para usuario capturista

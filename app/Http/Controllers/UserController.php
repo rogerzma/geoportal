@@ -127,6 +127,10 @@ class UserController extends Controller
         elseif ($authUser && $authUser->tipo_usuario === 'tecnico') {
             return view('tecnico.ModificarUsuarioTecnico', compact('user'));
         }
+        // Si el usuario autenticado es jefe operativo, muestra la vista de jefe operativo
+        elseif ($authUser && $authUser->tipo_usuario === 'jefe_operativo') {
+            return view('jefe_operativo.ModificarUsuariosJefeOperativo', compact('user'));
+        }
         // Vista genérica o error
         else {
             return view('ModificarUsuarios', compact('user'));

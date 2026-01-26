@@ -53,6 +53,14 @@ function cargarPoligonos() {
                         weight: 2
                     }).addTo(map);
 
+                    polygon.bindPopup(`
+                        <div class="popup-poligono">
+                            <strong>Nombre:</strong> ${poligono.nombre}<br>
+                            <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                            <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
+                        </div>
+                    `);
+
                     bounds.extend(polygon.getBounds());
 
                 } catch (e) {
