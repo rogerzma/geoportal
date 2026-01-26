@@ -53,7 +53,6 @@
                 <div class="col-md-4">
                     <h4>Tipo de usuario</h4>
                     <select class="form-control" name="tipo_usuario">
-                        <option value="root" {{ $user->tipo_usuario == 'root' ? 'selected' : '' }}>Superusuario</option>
                         <option value="administrador" {{ $user->tipo_usuario == 'administrador' ? 'selected' : '' }}>Administrador</option>
                         <option value="tecnico" {{ $user->tipo_usuario == 'tecnico' ? 'selected' : '' }}>Técnico</option>
                         <option value="jefe_operativo" {{ $user->tipo_usuario == 'jefe_operativo' ? 'selected' : '' }}>Jefe operativo</option>
