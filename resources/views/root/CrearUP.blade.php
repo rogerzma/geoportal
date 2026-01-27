@@ -51,12 +51,12 @@
                 <div class="col-md-4">
                   <p>
                       <p><h4>Nombre del capturista</h4></p>
-                      <select class="form-control" id="capturista">
+                        <select class="form-control" id="capturista">
                           <option value="">No aplica</option>
                           @foreach($capturistas as $capturista)
-                              <option value="{{ $capturista->name }}">{{ $capturista->name }}</option>
+                            <option value="{{ $capturista->id }}">{{ $capturista->name }}</option>
                           @endforeach
-                      </select>
+                        </select>
                   </p>
                 </div>
        </div>

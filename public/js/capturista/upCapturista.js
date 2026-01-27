@@ -12,9 +12,9 @@ $(document).ready(function () {
         const responsable = $('#responsable').val();
         const localidad = $('#localidad').val();
         const telefono = $('#telefono').val();
-        const capturista = $('#capturista').val();
+        const capturista_id = $('#capturista').val();
 
-        if (!nombre_up || !responsable || !localidad || !telefono || !capturista) {
+        if (!nombre_up || !responsable || !localidad || !telefono) {
             $('#emptyFieldsAlert').show();
             return;
         }
