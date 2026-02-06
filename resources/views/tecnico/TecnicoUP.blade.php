@@ -40,6 +40,7 @@
                     <tr>
                         <th colspan="1" style="background:#009933; color:#FFF;">Nombre</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Localidad</th>
+                        <th colspan="1" style="background:#009933; color:#FFF;">Capturista</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Responsable</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Teléfono</th>
                         <th colspan="1" style="background:#009933; color:#FFF;">Polígonos</th>
@@ -50,6 +51,11 @@
                     <!-- Datos dinámicos -->
                 </tbody>
             </table>
+            <div class = "row mt-4">
+                <div class = "col-md-12 text-center">
+                    <div id= "paginacion-up"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Mensaje si no hay UPs -->

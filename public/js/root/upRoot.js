@@ -6,6 +6,11 @@ $(document).ready(function () {
         }
     });
 
+    // Paginación
+    let unidadesGlobal = [];
+    let paginaActual = 1;
+    const unidadesPorPagina = 5;
+
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
         const nombre_up = $('#nombre_up').val();
@@ -53,29 +58,10 @@ $(document).ready(function () {
                     $('#tabla-up-wrapper').show();
                     $('#mensaje-vacio').hide();
 
-                    let filas = '';
-                    response.forEach(function (up) {
-                        const capturista = up.capturista ? up.capturista.name : '—';
-                        filas += `
-                            <tr>
-                                <td>${up.nombre_up}</td>
-                                <td>${up.localidad}</td>
-                                <td>${capturista}</td>
-                                <td>${up.responsable}</td>
-                                <td>${up.telefono}</td>
-                                <td>
-                                    <a href="/root/up/poligonos?up_id=${up.id}" title="Ver mapa">
-                                        <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href="/root/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
-                                    <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    $('#tbody-up').html(filas);
+                    unidadesGlobal = response;
+                    paginaActual = 1;
+                    renderTablaUP();
+
                 }
             },
             error: function (xhr) {
@@ -85,6 +71,100 @@ $(document).ready(function () {
             }
         });
     }
+
+    // Tabla paginada
+    function renderTablaUP(){
+        let filas = '';
+        const inicio = (paginaActual - 1) * unidadesPorPagina;
+        const fin = inicio + unidadesPorPagina;
+        const unidadesPagina = unidadesGlobal.slice(inicio, fin);
+
+        unidadesPagina.forEach(function (up) {
+            const capturista = up.capturista ? up.capturista.name : '—';
+            filas += `
+                <tr>
+                    <td>${up.nombre_up}</td>
+                    <td>${up.localidad}</td>
+                    <td>${capturista}</td>
+                    <td>${up.responsable}</td>
+                    <td>${up.telefono}</td>
+                    <td>
+                        <a href="/root/up/poligonos?up_id=${up.id}" title="Ver mapa">
+                             <img src="/images/map-icon.png" width="20" height="20" alt="Mapa">
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/root/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
+                        <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
+                    </td>
+                </tr>
+            `;
+        }); $('#tbody-up').html(filas);
+        renderPaginacionUP();
+    }
+
+    // Renderizar paginación
+    function renderPaginacionUP() {
+        let totalPaginas = Math.ceil(unidadesGlobal.length / unidadesPorPagina);
+
+        let paginacionHtml = '<nav><ul class="pagination">';
+
+        paginacionHtml += `
+            <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" id="up-anterior">&laquo;</a>
+            </li>
+        `;
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            paginacionHtml += `
+                <li class="page-item ${paginaActual === i ? 'active' : ''}">
+                    <a class="page-link up-page-num" href="#" data-pagina="${i}">${i}</a>
+                </li>
+            `;
+        }
+
+        paginacionHtml += `
+            <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+                <a class="page-link" href="#" id="up-siguiente">&raquo;</a>
+            </li>
+        </ul></nav>
+        `;
+
+        if ($('#paginacion-up').length === 0) {
+            $('#tabla-up-wrapper').after(
+                '<div id="paginacion-up" class="text-center"></div>'
+            );
+        }
+
+        $('#paginacion-up').html(paginacionHtml);
+
+        // Eventos
+        $('#up-anterior').off().on('click', function (e) {
+            e.preventDefault();
+            if (paginaActual > 1) {
+                paginaActual--;
+                renderTablaUP();
+            }
+        });
+
+        $('#up-siguiente').off().on('click', function (e) {
+            e.preventDefault();
+            if (paginaActual < totalPaginas) {
+                paginaActual++;
+                renderTablaUP();
+            }
+        });
+
+        $('.up-page-num').off().on('click', function (e) {
+            e.preventDefault();
+            const pagina = parseInt($(this).data('pagina'));
+            if (pagina !== paginaActual) {
+                paginaActual = pagina;
+                renderTablaUP();
+            }
+        });
+    }
+
 
     cargarUnidadesProduccion();
 

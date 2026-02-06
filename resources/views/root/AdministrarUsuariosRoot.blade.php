@@ -55,6 +55,13 @@
                 <p>
                 <a href="{{'registro-usuarios'}}" button class="btn btn-primary" type="button">Registrar usuario nuevo</a>
                 </p>
+                
+        </div>
+        <div class="col-md-4">
+                <p>
+                <button id="btnExportarUsuarios" class="btn btn-success">Exportar a Excel</button>
+                </p>
+                
         </div>
     </div>
 

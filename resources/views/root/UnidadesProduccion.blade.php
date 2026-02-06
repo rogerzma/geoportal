@@ -51,7 +51,11 @@
                     <!-- Datos dinámicos -->
                 </tbody>
             </table>
-        </div>
+            <div class = "row mt-4">
+                <div class = "col-md-12 text-center">
+                    <div id= "paginacion-up"></div>
+                </div>
+            </div>
 
         <!-- Mensaje si no hay UPs -->
         <div class="col-sm-10" id="mensaje-vacio" style="display:none; margin-bottom:2em;">

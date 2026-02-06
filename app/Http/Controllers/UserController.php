@@ -136,4 +136,36 @@ class UserController extends Controller
             return view('ModificarUsuarios', compact('user'));
         }
     }
+
+    // Exportar la tabla de usuarios a CSV (incluyendo contraseña en texto plano SOLO PARA PRUEBA)
+    public function exportarCSV()
+    {
+        $usuarios = User::all();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="usuarios.csv"',
+        ];
+
+        $callback = function() use ($usuarios) {
+            $handle = fopen('php://output', 'w');
+            // Encabezados
+            fputcsv($handle, ['Nombre', 'Correo', 'Telefono', 'Roles', 'Contraseña']);
+
+            foreach ($usuarios as $usuario) {
+                // Si tienes un campo temporal 'password_plain', úsalo aquí. Si no, pon un valor de ejemplo.
+                $passwordPlano = $usuario->password_plain ?? 'NO DISPONIBLE';
+                fputcsv($handle, [
+                    $usuario->name,
+                    $usuario->email,
+                    $usuario->telefono,
+                    $usuario->tipo_usuario,
+                    $passwordPlano
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
