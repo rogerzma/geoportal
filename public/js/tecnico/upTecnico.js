@@ -102,38 +102,79 @@ $(document).ready(function () {
         renderPaginacionUP();
     }
 
-    // Renderizar paginación
+   // Renderizar paginación
     function renderPaginacionUP() {
         let totalPaginas = Math.ceil(unidadesGlobal.length / unidadesPorPagina);
+        if (totalPaginas <= 1) {
+            $('#paginacion-up').html('');
+            return;
+        }
 
-        let paginacionHtml = '<nav><ul class="pagination">';
+        let paginacionHtml = '<nav><ul class="pagination justify-content-center">';
 
+        // « Anterior
         paginacionHtml += `
             <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" id="up-anterior">&laquo;</a>
             </li>
         `;
 
-        for (let i = 1; i <= totalPaginas; i++) {
+        // Página 1
+        paginacionHtml += `
+            <li class="page-item ${paginaActual === 1 ? 'active' : ''}">
+                <a class="page-link up-page-num" href="#" data-pagina="1">1</a>
+            </li>
+        `;
+
+        // Ellipsis izquierda
+        if (paginaActual > ventanaPaginas + 2) {
             paginacionHtml += `
-                <li class="page-item ${paginaActual === i ? 'active' : ''}">
-                    <a class="page-link up-page-num" href="#" data-pagina="${i}">${i}</a>
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
                 </li>
             `;
         }
 
+        // Rango central
+        let inicio = Math.max(2, paginaActual - ventanaPaginas);
+        let fin = Math.min(totalPaginas - 1, paginaActual + ventanaPaginas);
+
+        for (let i = inicio; i <= fin; i++) {
+            paginacionHtml += `
+                <li class="page-item ${paginaActual === i ? 'active' : ''}">
+                    <a class="page-link up-page-num" href="#" data-pagina="${i}">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        }
+
+        // Ellipsis derecha
+        if (paginaActual < totalPaginas - (ventanaPaginas + 1)) {
+            paginacionHtml += `
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+            `;
+        }
+
+        // Última página
+        paginacionHtml += `
+            <li class="page-item ${paginaActual === totalPaginas ? 'active' : ''}">
+                <a class="page-link up-page-num" href="#" data-pagina="${totalPaginas}">
+                    ${totalPaginas}
+                </a>
+            </li>
+        `;
+
+        // » Siguiente
         paginacionHtml += `
             <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
                 <a class="page-link" href="#" id="up-siguiente">&raquo;</a>
             </li>
-        </ul></nav>
         `;
 
-        if ($('#paginacion-up').length === 0) {
-            $('#tabla-up-wrapper').after(
-                '<div id="paginacion-up" class="text-center"></div>'
-            );
-        }
+        paginacionHtml += '</ul></nav>';
 
         $('#paginacion-up').html(paginacionHtml);
 
@@ -156,11 +197,8 @@ $(document).ready(function () {
 
         $('.up-page-num').off().on('click', function (e) {
             e.preventDefault();
-            const pagina = parseInt($(this).data('pagina'));
-            if (pagina !== paginaActual) {
-                paginaActual = pagina;
-                renderTablaUP();
-            }
+            paginaActual = parseInt($(this).data('pagina'));
+            renderTablaUP();
         });
     }
 
