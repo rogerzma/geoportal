@@ -127,12 +127,24 @@
                         <div class="mb-3">
                             <label for="cultivo" class="form-label">Cultivo</label>
                             <select class="form-control" name="cultivo" id="cultivo" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Frijol">Frijol</option>
-                                <option value="Chile">Chile</option>
-                                <option value="Maiz">Maiz</option>
-                                <option value="Ajo">Ajo</option>
-                            </select>
+    <option value="">Seleccione...</option>
+    <option value="Frijol">Frijol</option>
+    <option value="Chile">Chile</option>
+    <option value="Maiz">Maiz</option>
+    <option value="Ajo">Ajo</option>
+    <option value="Avena">Avena</option>
+    <option value="Cebada">Cebada</option>
+    <option value="Trigo">Trigo</option>
+    <option value="Sorgo">Sorgo</option>
+    <option value="Cebolla">Cebolla</option>
+    <option value="Zanahoria">Zanahoria</option>
+    <option value="Pepino">Pepino</option>
+    <option value="Guayaba">Guayaba</option>
+    <option value="Manzana">Manzana</option>
+    <option value="Durazno">Durazno</option>
+    <option value="Algodon">Algodón</option>
+    <option value="Nopal">Nopal</option>
+</select>
                         </div>
 
                         <!-- Ocultos -->

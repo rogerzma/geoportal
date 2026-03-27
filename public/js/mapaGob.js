@@ -17,11 +17,23 @@ map.on('mousemove', function (e) {
 
 // Genera un color para cada cultivo
 const COLORES_CULTIVO = {
-    'Frijol': '#57352B',   // cafe
-    'Chile':  '#1A6E0D',   // verde
-    'Maiz':   '#F9A825',   // amarillo
-    'Ajo':    '#7E12B8',    // morado
-    'Tomate': '#FF0000', // rojo
+    'Frijol':   '#57352B', // café
+    'Chile':    '#1A6E0D', // verde
+    'Maiz':     '#F9A825', // amarillo
+    'Ajo':      '#FFE880', // amarillo claro
+    'Tomate':   '#FF0000', // rojo
+    'Avena':    '#B2BABB', // gris claro
+    'Cebada':   '#A0522D', // marrón
+    'Trigo':    '#F4D03F', // dorado
+    'Sorgo':    '#8D5524', // marrón oscuro
+    'Cebolla':  '#D7BDE2', // lila claro
+    'Zanahoria':'#FF9800', // naranja
+    'Pepino':   '#4CAF50', // verde claro
+    'Guayaba':  '#E91E63', // rosa
+    'Manzana':  '#8BC34A', // verde manzana
+    'Durazno':  '#FFB74D', // durazno
+    'Algodon':  '#FFFFFF', // blanco
+    'Nopal':    '#388E3C', // verde nopal
 };
 
 function colorPorCultivo(cultivo) {
