@@ -32,7 +32,7 @@ const COLORES_CULTIVO = {
     'Guayaba':  '#E91E63', // rosa
     'Manzana':  '#8BC34A', // verde manzana
     'Durazno':  '#FFB74D', // durazno
-    'Algodon':  '#FFFFFF', // blanco
+    'Algodon':  '#DBC621', // blanco
     'Nopal':    '#388E3C', // verde nopal
 };
 
@@ -95,7 +95,24 @@ function cargarHectareasPorCultivo() {
     fetch('/api/poligonos/hectareas-por-cultivo')
         .then(response => response.json())
         .then(data => {
-            const cultivos = ['Frijol', 'Chile', 'Maiz', 'Ajo', 'Tomate'];
+            const cultivos = [
+                'Frijol',
+                'Chile',
+                'Maiz',
+                'Ajo',
+                'Avena',
+                'Cebada',
+                'Trigo',
+                'Sorgo',
+                'Cebolla',
+                'Zanahoria',
+                'Pepino',
+                'Guayaba',
+                'Manzana',
+                'Durazno',
+                'Algodon',
+                'Nopal'
+            ];
             const tabla = document.getElementById('tabla-cultivos-body');
             if (!tabla) return;
             tabla.innerHTML = '';

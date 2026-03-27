@@ -35,7 +35,7 @@ const COLORES_CULTIVO = {
     'Guayaba':  '#E91E63', // rosa
     'Manzana':  '#8BC34A', // verde manzana
     'Durazno':  '#FFB74D', // durazno
-    'Algodon':  '#FFFFFF', // blanco
+    'Algodon':  '#DBC621', // verde oliva
     'Nopal':    '#388E3C', // verde nopal
 };
 
