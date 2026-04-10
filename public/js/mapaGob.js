@@ -100,6 +100,7 @@ function cargarHectareasPorCultivo() {
                 'Chile',
                 'Maiz',
                 'Ajo',
+                'Tomate',
                 'Avena',
                 'Cebada',
                 'Trigo',
