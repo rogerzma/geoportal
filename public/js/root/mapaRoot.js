@@ -30,7 +30,7 @@ const COLORES_CULTIVO = {
     'Ciruela':  '#7E57C2', // violeta ciruela
     'Durazno':  '#FFB74D', // durazno
     'En descanso': '#7D7D7D', // gris
-    'Fresa':    '#FF69B4', // rosa fuerte
+    'Fresa':    '#FF0D3D', // rosa fuerte
     'Frijol':   '#57352B', // café
     'Guayaba':  '#E91E63', // rosa
     'Maiz':     '#F9A825', // amarillo
