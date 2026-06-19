@@ -129,6 +129,8 @@
                                 <option value="Chile">Chile</option>
                                 <option value="Maiz">Maiz</option>
                                 <option value="Ajo">Ajo</option>
+                                <option value="Tomate">Tomate</option>
+                                <option value="Tomatillo">Tomatillo</option>
                                 <option value="Avena">Avena</option>
                                 <option value="Cebada">Cebada</option>
                                 <option value="Trigo">Trigo</option>
@@ -141,6 +143,7 @@
                                 <option value="Durazno">Durazno</option>
                                 <option value="Algodon">Algodón</option>
                                 <option value="Nopal">Nopal</option>
+                                <option value="Uva">Uva</option>
                             </select>
                         </div>
 

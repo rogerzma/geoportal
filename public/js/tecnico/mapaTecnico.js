@@ -17,23 +17,30 @@ map.on('mousemove', function (e) {
 
 // Genera un color para cada cultivo
 const COLORES_CULTIVO = {
-    'Frijol':   '#57352B', // café
-    'Chile':    '#1A6E0D', // verde
-    'Maiz':     '#F9A825', // amarillo
+    'Alfalfa':  '#00692C', // verde oscuro
+    'Algodon':  '#EDEDED', // blanco
     'Ajo':      '#FFE880', // amarillo claro
-    'Tomate':   '#FF0000', // rojo
     'Avena':    '#B2BABB', // gris claro
     'Cebada':   '#A0522D', // marrón
-    'Trigo':    '#F4D03F', // dorado
-    'Sorgo':    '#8D5524', // marrón oscuro
     'Cebolla':  '#D7BDE2', // lila claro
-    'Zanahoria':'#FF9800', // naranja
-    'Pepino':   '#4CAF50', // verde claro
-    'Guayaba':  '#E91E63', // rosa
-    'Manzana':  '#8BC34A', // verde manzana
+    'Chile':    '#1A6E0D', // verde
+    'Ciruela':  '#7E57C2', // violeta ciruela
     'Durazno':  '#FFB74D', // durazno
-    'Algodon':  '#DBC621', // verde oliva
+    'En descanso': '#7D7D7D', // gris
+    'Fresa':    '#FF69B4', // rosa fuerte
+    'Frijol':   '#57352B', // café
+    'Guayaba':  '#E91E63', // rosa
+    'Maiz':     '#F9A825', // amarillo
+    'Manzana':  '#8BC34A', // verde manzana
+    'Nogal':    '#8B4513', // marrón oscuro
     'Nopal':    '#388E3C', // verde nopal
+    'Pepino':   '#4CAF50', // verde claro
+    'Sorgo':    '#8D5524', // marrón oscuro
+    'Tomate':   '#E53935', // rojo
+    'Tomatillo': '#32CD32', // verde lima claro
+    'Trigo':    '#F4D03F', // dorado
+    'Uva':      '#360869', // morado
+    'Zanahoria':'#FF9800', // naranja
 };
 
 const COLOR_DEFAULT = '#3388ff';

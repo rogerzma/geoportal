@@ -57,12 +57,6 @@
                 </p>
                 
         </div>
-        <div class="col-md-4">
-                <p>
-                <button id="btnExportarUsuarios" class="btn btn-success">Exportar a Excel</button>
-                </p>
-                
-        </div>
     </div>
 
     <div class="modal fade" id="modalEliminarUsuario" tabindex="-1" role="dialog" aria-labelledby="modalEliminarLabel">

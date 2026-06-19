@@ -346,7 +346,10 @@ class PoligonoController extends Controller
      */
 
     public function poligonosTotales(){
-        
+        $total = DB::table('poligono')->count();
+        return response()->json([
+            'poligonos_totales' => $total
+        ]);
     }
 
 }
