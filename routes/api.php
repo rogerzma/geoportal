@@ -6,6 +6,7 @@ use App\Http\Controllers\ParcelaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PoligonoController;
 use App\Http\Controllers\UPController;
+use App\Http\Controllers\CultivoController;
 use App\Models\User;
 
 /*
@@ -47,3 +48,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/usuarios/{id}', [UserController::class, 'show']);
     Route::put('/usuarios/{id}', [UserController::class, 'update']);
     Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
+// Rutas para cultivos
+    Route::get('/cultivos', [CultivoController::class, 'index']);
+    Route::post('/cultivos', [CultivoController::class, 'store']);
+    Route::get('/cultivos/{id}', [CultivoController::class, 'show']);
+    Route::put('/cultivos/{id}', [CultivoController::class, 'update']);
+    Route::delete('/cultivos/{id}', [CultivoController::class, 'destroy']);

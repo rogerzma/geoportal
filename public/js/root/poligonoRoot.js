@@ -41,9 +41,41 @@ const COLORES_CULTIVO = {
     'Trigo':    '#F4D03F', // dorado
     'Uva':      '#360869', // morado
     'Zanahoria':'#FF9800', // naranja
+    'Sin cultivo': '#000000' // negro
 };
+
 function colorPorCultivo(cultivo) {
-    return COLORES_CULTIVO[cultivo] || COLOR_DEFAULT;
+    return COLORES_CULTIVO[cultivo] || '#000000'; // negro por defecto
+}
+
+const ESTILO_GRIS_REGISTRO = {
+    color: '#808080',
+    fillColor: '#808080',
+    fillOpacity: 0.35,
+    weight: 2
+};
+
+// Cuando el usuario registra poligonos, evita registrar los ya registrados.
+function pintarRegistradosEnGris() {
+    drawnItems.eachLayer((layer) => {
+        if (!layer._esRegistrado || !layer.setStyle) return; // solo los ya guardados
+        if (!layer._estiloOriginal) {
+            layer._estiloOriginal = {
+                color: layer.options.color,
+                fillColor: layer.options.fillColor || layer.options.color,
+                fillOpacity: layer.options.fillOpacity,
+                weight: layer.options.weight || 2
+            };
+        }
+        layer.setStyle(ESTILO_GRIS_REGISTRO);
+    });
+}
+
+function restaurarColorRegistrados() {
+    drawnItems.eachLayer((layer) => {
+        if (!layer._esRegistrado || !layer.setStyle || !layer._estiloOriginal) return;
+        layer.setStyle(layer._estiloOriginal);
+    });
 }
 
 // Obtener el parámetro up_id de la URL
@@ -66,6 +98,7 @@ document.getElementById("draw-poligono").addEventListener("click", function () {
             drawControl.disable();
             drawControl = null;
         }
+        restaurarColorRegistrados(); // <-- NUEVO
         map.getContainer().style.cursor = "";
         mostrarAlerta('Modo dibujo desactivado.', 'info');
         return;
@@ -82,6 +115,7 @@ document.getElementById("draw-poligono").addEventListener("click", function () {
     };
     drawControl = new L.Draw.Polygon(map, polygonOptions);
     drawControl.enable();
+    pintarRegistradosEnGris(); // <-- NUEVO (solo en registro)
     mostrarAlerta('Modo dibujo activado.', 'info');
 });
 
@@ -109,6 +143,7 @@ document.getElementById("delete-poligono").addEventListener("click", function ()
             drawControl.disable();
             drawControl = null;
         }
+        restaurarColorRegistrados(); // <-- NUEVO
     }
     // Activa modo eliminación
     deleteMode = true;
@@ -129,11 +164,10 @@ function cargarPoligonosPorUP(upId) {
                 allCoords = allCoords.concat(coords);
 
                 const color = colorPorCultivo(poligono.cultivo);
-                const polygon = L.polygon(coords, {
-                    color: color,
-                    fillOpacity: 0.9
-                }).addTo(drawnItems);
-
+                const estiloOriginal = { color, fillColor: color, fillOpacity: 0.9, weight: 2 };
+                const polygon = L.polygon(coords, estiloOriginal).addTo(drawnItems);
+                polygon._esRegistrado = true;          // <-- NUEVO
+                polygon._estiloOriginal = estiloOriginal; // <-- NUEVO
                 polygon.bindPopup(`
                     <div class="popup-poligono">
                         <strong>Nombre:</strong> ${poligono.nombre}<br>
@@ -150,6 +184,8 @@ function cargarPoligonosPorUP(upId) {
                     }
                 });
             });
+
+            if (drawMode) pintarRegistradosEnGris(); // <-- NUEVO
 
             if (allCoords.length > 0) {
                 const bounds = L.latLngBounds(allCoords);
@@ -173,11 +209,9 @@ function cargarPoligonos() {
                 const coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
                 allCoords = allCoords.concat(coords);
 
-                const color = generarColorAleatorio();
-                const polygon = L.polygon(coords, {
-                    color: color,
-                    fillOpacity: 0.9
-                }).addTo(drawnItems);
+                const polygon = L.polygon(coords, estiloOriginal).addTo(drawnItems);
+                polygon._esRegistrado = true;           // <-- NUEVO
+                polygon._estiloOriginal = estiloOriginal; // <-- NUEVO
 
                 polygon.bindPopup(`
                     <strong>Nombre:</strong> ${poligono.nombre}<br>
@@ -196,7 +230,9 @@ function cargarPoligonos() {
                         modal.show();
                     }
                 });
+
             });
+            if (drawMode) pintarRegistradosEnGris(); // <-- NUEVO
 
             if (allCoords.length > 0) {
                 const bounds = L.latLngBounds(allCoords);

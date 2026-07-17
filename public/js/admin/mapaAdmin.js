@@ -41,6 +41,7 @@ const COLORES_CULTIVO = {
     'Trigo':    '#F4D03F', // dorado
     'Uva':      '#360869', // morado
     'Zanahoria':'#FF9800', // naranja
+    'Sin cultivo': '#000000' // negro
 };
 
 function colorPorCultivo(cultivo) {

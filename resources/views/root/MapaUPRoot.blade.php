@@ -149,6 +149,7 @@
                                 <option value="Trigo">Trigo</option>
                                 <option value="Uva">Uva</option>
                                 <option value="Zanahoria">Zanahoria</option>
+                                <option value="Sin cultivo">Sin cultivo</option>
                             </select>
                         </div>
 

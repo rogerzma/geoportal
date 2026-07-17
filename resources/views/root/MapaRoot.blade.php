@@ -14,6 +14,53 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <style>
+        #toggle-tabla-cultivos-wrap {
+            margin-bottom: 10px;
+        }
+
+        #toggle-tabla-cultivos {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #1e5bbf;
+            border-radius: 8px;
+            background: #2f6fd6;
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+        }
+
+        #toggle-tabla-cultivos:hover {
+            background: #1f5fc6;
+            border-color: #184ea3;
+            color: #ffffff;
+        }
+
+        #buscador-cultivos {
+            height: 42px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        #buscador-coordenadas {
+            height: 42px;
+            border-radius: 8px;
+        }
+
+        #btn-buscar-coordenadas {
+            height: 42px;
+            min-width: 120px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        #paginacion-cultivos .pagination {
+            margin: 6px 0 4px;
+        }
+    </style>
 
 
     <!-- Respond.js soporte de media queries para Internet Explorer 8 -->
@@ -88,7 +135,7 @@
                 <div class="col-md-9">
                     <h2>Vista general de los polígonos</h2>
                     <hr class="red">
-                   <p>A continuación, seleccione un polígono para ver su información</p>
+                   
                 </div>
                 <div class="col-md-3">
                     <div class="list-group">
@@ -107,6 +154,47 @@
                         </p>
                     </div>
                 </div>
+                <div class="row justify-content-end" id="toggle-tabla-cultivos-wrap">
+                    <div class="col-md-11">
+                        <button class="btn btn-primary" type="button" id="toggle-tabla-cultivos">Ocultar cultivos</button>
+                    </div>
+                </div>
+                <div class="row justify-content-end" id="tabla-cultivos-section">
+                    <div class="col-md-9 card-map-container">
+                        <label for="buscador-cultivos">Buscar cultivo:</label>
+                        <input class="form-control" type="text" id="buscador-cultivos" placeholder="Escribe el nombre del cultivo">
+                        <div class="table-responsive" id="tabla-up-wrapper">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background:#009933; color:#FFF;">Cultivo</th>
+                                        <th style="background:#009933; color:#FFF;">No. de hectareas</th>
+                                        <th style="background:#009933; color:#FFF;">Visualizar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-cultivos-body"></tbody>
+                            </table>
+                            <div id="paginacion-cultivos" class="text-center"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 12px;">
+                            <div class="col-sm-12">
+                                <p>Buscar por coordenadas:</p>
+                            </div>
+                        </div>
+                        <div class="row" id="buscador-coordenadas-row" style="margin-bottom: 12px">
+                            <div class="col-sm-6" id="buscador-coordenadas-wrapper">
+                                <input class="form-control" type="text" id="buscador-coordenadas" placeholder="Ejemplo: 22.7700, -102.5700">
+                            </div>
+                            <div class="col-sm-6">
+                                <button id="btn-buscar-coordenadas" class="btn btn-success" type="button">Buscar</button>
+                            </div>
+                            <div class="col-sm-6">
+                                <p>A continuación, seleccione un polígono para ver su información</p>
+                            </div>
+                        </div>
                 <div class="row justify-content-end">
                     <div class="col-md-11 card-map-container">
                         <div class="map-wrapper">

@@ -85,6 +85,7 @@ const COLORES_CULTIVO = {
     'Trigo':    '#F4D03F', // dorado
     'Uva':      '#360869', // morado
     'Zanahoria':'#FF9800', // naranja
+    'Sin cultivo': '#000000' // negro
 };
 
 const COLOR_DEFAULT = '#3388ff';
@@ -99,6 +100,142 @@ const CULTIVOS_ORDENADOS = Object.keys(COLORES_CULTIVO)
 // Variables globales para polígonos y cultivos
 let poligonosGlobal = [];
 let poligonosLayerGroup = L.layerGroup().addTo(map);
+
+function cargarScriptExterno(src) {
+    return new Promise((resolve, reject) => {
+        const existente = document.querySelector(`script[data-src="${src}"]`);
+        if (existente) {
+            if (existente.dataset.loaded === 'true') {
+                resolve();
+                return;
+            }
+            existente.addEventListener('load', () => resolve(), { once: true });
+            existente.addEventListener('error', () => reject(new Error(`No se pudo cargar ${src}`)), { once: true });
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.dataset.src = src;
+        script.addEventListener('load', function() {
+            this.dataset.loaded = 'true';
+            resolve();
+        }, { once: true });
+        script.addEventListener('error', () => reject(new Error(`No se pudo cargar ${src}`)), { once: true });
+        document.head.appendChild(script);
+    });
+}
+
+function crearFeatureGeoJsonDesdePoligono(poligono) {
+    let coordsOriginales;
+    try {
+        coordsOriginales = JSON.parse(poligono.coordenadas);
+    } catch (e) {
+        return null;
+    }
+
+    if (!Array.isArray(coordsOriginales) || coordsOriginales.length < 3) {
+        return null;
+    }
+
+    const anillo = coordsOriginales
+        .filter(p => p && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)))
+        .map(p => [Number(p.lng), Number(p.lat)]);
+
+    if (anillo.length < 3) {
+        return null;
+    }
+
+    const primero = anillo[0];
+    const ultimo = anillo[anillo.length - 1];
+    if (primero[0] !== ultimo[0] || primero[1] !== ultimo[1]) {
+        anillo.push([primero[0], primero[1]]);
+    }
+
+    return {
+        type: 'Feature',
+        properties: {
+            id: poligono.id ?? null,
+            nombre: poligono.nombre ?? '',
+            cultivo: poligono.cultivo ?? '',
+            fecha: poligono.fecha_creacion ?? '',
+            up_id: poligono.up_id ?? null,
+            user_id: poligono.user_id ?? null
+        },
+        geometry: {
+            type: 'Polygon',
+            coordinates: [anillo]
+        }
+    };
+}
+
+function obtenerFeatureCollectionSeleccionActual() {
+    const checksActivos = Array.from(document.querySelectorAll('.check-cultivo:checked')).map(c => c.value);
+    const aplicarFiltro = checksActivos.length > 0;
+
+    const features = poligonosGlobal
+        .filter(poligono => !aplicarFiltro || checksActivos.includes(poligono.cultivo))
+        .map(crearFeatureGeoJsonDesdePoligono)
+        .filter(Boolean);
+
+    return {
+        type: 'FeatureCollection',
+        features
+    };
+}
+
+async function descargarPoligonosShape() {
+    try {
+        if (!Array.isArray(poligonosGlobal) || poligonosGlobal.length === 0) {
+            mostrarAlerta('No hay polígonos disponibles para exportar.', 'warning');
+            return;
+        }
+
+        const featureCollection = obtenerFeatureCollectionSeleccionActual();
+        if (!featureCollection.features.length) {
+            mostrarAlerta('No hay geometrías válidas para exportar a Shapefile.', 'warning');
+            return;
+        }
+
+        await cargarScriptExterno('https://cdn.jsdelivr.net/npm/@mapbox/shp-write@0.4.3/shpwrite.min.js');
+
+        if (!window.shpwrite || typeof window.shpwrite.download !== 'function') {
+            throw new Error('La librería de exportación SHP no está disponible.');
+        }
+
+        window.shpwrite.download(featureCollection, {
+            folder: 'geoportal',
+            types: {
+                polygon: 'poligonos'
+            }
+        });
+
+        mostrarAlerta(`Descarga iniciada: ${featureCollection.features.length} polígono(s).`, 'success');
+    } catch (error) {
+        console.error('Error al exportar a Shapefile:', error);
+        mostrarAlerta('No fue posible generar el archivo SHP. Revisa la consola para más detalle.', 'danger');
+    }
+}
+
+function agregarBotonDescargaShape() {
+    if (document.getElementById('btn-descargar-shape')) {
+        return;
+    }
+
+    const ancla = document.getElementById('toggle-tabla-cultivos-wrap') || document.getElementById('buscador-coordenadas-row');
+    if (!ancla) {
+        return;
+    }
+
+    const boton = document.getElementById('btn-descargar-shape');
+    if (boton) {
+        boton.addEventListener('click', function(e) {
+            e.preventDefault();
+            descargarPoligonosShape();
+        });
+    }
+}
 
 // Cargar polígonos y guardarlos globalmente
 function cargarPoligonos(callback) {
@@ -320,7 +457,7 @@ function agregarToggleTablaCultivos() {
             if (icono) icono.className = 'fas fa-eye-slash';
         } else {
             tablaWrapper.style.display = 'none';
-            document.getElementById('toggle-tabla-texto').textContent = 'Mostrar tabla de cultivos';
+            document.getElementById('toggle-tabla-texto').textContent = 'Mostrar cultivos';
             if (icono) icono.className = 'fas fa-eye';
         }
     };
@@ -331,6 +468,7 @@ cargarPoligonos(() => {
     cargarHectareasPorCultivo();
     // Agregar el enlace después de que el DOM esté listo
     setTimeout(agregarToggleTablaCultivos, 300);
+    setTimeout(agregarBotonDescargaShape, 350);
 });
 cargarHectareasTotales();
 cargarPoligonosTotales();

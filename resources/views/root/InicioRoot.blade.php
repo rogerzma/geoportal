@@ -1,6 +1,6 @@
 @extends('layouts.appGOB')
 
-@section("title", "InicioAdmin")
+@section("title", "InicioRoot")
 
 @section('content')
 
@@ -38,7 +38,9 @@
                 <h4><a href="{{ route('mapa-root') }}">Vista general del geoportal</a><br></h4>
                 <h4><a href="{{ route('unidades-produccion-root') }}">Unidades de producción</a><br></h4>
                 <h4><a href="{{ route('administrar-usuarios-root') }}">Administrar usuarios</a><br></h4>
-                <h4><a href="{{ route('registrar-usuarios-root') }}">Dar de alta a usuarios</a><br><br></h4>
+                <h4><a href="{{ route('registrar-usuarios-root') }}">Dar de alta a usuarios</a><br></h4>
+                <h4><a href="{{ route('administrar-cultivos-root') }}">Lista de cultivos</a><br></h4>
+                <h4><a href="{{ route('registrar-cultivos-root') }}">Registrar cultivos</a><br><br></h4>
         </div>
         </div>
     </div>

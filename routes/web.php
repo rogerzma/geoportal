@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UPController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PoligonoController;
+use App\Http\Controllers\CultivoController;
 
 Auth::routes();
 
@@ -33,7 +34,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/unidades-produccion', [UPController::class, 'store']);
 
     Route::delete('/unidades-produccion/{id}', [UPController::class, 'destroy']);
-});
+
+    });
 
 
 Route::middleware(['auth', 'role:root'])->group(function(){
@@ -58,6 +60,14 @@ Route::middleware(['auth', 'role:root'])->group(function(){
         return view('root/UnidadesProduccion');
     })->name('unidades-produccion-root');
 
+    Route::get('/root/cultivos', function(){
+        return view('root/AdministrarCultivos');
+    })->name('administrar-cultivos-root');
+
+    Route::get('/root/registro-cultivos', function(){
+        return view('root/RegistrarCultivo');
+    })->name('registrar-cultivos-root');
+
     Route::get('/root/crear-up', [UPController::class, 'create'])->name('crear-up-root');
 
     Route::get('/root/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-root');
@@ -65,6 +75,19 @@ Route::middleware(['auth', 'role:root'])->group(function(){
     Route::put('/root/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.root');
     Route::get('/root/modificar-usuario/{id}', [UserController::class, 'edit'])->name('root.modificar-usuario');
     Route::put('/root/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.root');
+
+    // Datos de cultivos (solo root)
+    Route::get('/root/cultivos/data', [CultivoController::class, 'index'])
+    ->name('root.cultivos.data');
+
+    Route::post('/root/cultivos', [CultivoController::class, 'store'])
+    ->name('root.cultivos.store');
+
+    Route::delete('/root/cultivos/{id}', [CultivoController::class, 'destroy'])
+    ->name('root.cultivos.destroy');
+
+    Route::get('/root/modificar-cultivo/{id}', [CultivoController::class, 'edit'])->name('root.modificar-cultivo');
+    Route::put('/root/cultivos/{id}', [CultivoController::class, 'update'])->name('actualizar.cultivo.root');
 });
 
 Route::middleware(['auth', 'role:administrador'])->group(function(){
