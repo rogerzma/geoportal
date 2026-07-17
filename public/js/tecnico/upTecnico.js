@@ -10,6 +10,7 @@ $(document).ready(function () {
     let unidadesGlobal = [];
     let paginaActual = 1;
     const unidadesPorPagina = 5;
+    const ventanaPaginas = 2;
 
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
