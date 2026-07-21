@@ -10,6 +10,30 @@ $(document).ready(function () {
     let unidadesGlobal = [];
     let paginaActual = 1;
     const unidadesPorPagina = 5;
+    const ventanaPaginas = 2;
+
+    function obtenerUnidadesFiltradas() {
+        const filtro = ($('#buscador-up').val() || '').trim().toLowerCase();
+
+        if (!filtro) {
+            return unidadesGlobal;
+        }
+
+        return unidadesGlobal.filter(function (up) {
+            const capturista = up.capturista ? up.capturista.name : '';
+            const valoresBusqueda = [
+                up.nombre_up,
+                up.localidad,
+                up.responsable,
+                up.telefono,
+                capturista
+            ];
+
+            return valoresBusqueda.some(function (valor) {
+                return (valor || '').toString().toLowerCase().includes(filtro);
+            });
+        });
+    }
 
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
@@ -76,7 +100,19 @@ $(document).ready(function () {
         let filas = '';
         const inicio = (paginaActual - 1) * unidadesPorPagina;
         const fin = inicio + unidadesPorPagina;
-        const unidadesPagina = unidadesGlobal.slice(inicio, fin);
+        const unidadesFiltradas = obtenerUnidadesFiltradas();
+        const unidadesPagina = unidadesFiltradas.slice(inicio, fin);
+
+        if (unidadesFiltradas.length === 0) {
+            filas = `
+                <tr>
+                    <td colspan="7" class="text-center">No se encontraron unidades de producción relacionadas.</td>
+                </tr>
+            `;
+            $('#tbody-up').html(filas);
+            $('#paginacion-up').html('');
+            return;
+        }
 
         unidadesPagina.forEach(function (up) {
             const capturista = up.capturista ? up.capturista.name : '—';
@@ -104,7 +140,8 @@ $(document).ready(function () {
 
    // Renderizar paginación
     function renderPaginacionUP() {
-        let totalPaginas = Math.ceil(unidadesGlobal.length / unidadesPorPagina);
+        const unidadesFiltradas = obtenerUnidadesFiltradas();
+        let totalPaginas = Math.ceil(unidadesFiltradas.length / unidadesPorPagina);
         if (totalPaginas <= 1) {
             $('#paginacion-up').html('');
             return;
@@ -201,6 +238,12 @@ $(document).ready(function () {
             renderTablaUP();
         });
     }
+
+    $('#buscador-up').on('input', function () {
+        paginaActual = 1;
+        renderTablaUP();
+    });
+
 
     cargarUnidadesProduccion();
 

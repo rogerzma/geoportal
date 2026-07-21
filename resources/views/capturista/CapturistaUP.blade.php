@@ -32,6 +32,16 @@
     
 
     <div class="row">
+        <!-- Buscador de coordenadas -->
+            <div class="col-sm-10" style="margin-bottom: 12px;">
+                <label for="buscador-up">Buscar en unidades de producción</label>
+                <input
+                    type="text"
+                    id="buscador-up"
+                    class="form-control"
+                    placeholder="Escribe nombre, localidad, responsable, telefono o capturista"
+                >
+            </div>
         <!-- Contenedor de tabla -->
         <div class="col-sm-10 table-responsive" id="tabla-up-wrapper" style="margin-bottom:2em;">
             <table class="table table-striped table-bordered">
