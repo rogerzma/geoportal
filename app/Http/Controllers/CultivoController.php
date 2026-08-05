@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cultivo;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 
@@ -51,11 +52,13 @@ class CultivoController extends Controller
                 'string',
                 'max:150',
             ],
+
             'nombre_cientifico' => [
                 'nullable',
                 'string',
                 'max:150',
             ],
+
             'categoria' => [
                 'required',
                 'string',
@@ -73,26 +76,47 @@ class CultivoController extends Controller
                     'Otra',
                 ]),
             ],
+
             'color' => [
                 'required',
                 'regex:/^#[0-9A-Fa-f]{6}$/',
             ],
+
             'activo' => [
                 'required',
                 'boolean',
             ],
+
+            // Puede venir vacío si el cultivo no tiene variantes.
+            'variantes' => [
+                'nullable',
+                'array',
+            ],
+
+            'variantes.*' => [
+                'required',
+                'string',
+                'max:150',
+                'distinct',
+            ],
         ]);
+
+        $nombre = trim($datos['nombre']);
+
+        $nombreCientifico = !empty($datos['nombre_cientifico'])
+            ? trim($datos['nombre_cientifico'])
+            : null;
 
         $existe = Cultivo::whereRaw(
             'LOWER(nombre) = ?',
-            [mb_strtolower(trim($datos['nombre']))]
+            [mb_strtolower($nombre)]
         )
         ->when(
-            !empty($datos['nombre_cientifico']),
-            function ($query) use ($datos) {
+            $nombreCientifico !== null,
+            function ($query) use ($nombreCientifico) {
                 $query->whereRaw(
                     'LOWER(nombre_cientifico) = ?',
-                    [mb_strtolower(trim($datos['nombre_cientifico']))]
+                    [mb_strtolower($nombreCientifico)]
                 );
             },
             function ($query) {
@@ -107,20 +131,50 @@ class CultivoController extends Controller
             ], 422);
         }
 
-        $cultivo = Cultivo::create([
-            'nombre' => trim($datos['nombre']),
-            'nombre_cientifico' => !empty($datos['nombre_cientifico'])
-                ? trim($datos['nombre_cientifico'])
-                : null,
-            'categoria' => $datos['categoria'],
-            'color' => strtoupper($datos['color']),
-            'activo' => $request->boolean('activo'),
-            'created_by' => $usuario->id,
-        ]);
+        // Limpiar variantes y quitar duplicados sin distinguir mayúsculas.
+        $variantes = $this->normalizarVariantes(
+            $datos['variantes'] ?? []
+        );
+
+        $cultivo = DB::transaction(function () use (
+            $datos,
+            $usuario,
+            $nombre,
+            $nombreCientifico,
+            $variantes
+        ) {
+            $cultivo = Cultivo::create([
+                'nombre' => $nombre,
+                'nombre_cientifico' => $nombreCientifico,
+                'categoria' => $datos['categoria'],
+                'color' => strtoupper($datos['color']),
+                'activo' => filter_var(
+                    $datos['activo'],
+                    FILTER_VALIDATE_BOOLEAN
+                ),
+                'created_by' => $usuario->id,
+            ]);
+
+            if (!empty($variantes)) {
+                $cultivo->variantes()->createMany(
+                    array_map(
+                        fn ($nombreVariante) => [
+                            'nombre' => $nombreVariante,
+                        ],
+                        $variantes
+                    )
+                );
+            }
+
+            return $cultivo;
+        });
 
         return response()->json([
             'message' => 'Cultivo registrado correctamente.',
-            'cultivo' => $cultivo->load('creador:id,name'),
+            'cultivo' => $cultivo->load([
+                'creador:id,name',
+                'variantes',
+            ]),
         ], 201);
     }
 
@@ -167,7 +221,7 @@ class CultivoController extends Controller
 
         $this->autorizarGestion($usuario);
 
-        $cultivo = Cultivo::find($id);
+        $cultivo = Cultivo::with('variantes')->find($id);
 
         if (!$cultivo) {
             return response()->json([
@@ -182,12 +236,14 @@ class CultivoController extends Controller
                 'string',
                 'max:150',
             ],
+
             'nombre_cientifico' => [
                 'sometimes',
                 'nullable',
                 'string',
                 'max:150',
             ],
+
             'categoria' => [
                 'sometimes',
                 'required',
@@ -206,14 +262,35 @@ class CultivoController extends Controller
                     'Otra',
                 ]),
             ],
+
             'color' => [
                 'sometimes',
                 'required',
                 'regex:/^#[0-9A-Fa-f]{6}$/',
             ],
+
             'activo' => [
                 'sometimes',
                 'boolean',
+            ],
+
+            /*
+            * Si se envía:
+            * variantes: [] → elimina todas.
+            *
+            * Si no se envía el campo:
+            * conserva las variantes actuales.
+            */
+            'variantes' => [
+                'sometimes',
+                'array',
+            ],
+
+            'variantes.*' => [
+                'required',
+                'string',
+                'max:150',
+                'distinct',
             ],
         ]);
 
@@ -221,11 +298,14 @@ class CultivoController extends Controller
             ? trim($datos['nombre'])
             : $cultivo->nombre;
 
-        $nombreCientificoObjetivo = array_key_exists('nombre_cientifico', $datos)
-            ? (!empty($datos['nombre_cientifico'])
-                ? trim($datos['nombre_cientifico'])
-                : null)
-            : $cultivo->nombre_cientifico;
+        $nombreCientificoObjetivo =
+            array_key_exists('nombre_cientifico', $datos)
+                ? (
+                    !empty($datos['nombre_cientifico'])
+                        ? trim($datos['nombre_cientifico'])
+                        : null
+                )
+                : $cultivo->nombre_cientifico;
 
         $existe = Cultivo::where('id', '!=', $cultivo->id)
             ->whereRaw(
@@ -233,7 +313,7 @@ class CultivoController extends Controller
                 [mb_strtolower($nombreObjetivo)]
             )
             ->when(
-                !empty($nombreCientificoObjetivo),
+                $nombreCientificoObjetivo !== null,
                 function ($query) use ($nombreCientificoObjetivo) {
                     $query->whereRaw(
                         'LOWER(nombre_cientifico) = ?',
@@ -252,34 +332,70 @@ class CultivoController extends Controller
             ], 422);
         }
 
-        if (array_key_exists('nombre', $datos)) {
-            $cultivo->nombre = trim($datos['nombre']);
-        }
+        DB::transaction(function () use (
+            $request,
+            $datos,
+            $cultivo
+        ) {
+            if (array_key_exists('nombre', $datos)) {
+                $cultivo->nombre = trim($datos['nombre']);
+            }
 
-        if (array_key_exists('nombre_cientifico', $datos)) {
-            $cultivo->nombre_cientifico =
-                !empty($datos['nombre_cientifico'])
-                    ? trim($datos['nombre_cientifico'])
-                    : null;
-        }
+            if (array_key_exists('nombre_cientifico', $datos)) {
+                $cultivo->nombre_cientifico =
+                    !empty($datos['nombre_cientifico'])
+                        ? trim($datos['nombre_cientifico'])
+                        : null;
+            }
 
-        if (array_key_exists('categoria', $datos)) {
-            $cultivo->categoria = $datos['categoria'];
-        }
+            if (array_key_exists('categoria', $datos)) {
+                $cultivo->categoria = $datos['categoria'];
+            }
 
-        if (array_key_exists('color', $datos)) {
-            $cultivo->color = strtoupper($datos['color']);
-        }
+            if (array_key_exists('color', $datos)) {
+                $cultivo->color = strtoupper($datos['color']);
+            }
 
-        if ($request->has('activo')) {
-            $cultivo->activo = $request->boolean('activo');
-        }
+            if ($request->exists('activo')) {
+                $cultivo->activo = $request->boolean('activo');
+            }
 
-        $cultivo->save();
+            $cultivo->save();
+
+            /*
+            * Solo modificar variantes cuando el frontend
+            * haya enviado explícitamente el campo.
+            */
+            if (array_key_exists('variantes', $datos)) {
+                $variantes = $this->normalizarVariantes(
+                    $datos['variantes']
+                );
+
+                /*
+                * Elimina las actuales y crea las nuevas.
+                * Un arreglo vacío deja el cultivo sin variantes.
+                */
+                $cultivo->variantes()->delete();
+
+                if (!empty($variantes)) {
+                    $cultivo->variantes()->createMany(
+                        array_map(
+                            fn ($nombreVariante) => [
+                                'nombre' => $nombreVariante,
+                            ],
+                            $variantes
+                        )
+                    );
+                }
+            }
+        });
 
         return response()->json([
             'message' => 'Cultivo actualizado correctamente.',
-            'cultivo' => $cultivo->load('creador:id,name'),
+            'cultivo' => $cultivo->fresh()->load([
+                'creador:id,name',
+                'variantes',
+            ]),
         ]);
     }
 
@@ -317,5 +433,32 @@ class CultivoController extends Controller
         ) {
             abort(403, 'No autorizado para gestionar cultivos.');
         }
+    }
+
+    private function normalizarVariantes(array $variantes): array
+    {
+        $resultado = [];
+        $nombresRegistrados = [];
+
+        foreach ($variantes as $variante) {
+            $nombre = trim((string) $variante);
+
+            // Ignorar entradas vacías.
+            if ($nombre === '') {
+                continue;
+            }
+
+            // Comparar sin distinguir mayúsculas ni minúsculas.
+            $clave = mb_strtolower($nombre);
+
+            if (in_array($clave, $nombresRegistrados, true)) {
+                continue;
+            }
+
+            $nombresRegistrados[] = $clave;
+            $resultado[] = $nombre;
+        }
+
+        return $resultado;
     }
 }

@@ -72,35 +72,93 @@ function normalizarTexto(texto) {
         .toLowerCase();
 }
 
+function escaparHtml(valor) {
+    return String(valor ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 function mostrarPoligonosPorCultivo() {
     poligonosLayerGroup.clearLayers();
 
     poligonosGlobal.forEach(poligono => {
-        if (!cultivosSeleccionados.has(poligono.cultivo)) return;
+        const nombreCultivo =
+            poligono.cultivo_catalogo?.nombre ||
+            poligono.cultivo ||
+            'Sin cultivo';
 
-        let coords = [];
-        try {
-            coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
-        } catch (e) {
+        if (!cultivosSeleccionados.has(nombreCultivo)) {
             return;
         }
 
-        const color = colorPorCultivo(poligono.cultivo);
+        let coords = [];
+
+        try {
+            coords = JSON.parse(poligono.coordenadas).map(coord => [
+                Number(coord.lat),
+                Number(coord.lng)
+            ]);
+        } catch (error) {
+            console.warn(
+                `Coordenadas inválidas en el polígono ${poligono.id}:`,
+                error
+            );
+
+            return;
+        }
+
+        const color =
+            poligono.cultivo_catalogo?.color ||
+            colorPorCultivo(nombreCultivo);
+
         const polygon = L.polygon(coords, {
             color: color,
+            fillColor: color,
             fillOpacity: 0.7,
             weight: 2
         }).addTo(poligonosLayerGroup);
 
+        /*
+         * Laravel convierte la relación varianteCultivo
+         * a variante_cultivo cuando genera el JSON.
+         */
+        const nombreVariante =
+            poligono.variante_cultivo?.nombre || null;
+
+        /*
+         * La línea únicamente se crea cuando existe
+         * una variante registrada.
+         */
+        const lineaVariante = nombreVariante
+            ? `
+                <strong>Variante:</strong>
+                ${escaparHtml(nombreVariante)}
+                <br>
+            `
+            : '';
+
         polygon.bindPopup(`
             <div class="popup-poligono">
-                <strong>Nombre:</strong> ${poligono.nombre}<br>
-                <strong>Cultivo:</strong> ${poligono.cultivo}<br>
-                <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
+                <strong>Nombre:</strong>
+                ${escaparHtml(poligono.nombre)}
+                <br>
+
+                <strong>Cultivo:</strong>
+                ${escaparHtml(nombreCultivo)}
+                <br>
+
+                ${lineaVariante}
+
+                <strong>Fecha de creación:</strong>
+                ${escaparHtml(poligono.fecha_creacion)}
             </div>
         `);
     });
 }
+
 
 function renderPaginacionCultivos() {
     const paginacion = document.getElementById('paginacion-cultivos');

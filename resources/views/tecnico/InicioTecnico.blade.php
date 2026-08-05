@@ -31,13 +31,27 @@
             </div>
         </div>
 
-        <div class="col-md-9">
-            <div class="row">
-                <h4><a href="{{ route('mapa-tecnico') }}">Vista general del geoportal</a><br></h4>
-                <h4><a href="{{ route('tecnico-up') }}">Unidades de producción</a><br></h4>
-                <h4><a href="{{ route('usuarios-tecnico') }}">Administrar usuarios</a><br></h4>
-                <h4><a href="{{ route('registrar-usuarios-tecnico') }}">Dar de alta a usuarios</a><br><br></h4>
-        </div>
+        <div class="row">
+            <div class="col-md-9">
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('mapa-tecnico') }}" class="menu-card">
+                        <img src="/images/iconos/zacatecas.png" alt="">
+                        <span>Mapa global de producción</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('tecnico-up') }}" class="menu-card">
+                        <img src="/images/iconos/up.png" alt="">
+                        <span>Unidades de producción</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('usuarios-tecnico') }}" class="menu-card">
+                        <img src="/images/iconos/usuarios.png" alt="">
+                        <span>Administrar usuarios</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

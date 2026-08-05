@@ -30,14 +30,34 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-9">
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('mapa-admin') }}" class="menu-card">
+                        <img src="/images/iconos/zacatecas.png" alt="">
+                        <span>Mapa global de producción</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('unidades-produccion-admin') }}" class="menu-card">
+                        <img src="/images/iconos/up.png" alt="">
+                        <span>Unidades de producción</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('administrar-cultivos-admin') }}" class="menu-card">
+                        <img src="/images/iconos/cultivos.png" alt="">
+                        <span>Lista de cultivos</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="{{ route('administrar-usuarios-admin') }}" class="menu-card">
+                        <img src="/images/iconos/usuarios.png" alt="">
+                        <span>Administrar usuarios</span>
+                    </a>
+                </div>
+            </div>
 
-        <div class="col-md-9">
-            <div class="row">
-                <h4><a href="{{ route('mapa-admin') }}">Vista general del geoportal</a><br></h4>
-                <h4><a href="{{ route('unidades-produccion-admin') }}">Unidades de producción</a><br></h4>
-                <h4><a href="{{ route('administrar-usuarios-admin') }}">Administrar usuarios</a><br></h4>
-                <h4><a href="{{ route('registrar-usuarios-admin') }}">Dar de alta a usuarios</a><br><br></h4>
-        </div>
         </div>
     </div>
 

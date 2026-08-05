@@ -26,6 +26,7 @@
             <div class="list-group">
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('unidades-produccion-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;" alt="">Unidades de producción</a>
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a> 
             </div>
         </div>
@@ -33,8 +34,20 @@
     
 
     <div class="row">
+        <div class="col-sm-10" style="margin-bottom: 12px;">
+            <label for="buscador-cultivos">
+                Buscar en cultivos
+            </label>
+
+            <input
+                type="text"
+                id="buscador-cultivos"
+                class="form-control"
+                placeholder="Escribe nombre, nombre científico, categoría, color o estado"
+            >
+        </div>
         <!-- Contenedor de tabla -->
-        <div class="col-sm-10 table-responsive" id="tabla-up-wrapper" style="margin-bottom:2em;">
+        <div class="col-sm-10 table-responsive" id="tabla-cultivos-wrapper" style="margin-bottom:2em;">
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
@@ -46,13 +59,13 @@
                         <th colspan="1" style="background:#009933; color:#FFF;">Opciones</th>
                     </tr>
                 </thead>
-                <tbody id="tbody-up">
+                <tbody id="tbody-cultivos">
                     <!-- Datos dinámicos -->
                 </tbody>
             </table>
             <div class = "row mt-4">
                 <div class = "col-md-12 text-center">
-                    <div id= "paginacion-up"></div>
+                    <div id= "paginacion-cultivos"></div>
                 </div>
             </div>
 
@@ -66,22 +79,24 @@
     <div class="row">
         <div class="col-md-4">
                 <p>
-                <a href="{{'crear-cultivo'}}" button class="btn btn-primary" type="button">Registrar Cultivo</a>
+                <a href="{{ route('registrar-cultivos-root') }}" class="btn btn-primary">
+                    Registrar cultivo
+                </a>
                 </p>
         </div>
     </div>
-    <div class="modal fade" id="modalEliminarUP" tabindex="-1" role="dialog" aria-labelledby="modalEliminarLabel">
+    <div class="modal fade" id="modalEliminarCultivo" tabindex="-1" role="dialog" aria-labelledby="modalEliminarCultivoLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
             <div class="modal-header" style="background:#990000; color:white;">
-                <h4 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h4>
+                <h4 class="modal-title" id="modalEliminarCultivoLabel">Confirmar eliminación</h4>
             </div>
             <div class="modal-body">
-                La unidad de producción se eliminará definitivamente. ¿Desea continuar?
+                El cultivo se eliminará definitivamente. ¿Desea continuar?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="btnConfirmarEliminar" class="btn btn-danger">Eliminar</button>
+                <button type="button" id="btnConfirmarEliminarCultivo" class="btn btn-danger">Eliminar</button>
             </div>
             </div>
         </div>
@@ -89,6 +104,11 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ asset('js/root/cultivoRoot.js') }}"></script>
+<script>
+    const urlCultivosData = "{{ route('root.cultivos.data') }}";
+    const urlCultivosDestroyBase = "{{ url('/root/cultivos') }}";
+    const urlEditarCultivoBase = "{{ url('/root/modificar-cultivo') }}";
+</script>
+<script src="{{ asset('js/root/cultivos/administrarCultivosRoot.js') }}"></script>
 
 @endsection

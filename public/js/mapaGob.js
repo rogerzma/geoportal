@@ -253,22 +253,47 @@ function cargarPoligonos(callback) {
 
 // Dibuja solo los polígonos de los cultivos seleccionados
 function mostrarPoligonosPorCultivo(cultivosSeleccionados) {
+
     poligonosLayerGroup.clearLayers();
+
+    let bounds = L.latLngBounds([]);
+    let hayPoligonos = false;
+
     poligonosGlobal.forEach(poligono => {
-        if (!cultivosSeleccionados.includes(poligono.cultivo)) return;
+
+        if (!cultivosSeleccionados.includes(poligono.cultivo)) {
+            return;
+        }
+
         let coords = [];
+
         try {
-            coords = JSON.parse(poligono.coordenadas).map(coord => [coord.lat, coord.lng]);
+            coords = JSON.parse(poligono.coordenadas)
+                .map(coord => [coord.lat, coord.lng]);
+
         } catch (e) {
             return;
         }
+
         const color = colorPorCultivo(poligono.cultivo);
-        L.polygon(coords, {
+
+        const polygon = L.polygon(coords, {
             color: color,
             fillOpacity: 0.7,
             weight: 2
         }).addTo(poligonosLayerGroup);
+
+        bounds.extend(polygon.getBounds());
+        hayPoligonos = true;
     });
+
+    // Ajustar automáticamente el zoom al conjunto de polígonos visibles
+    if (hayPoligonos) {
+        map.fitBounds(bounds, {
+            padding: [30, 30]
+        });
+    }
+
 }
 
 

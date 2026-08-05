@@ -5,116 +5,165 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UnidadProduccion;
 use App\Models\User;
+use App\Models\Cultivo;
 
 class UPController extends Controller
 {
-    /**
-     * ============================
-     * LISTAR UNIDADES DE PRODUCCIÓN
-     * ============================
-     */
-    public function index()
+    // Función para obtener los IDs de los usuarios que pueden crear UP según el rol del usuario autenticado
+    private function creadoresPermitidosParaGestionar(User $auth)
     {
-        $auth = auth()->user();
-        if (!$auth) {
-            return response()->json([]);
-        }
+        $usuariosPermitidos = collect([$auth->id]);
 
-        // ROOT → ve todas las UP
         if ($auth->tipo_usuario === 'root') {
-            return UnidadProduccion::with(['capturista', 'creador'])->get();
+            return User::pluck('id');
         }
 
-        // ADMINISTRADOR → UP creadas por él y su jerarquía
         if ($auth->tipo_usuario === 'administrador') {
-
-            // Técnicos creados por el admin
             $tecnicos = User::where('tipo_usuario', 'tecnico')
                 ->where('created_by', $auth->id)
                 ->pluck('id');
 
-            // Jefes operativos creados por el admin o por sus técnicos
             $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
-                ->where(function ($q) use ($auth, $tecnicos) {
-                    $q->where('created_by', $auth->id)
-                    ->orWhereIn('created_by', $tecnicos);
+                ->where(function ($query) use ($auth, $tecnicos) {
+                    $query->where('created_by', $auth->id)
+                        ->orWhereIn('created_by', $tecnicos);
                 })
                 ->pluck('id');
 
-            // Capturistas creados por el admin, técnicos o jefes operativos
             $capturistas = User::where('tipo_usuario', 'capturista')
-                ->where(function ($q) use ($auth, $tecnicos, $jefesOperativos) {
-                    $q->where('created_by', $auth->id)
-                    ->orWhereIn('created_by', $tecnicos)
-                    ->orWhereIn('created_by', $jefesOperativos);
+                ->where(function ($query) use ($auth, $tecnicos, $jefesOperativos) {
+                    $query->where('created_by', $auth->id)
+                        ->orWhereIn('created_by', $tecnicos)
+                        ->orWhereIn('created_by', $jefesOperativos);
                 })
                 ->pluck('id');
 
-            // Usuarios válidos que pudieron crear UP
-            $creadoresPermitidos = collect([$auth->id])
+            return $usuariosPermitidos
                 ->merge($tecnicos)
                 ->merge($jefesOperativos)
                 ->merge($capturistas)
-                ->unique();
-
-            return UnidadProduccion::with(['capturista', 'creador'])
-                ->whereIn('created_by', $creadoresPermitidos)
-                ->get();
+                ->unique()
+                ->values();
         }
 
-        // TÉCNICO → UP creadas por él, sus jefes operativos y capturistas
         if ($auth->tipo_usuario === 'tecnico') {
-
-            // Jefes operativos creados por el técnico
             $jefesOperativos = User::where('tipo_usuario', 'jefe_operativo')
                 ->where('created_by', $auth->id)
                 ->pluck('id');
 
-            // Capturistas creados por el técnico o por sus jefes operativos
             $capturistas = User::where('tipo_usuario', 'capturista')
-                ->where(function ($q) use ($auth, $jefesOperativos) {
-                    $q->where('created_by', $auth->id)
-                    ->orWhereIn('created_by', $jefesOperativos);
+                ->where(function ($query) use ($auth, $jefesOperativos) {
+                    $query->where('created_by', $auth->id)
+                        ->orWhereIn('created_by', $jefesOperativos);
                 })
                 ->pluck('id');
 
-            // Usuarios que pueden haber creado UP
-            $creadoresPermitidos = collect([$auth->id])
+            return $usuariosPermitidos
                 ->merge($jefesOperativos)
                 ->merge($capturistas)
-                ->unique();
-
-            return UnidadProduccion::with(['capturista', 'creador'])
-                ->whereIn('created_by', $creadoresPermitidos)
-                ->get();
+                ->unique()
+                ->values();
         }
 
-        // JEFE OPERATIVO → UP creadas por él, sus jefes operativos y capturistas
         if ($auth->tipo_usuario === 'jefe_operativo') {
-
-            // Capturistas creados por el técnico o por sus jefes operativos
             $capturistas = User::where('tipo_usuario', 'capturista')
                 ->where('created_by', $auth->id)
                 ->pluck('id');
 
-            // Usuarios que pueden haber creado UP
-            $creadoresPermitidos = collect([$auth->id])
+            return $usuariosPermitidos
                 ->merge($capturistas)
-                ->unique();
-
-            return UnidadProduccion::with(['capturista', 'creador'])
-                ->whereIn('created_by', $creadoresPermitidos)
-                ->get();
+                ->unique()
+                ->values();
         }
 
-        // CAPTURISTA → ve SUS UP aunque no las haya creado
-        if ($auth->tipo_usuario === 'capturista') {
-            return UnidadProduccion::with(['capturista', 'creador'])
-                ->where('capturista_id', $auth->id)
+        return $usuariosPermitidos;
+    }
+    /*
+     Listar unidades de producción
+     */
+    public function index()
+    {
+        $auth = auth()->user();
+
+        if (!$auth) {
+            return response()->json([]);
+        }
+
+        $relaciones = ['capturista', 'creador'];
+
+        /*
+        * Root y administrador visualizan todas las UP.
+        */
+        if (in_array($auth->tipo_usuario, ['root', 'administrador'], true)) {
+            $creadoresPermitidos = $this
+                ->creadoresPermitidosParaGestionar($auth)
+                ->map(fn ($id) => (int) $id);
+
+            $unidades = UnidadProduccion::with($relaciones)
+                ->orderBy('nombre_up')
                 ->get();
+
+            $unidades->each(function ($unidad) use ($auth, $creadoresPermitidos) {
+                $unidad->puede_gestionar =
+                    $auth->tipo_usuario === 'root'
+                    || $creadoresPermitidos->contains((int) $unidad->created_by);
+            });
+
+            return response()->json($unidades);
+        }
+
+        /*
+        * Técnico y jefe operativo conservan el acceso
+        * a las UP de su jerarquía.
+        */
+        if (in_array($auth->tipo_usuario, ['tecnico', 'jefe_operativo'], true)) {
+            $creadoresPermitidos = $this
+                ->creadoresPermitidosParaGestionar($auth);
+
+            $unidades = UnidadProduccion::with($relaciones)
+                ->whereIn('created_by', $creadoresPermitidos)
+                ->orderBy('nombre_up')
+                ->get();
+
+            $unidades->each(function ($unidad) {
+                $unidad->puede_gestionar = true;
+            });
+
+            return response()->json($unidades);
+        }
+
+        /*
+        * Capturista: visualiza las UP que tiene asignadas.
+        */
+        if ($auth->tipo_usuario === 'capturista') {
+            $unidades = UnidadProduccion::with($relaciones)
+                ->where('capturista_id', $auth->id)
+                ->orderBy('nombre_up')
+                ->get();
+
+            $unidades->each(function ($unidad) use ($auth) {
+                $unidad->puede_gestionar =
+                    (int) $unidad->created_by === (int) $auth->id;
+            });
+
+            return response()->json($unidades);
         }
 
         return response()->json([]);
+    }
+
+    // Verifica si el usuario autenticado puede gestionar la unidad de producción
+    private function puedeGestionarUnidad(User $auth, UnidadProduccion $unidad): bool
+    {
+        if ($auth->tipo_usuario === 'root') {
+            return true;
+        }
+
+        $creadoresPermitidos = $this
+            ->creadoresPermitidosParaGestionar($auth)
+            ->map(fn ($id) => (int) $id);
+
+        return $creadoresPermitidos->contains((int) $unidad->created_by);
     }
 
     // Guardar nueva UP
@@ -236,6 +285,13 @@ class UPController extends Controller
 
         $unidad = UnidadProduccion::findOrFail($id);
 
+        $user = auth()->user();
+        if (!$this->puedeGestionarUnidad($user, $unidad)) {
+            return response()->json([
+                'message' => 'No tiene permiso para modificar esta unidad de producción.'
+            ], 403);
+        }
+
         $unidad->update($request->only([
             'nombre_up',
             'localidad',
@@ -266,6 +322,11 @@ class UPController extends Controller
     {
         $unidad = UnidadProduccion::findOrFail($id);
         $user = auth()->user();
+
+        //  Verifica si el usuario autenticado puede gestionar la unidad de producción
+        if(!$this->puedeGestionarUnidad($user, $unidad)) {
+            abort(403, 'No autorizado para modificar esta unidad de producción');
+        }
 
         // Redirige a la vista de superusuario
         if ($user->tipo_usuario === 'root') {
@@ -318,33 +379,50 @@ class UPController extends Controller
             ? UnidadProduccion::find($request->up_id)
             : null;
 
+        $cultivos = Cultivo::with([
+            'variantes' => function ($query) {
+                $query->orderBy('nombre');
+            }
+        ])
+        ->where('activo', true)
+        ->orderBy('nombre')
+        ->get();
+
         $user = auth()->user();
 
         return match ($user->tipo_usuario) {
-            'root'          => view('root.MapaUPRoot', compact('unidadProduccion')),
-            'administrador' => view('admin.MapaUPAdmin', compact('unidadProduccion')),
-            'tecnico'       => view('tecnico.MapaUPTecnico', compact('unidadProduccion')),
-            'jefe_operativo' => view('jefe_operativo.MapaUPJefeOperativo', compact('unidadProduccion')),
-            'capturista'     => view('capturista.MapaUPCapturista', compact('unidadProduccion')),
+            'root'          => view('root.MapaUPRoot', compact('unidadProduccion', 'cultivos')),
+            'administrador' => view('admin.MapaUPAdmin', compact('unidadProduccion', 'cultivos')),
+            'tecnico'       => view('tecnico.MapaUPTecnico', compact('unidadProduccion', 'cultivos')),
+            'jefe_operativo' => view('jefe_operativo.MapaUPJefeOperativo', compact('unidadProduccion', 'cultivos')),
+            'capturista'     => view('capturista.MapaUPCapturista', compact('unidadProduccion', 'cultivos')),
             default         => abort(403),
         };
     }
 
-    /**
-     * ============================
-     * ELIMINAR UP
-     * ============================
-     */
+    // Eliminar UP 
     public function destroy($id)
     {
         $unidad = UnidadProduccion::find($id);
 
         if (!$unidad) {
-            return response()->json(['error' => 'Unidad no encontrada'], 404);
+            return response()->json([
+                'error' => 'Unidad no encontrada'
+            ], 404);
+        }
+
+        $auth = auth()->user();
+
+        if (!$auth || !$this->puedeGestionarUnidad($auth, $unidad)) {
+            return response()->json([
+                'message' => 'No tiene permiso para eliminar esta unidad de producción.'
+            ], 403);
         }
 
         $unidad->delete();
 
-        return response()->json(['message' => 'Unidad eliminada correctamente']);
+        return response()->json([
+            'message' => 'Unidad eliminada correctamente'
+        ]);
     }
 }

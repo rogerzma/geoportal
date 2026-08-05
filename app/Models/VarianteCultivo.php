@@ -15,9 +15,7 @@ class VarianteCultivo extends Model
         'nombre'
     ];
 
-    /**
-     * Cultivo al que pertenece la variante.
-     */
+    // Cultivo al que pertenece la variante.
     public function cultivo()
     {
         return $this->belongsTo(Cultivo::class, 'cultivo_id');

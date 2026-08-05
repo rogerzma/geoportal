@@ -116,6 +116,9 @@ $(document).ready(function () {
 
         unidadesPagina.forEach(function (up) {
             const capturista = up.capturista ? up.capturista.name : '—';
+            const puedeGestionar = up.puede_gestionar === true // Evita que se borre o modifique una UP que no le pertenece al usuario
+                || up.puede_gestionar === 1
+                || up.puede_gestionar === '1';
             filas += `
                 <tr>
                     <td>${up.nombre_up}</td>
@@ -129,8 +132,35 @@ $(document).ready(function () {
                         </a>
                     </td>
                     <td>
-                        <a href="/admin/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
-                        <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
+                        ${
+                            puedeGestionar
+                                ? `
+                                    <a href="/admin/modificar-up/${up.id}" title="Modificar unidad de producción" aria-label="Modificar unidad de producción" style="text-decoration:none; margin-right:12px;">
+                                        <span class="bootstrap-icons" aria-hidden="true">
+                                            <i class="bi bi-pencil"></i>
+                                        </span>
+                                    </a>
+
+                                    <a href="#" class="btn-eliminar-up" data-id="${up.id}" title="Eliminar unidad de producción" aria-label="Eliminar unidad de producción" style="color:#ff0000; text-decoration:none;">
+                                        <span class="bootstrap-icons" aria-hidden="true">
+                                            <i class="bi bi-trash"></i>
+                                        </span>
+                                    </a>
+                                `
+                                : `
+                                    <span title="No tiene permiso para modificar esta unidad" style="color:#999; margin-right:12px; cursor:not-allowed;">
+                                        <span class="bootstrap-icons" aria-hidden="true">
+                                            <i class="bi bi-pencil"></i>
+                                        </span>
+                                    </span>
+
+                                    <span title="No tiene permiso para eliminar esta unidad" style="color:#999; cursor:not-allowed;">
+                                        <span class="bootstrap-icons" aria-hidden="true">
+                                            <i class="bi bi-trash"></i>
+                                        </span>
+                                    </span>
+                                `
+                        }
                     </td>
                 </tr>
             `;

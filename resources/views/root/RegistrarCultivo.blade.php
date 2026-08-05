@@ -6,6 +6,36 @@
 
 @section("content")
 
+<style>
+  .fila-variante{
+      display:flex;
+      align-items:center;
+      margin-bottom:12px;
+  }
+
+  .fila-variante .input-variante{
+      flex:1;
+  }
+
+  .btn-agregar-variante,
+  .btn-quitar-variante{
+      margin-left:8px;
+      width:38px;
+      height:38px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      padding:0;
+  }
+
+  .btn-agregar-variante .glyphicon,
+  .btn-quitar-variante .glyphicon{
+      font-size:14px;
+  }        
+</style>
+
 <div class="container">
     <ol class="breadcrumb top-buffer">
         <li><a href="http://www.gob.mx"><i class="icon icon-home"></i></a></li>
@@ -99,14 +129,54 @@
                       <option value="0">No</option>
                     </select>
                 </p></div>
-     </div>
+      </div>
+    
+      <div class="row">
+        <div class="col-md-8">
+            <h4>¿El cultivo tiene variantes?</h4>
+
+            <label class="radio-inline">
+                <input
+                    type="radio"
+                    name="tiene_variantes"
+                    id="variante_si"
+                    value="si"
+                >
+                Sí
+            </label>
+
+            <label class="radio-inline">
+                <input
+                    type="radio"
+                    name="tiene_variantes"
+                    id="variante_no"
+                    value="no"
+                >
+                No
+            </label>
+        </div>
+    </div>
+
+    <div
+        class="row"
+        id="contenedor-variantes"
+        style="display: none; margin-top: 20px;"
+    >
+        <div class="col-md-5">
+            <h4>Variantes</h4>
+
+            <div id="lista-variantes"></div>
+        </div>
+    </div>
 
      
      <div class="row">
         <div class="col-md-4">
             <p>
               <p><br>
-                <a href="{{ route('registrar-cultivos-root') }}" class="btn btn-primary" type="button">Registrar Cultivo</a>
+                <button type="button" class="btn btn-primary" id="validateReportButton">
+                    Registrar cultivo
+                </button>
               </p>
             </p></div>
             <input type="hidden" id="user_id" value="{{ Auth::id() }}">
@@ -139,11 +209,10 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  const urlCultivosData = "{{ route('root.cultivos.data') }}";
-  const urlCultivosDestroyBase = "{{ url('/root/cultivos') }}";
-  const urlEditarCultivoBase = "{{ url('/root/modificar-cultivo') }}";
+    const urlCultivosStore = "{{ route('root.cultivos.store') }}";
+    const urlCultivosRedirect = "{{ route('administrar-cultivos-root') }}";
 </script>
-<script src="{{ asset('js/root/cultivoRoot.js') }}"></script>
+<script src="{{ asset('js/root/cultivos/cultivoRoot.js') }}"></script>
 
 
 

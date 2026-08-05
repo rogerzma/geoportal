@@ -7,7 +7,7 @@ use App\Models\VarianteCultivo;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class CultivoController extends Controller
+class VarianteCultivoController extends Controller
 {
     public function index($cultivoId)
     {

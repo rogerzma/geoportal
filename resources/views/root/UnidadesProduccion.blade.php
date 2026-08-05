@@ -27,6 +27,7 @@
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Inicio</a>
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('mapa-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Mapa de producción</a>
             <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-usuarios-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Usuarios</a> 
+            <a class="list-group-item" style="text-decoration: none;" href="{{ route('administrar-cultivos-root') }}"><img src="/images/templatemo_list.png" style="margin-right:10px;">Cultivos</a>
             </div>
         </div>
     </div>

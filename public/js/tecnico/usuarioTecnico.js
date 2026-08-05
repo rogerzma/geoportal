@@ -1,4 +1,11 @@
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]'
+            ).attr('content')
+        }
+    });
     let usuarioAEliminarId = null;
 
     // 🔄 Cargar usuarios al iniciar
@@ -24,8 +31,29 @@ $(document).ready(function () {
                     <td>${usuario.telefono || ''}</td>
                     <td>${usuario.tipo_usuario ? usuario.tipo_usuario.charAt(0).toUpperCase() + usuario.tipo_usuario.slice(1) : ''}</td>
                     <td>
-                        <a href="/tecnico/modificar-usuario/${usuario.id}" class="glyphicon glyphicon-pencil"></a>
-                        <a href="#" class="glyphicon glyphicon-trash btn-eliminar" data-id="${usuario.id}" style="color: #ff0000;"></a>
+                        <a
+                            href="/tecnico/modificar-usuario/${usuario.id}"
+                            title="Modificar usuario"
+                            aria-label="Modificar usuario"
+                            style="text-decoration: none; margin-right: 12px;"
+                        >
+                            <span class="bootstrap-icons" aria-hidden="true">
+                                <i class="bi bi-pencil"></i>
+                            </span>
+                        </a>
+
+                        <a
+                            href="#"
+                            class="btn-eliminar"
+                            data-id="${usuario.id}"
+                            title="Eliminar usuario"
+                            aria-label="Eliminar usuario"
+                            style="color: #ff0000; text-decoration: none;"
+                        >
+                            <span class="bootstrap-icons" aria-hidden="true">
+                                <i class="bi bi-trash"></i>
+                            </span>
+                        </a>
                     </td>
                 </tr>
             `;

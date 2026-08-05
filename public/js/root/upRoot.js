@@ -130,9 +130,36 @@ $(document).ready(function () {
                         </a>
                     </td>
                     <td>
-                        <a href="/root/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
-                        <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
-                    </td>
+                    <a
+                        href="/root/modificar-up/${up.id}"
+                        title="Modificar unidad de producción"
+                        aria-label="Modificar unidad de producción"
+                        style="
+                            text-decoration: none;
+                            margin-right: 12px;
+                        "
+                    >
+                        <span class="bootstrap-icons" aria-hidden="true">
+                            <i class="bi bi-pencil"></i>
+                        </span>
+                    </a>
+
+                    <a
+                        href="#"
+                        class="btn-eliminar-up"
+                        data-id="${up.id}"
+                        title="Eliminar unidad de producción"
+                        aria-label="Eliminar unidad de producción"
+                        style="
+                            color: #ff0000;
+                            text-decoration: none;
+                        "
+                    >
+                        <span class="bootstrap-icons" aria-hidden="true">
+                            <i class="bi bi-trash"></i>
+                        </span>
+                    </a>
+                </td>
                 </tr>
             `;
         }); $('#tbody-up').html(filas);

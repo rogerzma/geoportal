@@ -18,6 +18,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/poligonos', [PoligonoController::class, 'index']);
     Route::get('/poligonos/hectareas-totales', [PoligonoController::class, 'hectareasTotales']);
     Route::get('/poligonos/hectareas-por-cultivo', [PoligonoController::class, 'hectareasPorCultivo']);
+    Route::get(
+    '/poligonos/hectareas-por-cultivo-usuario',
+        [PoligonoController::class, 'hectareasPorCultivoUsuario']
+    )->name('poligonos.hectareasPorCultivoUsuario');
     Route::get('/poligonos/hectareas-totales-usuario', [PoligonoController::class, 'hectareasTotalesUsuario']);
 });
 
@@ -114,13 +118,34 @@ Route::middleware(['auth', 'role:administrador'])->group(function(){
 
     Route::get('/admin/crear-up', [UPController::class, 'create'])->name('crear-up-admin');
 
+        Route::get('/admin/cultivos', function(){
+        return view('admin/AdministrarCultivosAdmin');
+    })->name('administrar-cultivos-admin');
+
+    Route::get('/admin/registro-cultivos', function(){
+        return view('admin/RegistrarCultivos');
+    })->name('registrar-cultivos-admin');
 
     Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-admin');
     Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
     Route::put('/admin/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.admin');
     Route::get('/admin/modificar-usuario/{id}', [UserController::class, 'edit'])->name('admin.modificar-usuario');
     Route::put('/admin/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.admin');
-});
+
+    // Datos de cultivos ADMIN
+    Route::get('/admin/cultivos/data', [CultivoController::class, 'index'])
+    ->name('admin.cultivos.data');
+
+    Route::post('/admin/cultivos', [CultivoController::class, 'store'])
+    ->name('admin.cultivos.store');
+
+    Route::delete('/admin/cultivos/{id}', [CultivoController::class, 'destroy'])
+    ->name('admin.cultivos.destroy');
+
+    Route::get('/admin/modificar-cultivo/{id}', [CultivoController::class, 'edit'])->name('admin.modificar-cultivo');
+    Route::put('/admin/cultivos/{id}', [CultivoController::class, 'update'])->name('actualizar.cultivo.admin');
+
+    });
 
 // Rutas para usuario técnico
 Route::middleware(['auth', 'role:tecnico'])->group(function(){

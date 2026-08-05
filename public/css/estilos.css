@@ -1,95 +1,593 @@
-/* Contenedor de botones flotantes dentro del mapa */
+/* Navegación */
 
-        .icon-container {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1000;
-            pointer-events: auto;
-        }
+.navbar-brand {
+    color: #ffffff !important;
+    font-size: 18px;
+    font-weight: bold;
+}
 
-        .icon-button {
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-            width: 50px;
-            height: 50px;
-            font-size: 16px;
-        }
-        .navbar-brand {
-            color: white !important;
-            font-size: 18px;
-            font-weight: bold;
-        }
+.navbar-nav > li > a {
+    color: #ffffff !important;
+}
 
-        .navbar-nav > li > a {
-            color: white !important;
-        }
 
-        .map-wrapper {
-            position: relative;
-        }
+/* Tarjetas del menú principal */
 
-        /* Corrige el mapa que podría verse afectado */
-        #map {
-            height: 500px;
-            width: 100%;
-            position: relative;
-            margin-bottom: 50px;
-            z-index: 1; /* Asegura que se renderice encima */
-        }
+.menu-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-                /* Contenedor de coordenadas */
-        #coordinates {
-            position: absolute;
-            top: 70px;
-            right: 10px;
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-            z-index: 1000;
-            font-size: 14px;
-        }
+    min-height: 170px;
+    margin-bottom: 25px;
 
-        .modal {
-            z-index: 1050 !important;
-        }
+    background: #f5f5f5;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
 
-        .modal-backdrop {
-            z-index: 1049 !important;
-        }
+    color: #444444;
+    text-decoration: none;
 
-        .alert-position {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1040;
-            width: 90%;
-            max-width: 800px;
-        }
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease,
+        color 0.25s ease;
+}
 
-        /* Puedes ajustar los valores a tu gusto */
-        .popup-poligono-leaflet {
-            min-width: 300px !important;
-            max-width: 400px !important;
-        }
+.menu-card:hover,
+.menu-card:focus {
+    background: #ffffff;
+    border-color: #9d2449;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
 
-        .popup-poligono {
-            font-size: 1.5em;
-            line-height: 1.5;
-        }
+    color: #9d2449;
+    text-decoration: none;
+}
 
-        
+.menu-card img {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 18px;
+    object-fit: contain;
+}
 
-                
+.menu-card span {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+
+/* Alertas */
+
+#alertContainer:empty {
+    display: none;
+}
+
+#alertContainer:not(:empty) {
+    display: block;
+    margin: 15px 0;
+}
+
+
+/* Contenedor del mapa */
+
+.card-map-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    height: 650px;
+
+    margin: 0 0 50px;
+    padding: 0;
+
+    overflow: hidden;
+}
+
+
+/* Herramientas del mapa */
+
+/* Herramientas del mapa */
+
+.icon-container {
+    position: absolute;
+    top: 92px;
+    left: 12px;
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    pointer-events: auto;
+}
+
+.icon-button {
+    position: relative;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    border-radius: 4px !important;
+
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+
+    color: #333333;
+    font-size: 16px !important;
+    line-height: 1 !important;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.icon-button:hover,
+.icon-button:focus {
+    background: #f4f4f4 !important;
+    border-color: #999999 !important;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+#draw-poligono,
+#delete-poligono {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+}
+
+/* Recuadro de coordenadas */
+
+#coordinates {
+    position: absolute !important;
+
+    top: 62px !important;
+    right: 15px !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    width: 220px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 10px 12px !important;
+
+    box-sizing: border-box !important;
+
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px !important;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+
+    z-index: 1000 !important;
+
+    pointer-events: none;
+}
+
+#coordinates strong {
+    display: block;
+    margin-bottom: 4px;
+
+    color: #333333;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+#lat-lng {
+    margin: 0;
+    padding: 0;
+
+    color: #555555;
+    font-size: 12px;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+
+/* Tabla de cultivos */
+
+#tabla-cultivos-section {
+    margin-top: 8px;
+}
+
+#tabla-cultivos-section label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+#tabla-up-wrapper {
+    margin-bottom: 8px !important;
+}
+
+#buscador-cultivos {
+    margin-bottom: 12px;
+}
+
+#toggle-tabla-cultivos-wrap {
+    margin-bottom: 8px;
+}
+
+#toggle-tabla-cultivos {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    background: #ffffff;
+    border: 1px solid #cfd8dc;
+    border-radius: 8px;
+
+    color: #2f4f3a;
+    font-weight: 600;
+    line-height: 1.2;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+#toggle-tabla-cultivos:hover,
+#toggle-tabla-cultivos:focus {
+    background: #f2f8f4;
+    border-color: #9fb8aa;
+    color: #1f3b2c;
+    outline: none;
+}
+
+
+/* Paginación de cultivos */
+
+#paginacion-cultivos .pagination > li > a,
+#paginacion-cultivos .pagination > li > span {
+    min-width: 36px;
+    min-height: 36px;
+
+    margin: 6px 0;
+    padding: 8px 12px;
+
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* Buscador por coordenadas */
+
+.buscador-coordenadas-seccion {
+    margin-top: 18px;
+    margin-bottom: 12px;
+}
+
+.buscador-coordenadas-seccion label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+#buscador-coordenadas-row {
+    margin-bottom: 12px;
+}
+
+#buscador-coordenadas {
+    width: 100%;
+    height: 44px;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+}
+
+#btn-buscar-coordenadas {
+    height: 44px;
+    min-width: 120px;
+
+    padding: 0 18px;
+
+    border-radius: 7px;
+
+    font-weight: 600;
+}
+
+#mensaje-busqueda-coordenadas {
+    min-height: 20px;
+
+    margin-top: 6px;
+    margin-bottom: 0;
+
+    font-size: 14px;
+}
+
+.mensaje-coordenadas-error {
+    color: #a94442;
+}
+
+.mensaje-coordenadas-exito {
+    color: #31733c;
+}
+
+
+/* Textos informativos del mapa */
+
+.texto-seleccion-poligono,
+.texto-instrucciones-mapa {
+    margin-bottom: 12px;
+}
+
+.texto-seleccion-poligono {
+    margin-top: 0;
+}
+
+.texto-instrucciones-mapa {
+    margin-top: 20px;
+}
+
+
+/* Geocoder de Leaflet */
+
+.buscador-coordenadas-container {
+    width: 100%;
+
+    margin: 0 0 20px;
+    padding: 14px 16px;
+
+    background: #f8f9fa;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+}
+
+.buscador-label {
+    display: block;
+    margin-bottom: 8px;
+
+    color: #333333;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.buscador-geocoder-div {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+}
+
+.buscador-geocoder-custom {
+    display: flex !important;
+    align-items: stretch !important;
+
+    width: 100% !important;
+    max-width: 520px;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.buscador-geocoder-custom form {
+    display: flex !important;
+    width: 100% !important;
+}
+
+.buscador-geocoder-custom input {
+    width: 100% !important;
+    height: 42px !important;
+
+    padding: 8px 14px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #bbbbbb !important;
+    border-right: none !important;
+    border-radius: 6px 0 0 6px !important;
+
+    color: #333333 !important;
+    font-size: 15px !important;
+
+    outline: none !important;
+}
+
+.buscador-geocoder-custom input:focus {
+    border-color: #009933 !important;
+    box-shadow: 0 0 0 2px rgba(0, 153, 51, 0.15) !important;
+}
+
+.buscador-geocoder-custom .leaflet-control-geocoder-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 48px !important;
+    min-width: 48px !important;
+    height: 42px !important;
+
+    background: #009933 !important;
+    border: 1px solid #009933 !important;
+    border-radius: 0 6px 6px 0 !important;
+
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
+
+.buscador-geocoder-custom .leaflet-control-geocoder-icon:hover,
+.buscador-geocoder-custom .leaflet-control-geocoder-icon:focus {
+    background: #007a29 !important;
+    border-color: #007a29 !important;
+}
+
+.buscador-geocoder-custom .leaflet-control-geocoder-icon i {
+    color: #ffffff;
+    font-size: 17px;
+}
+
+.buscador-geocoder-custom .leaflet-control-geocoder-alternatives {
+    margin-top: 4px !important;
+
+    border-radius: 6px !important;
+    overflow: hidden !important;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-control-geocoder-error {
+    display: none !important;
+}
+
+
+/* Mensajes de búsqueda */
+
+.mensaje-busqueda {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+.mensaje-error {
+    color: #a94442;
+}
+
+
+/* Controles propios de Leaflet */
+
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 900;
+}
+
+.leaflet-control-zoom {
+    margin-top: 12px !important;
+    margin-left: 12px !important;
+}
+
+
+/* Vista para celulares y tabletas */
+
+@media (max-width: 767px) {
+    .menu-card {
+        min-height: 145px;
+    }
+
+    .menu-card img {
+        width: 58px;
+        height: 58px;
+        margin-bottom: 12px;
+    }
+
+    .menu-card span {
+        font-size: 16px;
+    }
+
+    #map {
+        height: 500px;
+        margin-bottom: 30px;
+    }
+
+    #btn-buscar-coordenadas {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .buscador-geocoder-custom {
+        max-width: 100%;
+    }
+
+    #draw-poligono {
+        top: 10px;
+        left: 58px;
+    }
+
+    #delete-poligono {
+        top: 10px;
+        right: 10px;
+    }
+
+    #coordinates {
+        top: 58px !important;
+        left: 12px !important;
+        right: 12px !important;
+
+        width: auto !important;
+    }
+}
+
+
+/* Pantallas pequeñas */
+
+@media (max-width: 480px) {
+    #map {
+        height: 440px;
+    }
+
+    .icon-button {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+    }
+
+    #draw-poligono {
+        left: 54px;
+    }
+
+    #coordinates {
+        top: 56px !important;
+        padding: 8px 10px !important;
+    }
+
+    #coordinates strong {
+        font-size: 12px;
+    }
+
+    #lat-lng {
+        font-size: 11px;
+    }
+}
