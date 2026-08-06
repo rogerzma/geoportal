@@ -194,7 +194,7 @@ class CultivosSeeder extends Seeder
                     'categoria' => $cultivo['categoria'],
                     'color' => strtoupper($cultivo['color']),
                     'activo' => true,
-                    'created_by' => 12
+                    'created_by' => 13
                 ]
             );
 
