@@ -100,6 +100,11 @@ const CULTIVOS_ORDENADOS = Object.keys(COLORES_CULTIVO)
 // Variables globales para polígonos y cultivos
 let poligonosGlobal = [];
 let poligonosLayerGroup = L.layerGroup().addTo(map);
+let cultivosSeleccionadosGlobal = new Set();
+
+function obtenerCultivosSeleccionados() {
+    return Array.from(cultivosSeleccionadosGlobal);
+}
 
 function cargarScriptExterno(src) {
     return new Promise((resolve, reject) => {
@@ -171,11 +176,11 @@ function crearFeatureGeoJsonDesdePoligono(poligono) {
 }
 
 function obtenerFeatureCollectionSeleccionActual() {
-    const checksActivos = Array.from(document.querySelectorAll('.check-cultivo:checked')).map(c => c.value);
-    const aplicarFiltro = checksActivos.length > 0;
+    const cultivosSeleccionados = obtenerCultivosSeleccionados();
+    const aplicarFiltro = cultivosPaginados.length > 0;
 
     const features = poligonosGlobal
-        .filter(poligono => !aplicarFiltro || checksActivos.includes(poligono.cultivo))
+        .filter(poligono => !aplicarFiltro || cultivosSeleccionados.includes(poligono.cultivo))
         .map(crearFeatureGeoJsonDesdePoligono)
         .filter(Boolean);
 
@@ -243,6 +248,27 @@ function cargarPoligonos(callback) {
         .then(response => response.json())
         .then(poligonos => {
             poligonosGlobal = poligonos;
+
+            let bounds = L.latLngBounds([]);
+
+            poligonosGlobal.forEach(poligono => {
+                try {
+                    const coords = JSON.parse(poligono.coordenadas)
+                        .map(coord => [coord.lat, coord.lng]);
+
+                    const polygonTemporal = L.polygon(coords);
+                    bounds.extend(polygonTemporal.getBounds());
+                } catch (e) {
+                    return;
+                }
+            });
+
+            if (bounds.isValid()) {
+                map.fitBounds(bounds, {
+                    padding: [30, 30]
+                });
+            }
+
             if (callback) callback();
         })
         .catch(error => {
@@ -255,9 +281,6 @@ function cargarPoligonos(callback) {
 function mostrarPoligonosPorCultivo(cultivosSeleccionados) {
 
     poligonosLayerGroup.clearLayers();
-
-    let bounds = L.latLngBounds([]);
-    let hayPoligonos = false;
 
     poligonosGlobal.forEach(poligono => {
 
@@ -282,17 +305,7 @@ function mostrarPoligonosPorCultivo(cultivosSeleccionados) {
             fillOpacity: 0.7,
             weight: 2
         }).addTo(poligonosLayerGroup);
-
-        bounds.extend(polygon.getBounds());
-        hayPoligonos = true;
     });
-
-    // Ajustar automáticamente el zoom al conjunto de polígonos visibles
-    if (hayPoligonos) {
-        map.fitBounds(bounds, {
-            padding: [30, 30]
-        });
-    }
 
 }
 
@@ -333,12 +346,13 @@ function renderTablaCultivosPaginada() {
     const cultivosPagina = cultivosPaginados.slice(inicio, fin);
     cultivosPagina.forEach(({cultivo, hectareas, color}) => {
         const idCheck = `check-cultivo-${cultivo.replace(/\s+/g, '-').toLowerCase()}`;
+        const checked = cultivosSeleccionadosGlobal.has(cultivo) ? 'checked' : '';
         tabla.innerHTML += `
             <tr>
                 <td><span style="color:${color}; font-weight:bold;">${cultivo}</span></td>
                 <td id="hectareas-${cultivo}">${hectareas}</td>
                 <td style="text-align:center;">
-                    <input type="checkbox" class="check-cultivo" id="${idCheck}" value="${cultivo}" checked>
+                    <input type="checkbox" class="check-cultivo" id="${idCheck}" value="${cultivo}" ${checked}>
                 </td>
             </tr>
         `;
@@ -346,14 +360,18 @@ function renderTablaCultivosPaginada() {
     // Evento para checkboxes
     document.querySelectorAll('.check-cultivo').forEach(chk => {
         chk.addEventListener('change', function() {
-            const seleccionados = Array.from(document.querySelectorAll('.check-cultivo:checked')).map(c => c.value);
-            mostrarPoligonosPorCultivo(seleccionados);
+            if (this.checked) {
+                cultivosSeleccionadosGlobal.add(this.value);
+            } else {
+                cultivosSeleccionadosGlobal.delete(this.value);
+            }
+
+            mostrarPoligonosPorCultivo(obtenerCultivosSeleccionados());
         });
     });
     renderPaginacionCultivos();
     // Mostrar polígonos de los cultivos seleccionados
-    const seleccionados = Array.from(document.querySelectorAll('.check-cultivo:checked')).map(c => c.value);
-    mostrarPoligonosPorCultivo(seleccionados);
+    mostrarPoligonosPorCultivo(obtenerCultivosSeleccionados());
 }
 
 function renderPaginacionCultivos() {
@@ -434,6 +452,7 @@ function cargarHectareasPorCultivo() {
                     });
                 }
             });
+            cultivosSeleccionadosGlobal = new Set(cultivosPaginados.map(item => item.cultivo));
             paginaActual = 1;
             renderTablaCultivosPaginada();
         })
