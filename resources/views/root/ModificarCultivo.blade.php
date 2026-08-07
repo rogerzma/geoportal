@@ -352,7 +352,7 @@
     <div class="row" style="margin-top: 20px;">
 
         <div class="col-md-8">
-            <h4>¿El cultivo tiene variantes?</h4>
+            <h4>¿El cultivo tiene variedades?</h4>
 
             <label class="radio-inline">
                 <input
@@ -386,7 +386,7 @@
     >
         <div class="col-md-5">
 
-            <h4>Variantes</h4>
+            <h4>Variedades</h4>
 
             <div id="lista-variantes">
 
