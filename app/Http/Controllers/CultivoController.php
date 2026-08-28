@@ -208,7 +208,7 @@ class CultivoController extends Controller
                 compact('cultivo')
             ),
             'administrador' => view(
-                'admin.ModificarCultivo',
+                'admin.ModificarCultivoAdmin',
                 compact('cultivo')
             ),
             default => abort(403, 'No autorizado'),
