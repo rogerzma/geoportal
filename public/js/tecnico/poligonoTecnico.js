@@ -17,6 +17,11 @@ var drawnItems = new L.FeatureGroup();
 
 map.addLayer(drawnItems);
 
+// Polígonos que pertenecen a otras UP
+
+var poligonosOcupados = new L.FeatureGroup();
+map.addLayer(poligonosOcupados);
+
 
 // COORDENADAS EN TIEMPO REAL
 map.on('mousemove', function (event) {
@@ -843,6 +848,83 @@ function cargarPoligonosPorUP(upId) {
         });
 }
 
+// Función para cargar los polígonos que pertenecen a otras unidades de producción
+
+function cargarPoligonosOtrasUP(upId) {
+
+    poligonosOcupados.clearLayers();
+
+    fetch(`/api/poligonos/otras-up/${upId}`, {
+        headers: {
+            Accept: 'application/json'
+        }
+    })
+        .then(function (response) {
+
+            if (!response.ok) {
+                throw new Error(
+                    'No fue posible cargar las áreas ocupadas.'
+                );
+            }
+
+            return response.json();
+        })
+        .then(function (poligonos) {
+
+            poligonos.forEach(function (poligono) {
+
+                let coords;
+
+                try {
+
+                    coords = JSON
+                        .parse(poligono.coordenadas)
+                        .map(function (coordenada) {
+                            return [
+                                Number(coordenada.lat),
+                                Number(coordenada.lng)
+                            ];
+                        });
+
+                } catch (error) {
+
+                    console.error(
+                        'Coordenadas inválidas:',
+                        poligono.id,
+                        error
+                    );
+
+                    return;
+                }
+
+                const polygon = L.polygon(
+                    coords,
+                    {
+                        color: '#666666',
+                        fillColor: '#808080',
+                        fillOpacity: 0.55,
+                        weight: 2
+                    }
+                ).addTo(poligonosOcupados);
+
+                polygon._esAreaOcupada = true;
+                polygon._poligonoId = poligono.id;
+                polygon._upId = poligono.up_id;
+
+                // Fin de la iteración para cada polígono
+            });
+
+        })
+        .catch(function (error) {
+
+            console.error(
+                'Error al cargar áreas ocupadas:',
+                error
+            );
+
+        });
+}
+
 
 // ========================================================
 // CARGAR TODOS LOS POLÍGONOS
@@ -1031,6 +1113,7 @@ const upId = getUpIdFromUrl();
 
 if (upId) {
     cargarPoligonosPorUP(upId);
+    cargarPoligonosOtrasUP(upId);
 } else {
     cargarPoligonos();
 }
@@ -1109,6 +1192,60 @@ if(selectorCultivo){
 // POLÍGONO DIBUJADO
 // ========================================================
 
+/**
+ * Crear y activar nuevamente el control de dibujo,
+ * usado tanto al cancelar como al rechazar un polígono.
+ */
+function activarControlDibujo() {
+    const polygonOptions = {
+        allowIntersection: false,
+        showArea: true,
+
+        shapeOptions: {
+            color: '#9d2449',
+            fillColor: '#9d2449',
+            fillOpacity: 0.45,
+            weight: 3
+        }
+    };
+
+    drawControl =
+        new L.Draw.Polygon(
+            map,
+            polygonOptions
+        );
+
+    drawControl.enable();
+}
+
+/**
+ * Mostrar el modal de error de registro
+ * por solapamiento con otra UP.
+ */
+function mostrarErrorSolapamiento() {
+    const modalElement =
+        document.getElementById(
+            'modalErrorSolapamiento'
+        );
+
+    if (!modalElement) {
+        mostrarAlerta(
+            'No se puede registrar el polígono porque el área seleccionada ya está ocupada por otra unidad de producción.',
+            'danger'
+        );
+
+        return;
+    }
+
+    const modal =
+        bootstrap.Modal
+            .getOrCreateInstance(
+                modalElement
+            );
+
+    modal.show();
+}
+
 map.on(
     L.Draw.Event.CREATED,
     function (event) {
@@ -1141,37 +1278,99 @@ map.on(
             `${latlngs[0].lng} ` +
             `${latlngs[0].lat}))`;
 
-        document
-            .getElementById('geom')
-            .value =
-                wktPolygon;
+        const upIdActual =
+            document.getElementById('up_id')
+                .value;
 
-        document
-            .getElementById('coordenadas')
-            .value =
-                JSON.stringify(latlngs);
+        fetch('/api/poligonos/verificar-solapamiento', {
+            method: 'POST',
 
-        document
-            .getElementById(
-                'fecha_creacion'
-            )
-            .value =
-                new Date()
-                    .toISOString()
-                    .slice(0, 10);
+            headers: {
+                'Content-Type':
+                    'application/json',
 
-        const modalElement =
-            document.getElementById(
-                'parcelaModal'
-            );
+                Accept:
+                    'application/json'
+            },
 
-        const modal =
-            bootstrap.Modal
-                .getOrCreateInstance(
-                    modalElement
+            body: JSON.stringify({
+                geom: wktPolygon,
+                up_id: upIdActual
+            })
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (json) {
+                if (json.solapado) {
+                    drawnItems.removeLayer(
+                        drawnLayer
+                    );
+
+                    drawnLayer = null;
+
+                    mostrarErrorSolapamiento();
+
+                    if (drawMode) {
+                        activarControlDibujo();
+                    }
+
+                    return;
+                }
+
+                document
+                    .getElementById('geom')
+                    .value =
+                        wktPolygon;
+
+                document
+                    .getElementById('coordenadas')
+                    .value =
+                        JSON.stringify(latlngs);
+
+                document
+                    .getElementById(
+                        'fecha_creacion'
+                    )
+                    .value =
+                        new Date()
+                            .toISOString()
+                            .slice(0, 10);
+
+                const modalElement =
+                    document.getElementById(
+                        'parcelaModal'
+                    );
+
+                const modal =
+                    bootstrap.Modal
+                        .getOrCreateInstance(
+                            modalElement
+                        );
+
+                modal.show();
+            })
+            .catch(function (error) {
+                console.error(
+                    'Error al verificar el solapamiento:',
+                    error
                 );
 
-        modal.show();
+                drawnItems.removeLayer(
+                    drawnLayer
+                );
+
+                drawnLayer = null;
+
+                mostrarAlerta(
+                    'No fue posible validar el polígono. Intente nuevamente.',
+                    'danger'
+                );
+
+                if (drawMode) {
+                    activarControlDibujo();
+                }
+            });
     }
 );
 
@@ -1217,25 +1416,7 @@ if (botonCancelarParcela) {
              * no crear uno nuevo sin referencia.
              */
             if (drawMode) {
-                const polygonOptions = {
-                    allowIntersection: false,
-                    showArea: true,
-
-                    shapeOptions: {
-                        color: '#9d2449',
-                        fillColor: '#9d2449',
-                        fillOpacity: 0.45,
-                        weight: 3
-                    }
-                };
-
-                drawControl =
-                    new L.Draw.Polygon(
-                        map,
-                        polygonOptions
-                    );
-
-                drawControl.enable();
+                activarControlDibujo();
 
                 mostrarAlerta(
                     'Modo dibujo activado nuevamente.',

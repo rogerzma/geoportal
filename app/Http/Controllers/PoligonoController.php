@@ -271,6 +271,20 @@ class PoligonoController extends Controller
                 }
             }
 
+            // Verificar que el nuevo polígono no se superponga
+            // con polígonos pertenecientes a otra UP.
+            if (
+                $this->existeSolapamientoConOtraUP(
+                    $datosValidados['geom'],
+                    $datosValidados['up_id']
+                )
+            ) {
+                return response()->json([
+                    'message' =>
+                        'No se puede registrar el polígono porque el área seleccionada ya está ocupada por otra unidad de producción.'
+                ], 422);
+            }
+
             $poligono = Poligono::create([
                 'nombre' =>
                     $datosValidados['nombre'],
@@ -342,6 +356,61 @@ class PoligonoController extends Controller
                     $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Verificar, antes de guardar, si el polígono dibujado
+     * se superpone con un polígono de otra UP.
+     */
+    public function verificarSolapamiento(Request $request)
+    {
+        $datosValidados = $request->validate([
+            'geom' => [
+                'required',
+                'string'
+            ],
+
+            'up_id' => [
+                'required',
+                'exists:unidad_produccion,id'
+            ]
+        ]);
+
+        $solapado = $this->existeSolapamientoConOtraUP(
+            $datosValidados['geom'],
+            $datosValidados['up_id']
+        );
+
+        return response()->json([
+            'solapado' => $solapado
+        ]);
+    }
+
+    /**
+     * Determinar si el geom recibido se superpone con
+     * polígonos registrados en una UP distinta.
+     */
+    private function existeSolapamientoConOtraUP(
+        string $geom,
+        $upId
+    ): bool {
+        return Poligono::where(
+                'up_id',
+                '<>',
+                $upId
+            )
+            ->whereRaw(
+                "
+                ST_Area(
+                    ST_Intersection(
+                        geom,
+                        ST_GeomFromText(?, 4326)
+                    )::geography
+                ) > 0.01
+                ",
+                [$geom]
+            )
+            ->exists();
     }
 
     /**
@@ -885,6 +954,18 @@ class PoligonoController extends Controller
                 $total
         ]);
     }
+
+        // Mostrar poligonos de otras UP
+    public function poligonosOtrasUP($up_id)
+    {
+        // Lógica para obtener los polígonos de otras UP basados en $up_id
+        $poligonos = Poligono::with(
+            $this->relacionesPoligono()
+        )-> where('up_id', '<>', $up_id)->get(); 
+
+        return response()->json($poligonos);
+    }
+
 
     private function usuariosPermitidosPoligonos(User $auth): ?\Illuminate\Support\Collection
     {
