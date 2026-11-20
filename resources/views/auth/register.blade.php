@@ -69,6 +69,7 @@
                             <div class="col-md-6">
                                 <select id="tipo_usuario" class="form-control @error('tipo_usuario') is-invalid @enderror" name="tipo_usuario" required>
                                     <option value="">Seleccione...</option>
+                                    <option value="root" {{ old('tipo_usuario') == 'root' ? 'selected' : '' }}>Superusuario</option>
                                     <option value="administrador" {{ old('tipo_usuario') == 'administrador' ? 'selected' : '' }}>Administrador</option>
                                     <option value="tecnico" {{ old('tipo_usuario') == 'tecnico' ? 'selected' : '' }}>Técnico</option>
                                 </select>

@@ -25,7 +25,6 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/admin';
 
     /**
      * Create a new controller instance.
@@ -38,8 +37,18 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
-    public function redirectTo()
-        {
-            return '/admin';
-        }
+    protected function redirectTo()
+    {
+        $user = auth()->user();
+
+        return match ($user->tipo_usuario) {
+            'root'            => '/root',
+            'administrador'   => '/admin',
+            'tecnico'         => '/tecnico',
+            'jefe_operativo'  => '/jefe_operativo',
+            'capturista'      => '/capturista',
+            default           => '/',
+        };
+    }
+
 }

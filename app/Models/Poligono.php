@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\UnidadProduccion;
+use App\Models\Cultivo;
+use App\Models\PracticaImplementada;
+use App\Models\VarianteCultivo;
 
 class Poligono extends Model
 {
@@ -16,6 +21,9 @@ class Poligono extends Model
         'nombre',
         'coordenadas',
         'cultivo',
+        'cultivo_id', //Variable temporal para relacionarlo con la tabla cultivos
+        'variante_cultivo_id', // Variable temporal para relacionarlo con la tabla variantes_cultivo
+        'practica_implementada_id', // Variable temporal para relacionarlo con la tabla practicas_implementadas
         'geom',
         'fecha_creacion',
         'up_id', //id de la unidad de produccion
@@ -30,5 +38,29 @@ class Poligono extends Model
     public function unidadProduccion()
     {
         return $this->belongsTo(UnidadProduccion::class, 'up_id');
+    }
+
+    public function cultivoCatalogo()
+    {
+        return $this->belongsTo(
+            Cultivo::class,
+            'cultivo_id'
+        );
+    }
+
+    public function varianteCultivo()
+    {
+        return $this->belongsTo(
+            VarianteCultivo::class,
+            'variante_cultivo_id'
+        );
+    }
+
+    public function practicaImplementada()
+    {
+        return $this->belongsTo(
+            PracticaImplementada::class,
+            'practica_implementada_id'
+        );
     }
 }

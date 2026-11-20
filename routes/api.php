@@ -6,6 +6,7 @@ use App\Http\Controllers\ParcelaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PoligonoController;
 use App\Http\Controllers\UPController;
+use App\Http\Controllers\CultivoController;
 use App\Models\User;
 
 /*
@@ -25,11 +26,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // Rutas para polígonos
+    Route::get('/mapa-inicial', [PoligonoController::class, 'mapaInicial']);
     Route::get('/poligonos', [PoligonoController::class, 'index'])->name('poligonos.index');
     Route::get('/poligonos/up/{up_id}', [PoligonoController::class, 'porUP']);
     Route::post('/poligonos', [PoligonoController::class, 'store']);
+        Route::get('/poligonos/total', [PoligonoController::class, 'poligonosTotales']);
     Route::delete('/poligonos/{id}', [PoligonoController::class, 'destroy']);
     Route::get('/poligonos/hectareas-totales', [PoligonoController::class, 'hectareasTotales']);
+    Route::get('/poligonos/hectareas-totales-usuario', [PoligonoController::class, 'hectareasTotalesUsuario']);
+    Route::get('/poligonos/hectareas-por-cultivo', [PoligonoController::class, 'hectareasPorCultivo']);
+    Route::get('/poligonos/otras-up/{up_id}', [PoligonoController::class, 'poligonosOtrasUP']);
+    Route::post('/poligonos/verificar-solapamiento', [PoligonoController::class, 'verificarSolapamiento']);
 // Rutas para unidades de producción
     Route::post('/unidades-produccion', [UPController::class, 'store']);
     Route::get('/unidades-produccion', [UPController::class, 'index']);
@@ -39,4 +46,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Rutas para usuarios
     Route::get('/usuarios', [UserController::class, 'index']);
     Route::post('/usuarios', [UserController::class, 'store']);
+    Route::get('/usuarios/{id}', [UserController::class, 'show']);
+    Route::put('/usuarios/{id}', [UserController::class, 'update']);
     Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
+// Rutas para cultivos
+    Route::get('/cultivos', [CultivoController::class, 'index']);
+    Route::post('/cultivos', [CultivoController::class, 'store']);
+    Route::get('/cultivos/{id}', [CultivoController::class, 'show']);
+    Route::put('/cultivos/{id}', [CultivoController::class, 'update']);
+    Route::delete('/cultivos/{id}', [CultivoController::class, 'destroy']);

@@ -3,52 +3,263 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UPController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PoligonoController;
+use App\Http\Controllers\CultivoController;
 
 Auth::routes();
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
+    Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
+    Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+    Route::get('/poligonos', [PoligonoController::class, 'index']);
+    Route::get('/poligonos/hectareas-totales', [PoligonoController::class, 'hectareasTotales']);
+    Route::get('/poligonos/hectareas-por-cultivo', [PoligonoController::class, 'hectareasPorCultivo']);
+    Route::get(
+    '/poligonos/hectareas-por-cultivo-usuario',
+        [PoligonoController::class, 'hectareasPorCultivoUsuario']
+    )->name('poligonos.hectareasPorCultivoUsuario');
+    Route::get('/poligonos/hectareas-totales-usuario', [PoligonoController::class, 'hectareasTotalesUsuario']);
+});
 
 Route::get('/', function () {
     return view('welcome');
 })->name('inicio');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware(['auth'])->group(function () {
 
-Route::middleware(['auth'])->group(function(){
-    Route::get('/administrador', function () {
-        return view('administrador');
+    // 📦 ENDPOINTS DE DATOS (AJAX)
+    Route::get('/unidades-produccion', [UPController::class, 'index'])
+        ->name('unidades-produccion.data');
+
+    Route::post('/unidades-produccion', [UPController::class, 'store']);
+
+    Route::delete('/unidades-produccion/{id}', [UPController::class, 'destroy']);
+
     });
 
-    Route::get('/admin/mapa', function () {
-        return view('MapaGOB');
-    })->name('mapa-gob');
 
+Route::middleware(['auth', 'role:root'])->group(function(){
+    
+    Route::get('/root', function(){
+        return view('root/InicioRoot');
+    })->name('root');
+
+    Route::get('/root/mapa', function () {
+        return view('root/MapaRoot');
+    })->name('mapa-root');
+
+    Route::get('/root/registro-usuarios', function(){
+        return view('root/RegistrarUsuario');
+    })->name('registrar-usuarios-root');
+
+    Route::get('/root/usuarios', function(){
+        return view('root/AdministrarUsuariosRoot');
+    })->name('administrar-usuarios-root');
+
+    Route::get('/root/up', function(){
+        return view('root/UnidadesProduccion');
+    })->name('unidades-produccion-root');
+
+    Route::get('/root/cultivos', function(){
+        return view('root/AdministrarCultivos');
+    })->name('administrar-cultivos-root');
+
+    Route::get('/root/registro-cultivos', function(){
+        return view('root/RegistrarCultivo');
+    })->name('registrar-cultivos-root');
+
+    Route::get('/root/crear-up', [UPController::class, 'create'])->name('crear-up-root');
+
+    Route::get('/root/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-root');
+    Route::get('/root/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up-root');
+    Route::put('/root/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.root');
+    Route::get('/root/modificar-usuario/{id}', [UserController::class, 'edit'])->name('root.modificar-usuario');
+    Route::put('/root/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.root');
+
+    // Datos de cultivos (solo root)
+    Route::get('/root/cultivos/data', [CultivoController::class, 'index'])
+    ->name('root.cultivos.data');
+
+    Route::post('/root/cultivos', [CultivoController::class, 'store'])
+    ->name('root.cultivos.store');
+
+    Route::delete('/root/cultivos/{id}', [CultivoController::class, 'destroy'])
+    ->name('root.cultivos.destroy');
+
+    Route::get('/root/modificar-cultivo/{id}', [CultivoController::class, 'edit'])->name('root.modificar-cultivo');
+    Route::put('/root/cultivos/{id}', [CultivoController::class, 'update'])->name('actualizar.cultivo.root');
+
+    // Exportar todos los polígonos a KML (solo root).
+    // Debe ir ANTES de /root/poligonos/{id} para que "exportar-kml" no se tome como {id}.
+    Route::get('/root/poligonos/exportar-kml', [PoligonoController::class, 'exportarKml'])
+    ->name('root.poligonos.exportar-kml');
+
+    Route::get('/root/poligonos/{id}', [PoligonoController::class, 'show'])
+    ->name('root.poligonos.show');
+
+    Route::put('/root/poligonos/{id}', [PoligonoController::class, 'update'])
+    ->name('root.poligonos.update');
+});
+
+Route::middleware(['auth', 'role:administrador'])->group(function(){
+    
     Route::get('/admin', function(){
-        return view('InicioAdmin');
+        return view('admin/InicioAdmin');
     })->name('admin');
 
+    Route::get('/admin/mapa', function () {
+        return view('admin/MapaAdmin');
+    })->name('mapa-admin');
+
     Route::get('/admin/registro-usuarios', function(){
-        return view('RegistrarUsuario');
-    })->name('registrar-usuarios');
+        return view('admin/RegistrarUsuario');
+    })->name('registrar-usuarios-admin');
 
     Route::get('/admin/usuarios', function(){
-        return view('AdministrarUsuarios');
-    })->name('administrar-usuarios');
+        return view('admin/AdministrarUsuarios');
+    })->name('administrar-usuarios-admin');
 
     Route::get('/admin/up', function(){
-        return view('UnidadesProduccion');
-    })->name('unidades-produccion');
+        return view('admin/UnidadesProduccion');
+    })->name('unidades-produccion-admin');
 
-    Route::get('/admin/crear-up', function(){
-        return view('CrearUP');
-    })->name('crear-up');
+    Route::get('/admin/crear-up', [UPController::class, 'create'])->name('crear-up-admin');
 
-    Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos');
-    Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up');
-    Route::put('/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar');
-});
+        Route::get('/admin/cultivos', function(){
+        return view('admin/AdministrarCultivosAdmin');
+    })->name('administrar-cultivos-admin');
+
+    Route::get('/admin/registro-cultivos', function(){
+        return view('admin/RegistrarCultivos');
+    })->name('registrar-cultivos-admin');
+
+    Route::get('/admin/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-admin');
+    Route::get('/admin/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up-admin');
+    Route::put('/admin/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.admin');
+    Route::get('/admin/modificar-usuario/{id}', [UserController::class, 'edit'])->name('admin.modificar-usuario');
+    Route::put('/admin/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.admin');
+
+    // Datos de cultivos ADMIN
+    Route::get('/admin/cultivos/data', [CultivoController::class, 'index'])
+    ->name('admin.cultivos.data');
+
+    Route::post('/admin/cultivos', [CultivoController::class, 'store'])
+    ->name('admin.cultivos.store');
+
+    Route::delete('/admin/cultivos/{id}', [CultivoController::class, 'destroy'])
+    ->name('admin.cultivos.destroy');
+
+    Route::get('/admin/modificar-cultivo/{id}', [CultivoController::class, 'edit'])->name('admin.modificar-cultivo');
+    Route::put('/admin/cultivos/{id}', [CultivoController::class, 'update'])->name('actualizar.cultivo.admin');
+
+    Route::get('/admin/poligonos/{id}', [PoligonoController::class, 'show'])
+    ->name('admin.poligonos.show');
+
+    Route::put('/admin/poligonos/{id}', [PoligonoController::class, 'update'])
+    ->name('admin.poligonos.update');
+
+    });
 
 // Rutas para usuario técnico
 Route::middleware(['auth', 'role:tecnico'])->group(function(){
     Route::get('/tecnico', function(){
-        return view('InicioTecnico');
+        return view('tecnico/InicioTecnico');
     })->name('tecnico');
+
+    Route::get('/tecnico/mapa', function () {
+        return view('tecnico/MapaTecnico');
+    })->name('mapa-tecnico');
+
+    Route::get('/tecnico/up', function(){
+        return view('tecnico/TecnicoUP');
+    })->name('tecnico-up');
+
+    Route::get('/tecnico/registro-usuarios', function(){
+        return view('tecnico/RegistrarUsuarioTecnico');
+    })->name('registrar-usuarios-tecnico');
+
+    Route::get('/tecnico/usuarios', function(){
+        return view('tecnico/TecnicoUsuarios');
+    })->name('usuarios-tecnico');
+
+    Route::get('/tecnico/crear-up', [UPController::class, 'create'])->name('crear-up-tecnico');
+
+    Route::get('/tecnico/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-tecnico');
+    Route::get('/tecnico/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up-tecnico');
+    Route::get('/tecnico/modificar-usuario/{id}', [UserController::class, 'edit'])->name('tecnico.modificar-usuario');
+    Route::put('/tecnico/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.tecnico');
+    Route::put('/tecnico/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.tecnico');
+
+    Route::get('/tecnico/poligonos/{id}', [PoligonoController::class, 'show'])
+    ->name('tecnico.poligonos.show');
+
+    Route::put('/tecnico/poligonos/{id}', [PoligonoController::class, 'update'])
+    ->name('tecnico.poligonos.update');
+});
+
+// Rutas para usuario jefe operativo
+Route::middleware(['auth', 'role:jefe_operativo'])->group(function(){
+    Route::get('/jefe_operativo', function(){
+        return view('jefe_operativo/InicioJefeOperativo');
+    })->name('jefe_operativo');
+
+    Route::get('/jefe_operativo/mapa', function () {
+        return view('jefe_operativo/MapaJefeOperativo');
+    })->name('mapa-jefe_operativo');
+
+    Route::get('/jefe_operativo/up', function(){
+        return view('jefe_operativo/JefeOperativoUP');
+    })->name('jefe-operativo-up');
+
+    Route::get('/jefe_operativo/registro-usuarios', function(){
+        return view('jefe_operativo/RegistrarUsuarioJefeOP');
+    })->name('registrar-usuarios-jefe_operativo');
+
+    Route::get('/jefe_operativo/usuarios', function(){
+        return view('jefe_operativo/UsuariosJefeOP');
+    })->name('usuarios-jefe_operativo');
+
+
+    Route::get('/jefe_operativo/crear-up', [UPController::class, 'create'])->name('crear-up-jefe_operativo');
+
+    Route::get('/jefe_operativo/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-jefe_operativo');
+    Route::get('/jefe_operativo/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up-jefe_operativo');
+    Route::get('/jefe_operativo/modificar-usuario/{id}', [UserController::class, 'edit'])->name('jefe_operativo.modificar-usuario');
+    Route::put('/jefe_operativo/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.jefe_operativo');
+    Route::put('/jefe_operativo/usuarios/{id}', [UserController::class, 'update'])->name('actualizar.usuario.jefe_operativo');
+    Route::get('/jefe_operativo/poligonos/{id}', [PoligonoController::class, 'show'])
+    ->name('jefe_operativo.poligonos.show');
+
+    Route::put('/jefe_operativo/poligonos/{id}', [PoligonoController::class, 'update'])
+    ->name('jefe_operativo.poligonos.update');
+});
+
+// Rutas para usuario capturista
+Route::middleware(['auth', 'role:capturista'])->group(function(){
+    Route::get('/capturista', function(){
+        return view('capturista/InicioCapturista');
+    })->name('capturista');
+
+    Route::get('/capturista/mapa', function () {
+        return view('capturista/MapaCapturista');
+    })->name('mapa-capturista');
+
+    Route::get('/capturista/up', function(){
+        return view('capturista/CapturistaUP');
+    })->name('capturista-up');
+
+    Route::get('/capturista/crear-up', [UPController::class, 'create'])->name('crear-up-capturista');
+
+    Route::get('/capturista/up/poligonos', [UPController::class, 'mapaUP'])->name('mapa-poligonos-capturista');
+    Route::get('/capturista/modificar-up/{id}', [UPController::class, 'edit'])->name('modificar-up-capturista');
+    Route::put('/capturista/unidades-produccion/{id}', [UPController::class, 'update'])->name('up.actualizar.capturista');
+    Route::get('/capturista/poligonos/{id}', [PoligonoController::class, 'show'])
+    ->name('capturista.poligonos.show');
+
+    Route::put('/capturista/poligonos/{id}', [PoligonoController::class, 'update'])
+    ->name('capturista.poligonos.update');
 });

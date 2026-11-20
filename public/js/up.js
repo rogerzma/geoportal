@@ -6,6 +6,8 @@ $(document).ready(function () {
         }
     });
 
+    console.log('Rol del usuario:', window.userRole);
+
     // 🧩 Crear nueva UP
     $('#validateReportButton').on('click', function () {
         const nombre_up = $('#nombre_up').val();
@@ -22,7 +24,7 @@ $(document).ready(function () {
         $('#emptyFieldsAlert').hide();
 
         $.ajax({
-            url: '/api/unidades-produccion',
+            url: '/unidades-produccion',
             method: 'POST',
             data: {
                 nombre_up,
@@ -45,7 +47,7 @@ $(document).ready(function () {
     // 📦 Cargar tabla de UP
         function cargarUnidadesProduccion() {
         $.ajax({
-            url: '/api/unidades-produccion',
+            url: '/unidades-produccion',
             method: 'GET',
             success: function (response) {
                 if (response.length === 0) {
@@ -57,6 +59,17 @@ $(document).ready(function () {
 
                     let filas = '';
                     response.forEach(function (up) {
+                        let editarUrl = '';
+                        if (window.userRole === 'administrador') {
+                            editarUrl = `/admin/modificar-up/${up.id}`;
+                        } else if (window.userRole === 'tecnico') {
+                            editarUrl = `/tecnico/modificar-up/${up.id}`;
+                        } else if (window.userRole === 'productor') {
+                            editarUrl = `/productor/modificar-up/${up.id}`;
+                        } else {
+                            editarUrl = `/modificar-up/${up.id}`;
+                        }
+
                         filas += `
                             <tr>
                                 <td>${up.nombre_up}</td>
@@ -69,7 +82,7 @@ $(document).ready(function () {
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="/admin/modificar-up/${up.id}" class="glyphicon glyphicon-pencil"></a>
+                                    <a href="${editarUrl}" class="glyphicon glyphicon-pencil"></a>
                                     <a href="#" class="glyphicon glyphicon-trash btn-eliminar-up" data-id="${up.id}" style="color: #ff0000;"></a>
                                 </td>
                             </tr>
@@ -101,7 +114,7 @@ $(document).ready(function () {
         if (!upIdParaEliminar) return;
 
         $.ajax({
-            url: `/api/unidades-produccion/${upIdParaEliminar}`,
+            url: `/unidades-produccion/${upIdParaEliminar}`,
             method: 'DELETE',
             success: function (response) {
                 $('#modalEliminarUP').modal('hide');

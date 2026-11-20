@@ -22,7 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'telefono',
-        'tipo_usuario' // Indica si es admin, tecnico, etc.
+        'tipo_usuario', // Indica si es admin, tecnico, etc.
+        'created_by'
     ];
 
     /**
