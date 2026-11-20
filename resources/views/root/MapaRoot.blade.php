@@ -36,6 +36,12 @@
 
             <div id="toggle-tabla-cultivos-wrap">
                 <button class="btn btn-primary" type="button" id="toggle-tabla-cultivos">Ocultar cultivos</button>
+
+                @if (auth()->check() && auth()->user()->tipo_usuario === 'root')
+                    <a href="{{ route('root.poligonos.exportar-kml') }}" class="btn btn-success" id="btn-exportar-kml">
+                        Descargar polígonos (KML)
+                    </a>
+                @endif
             </div>
 
             <div id="tabla-cultivos-section">

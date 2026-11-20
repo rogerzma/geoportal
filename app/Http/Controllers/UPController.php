@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\UnidadProduccion;
 use App\Models\User;
 use App\Models\Cultivo;
+use App\Models\PracticaImplementada;
 
 class UPController extends Controller
 {
@@ -387,15 +388,17 @@ class UPController extends Controller
         ->where('activo', true)
         ->orderBy('nombre')
         ->get();
-
+        $practicasImplementadas = PracticaImplementada::where('activo', true)
+            ->orderBy('nombre')
+            ->get();
         $user = auth()->user();
 
         return match ($user->tipo_usuario) {
-            'root'          => view('root.MapaUPRoot', compact('unidadProduccion', 'cultivos')),
-            'administrador' => view('admin.MapaUPAdmin', compact('unidadProduccion', 'cultivos')),
-            'tecnico'       => view('tecnico.MapaUPTecnico', compact('unidadProduccion', 'cultivos')),
-            'jefe_operativo' => view('jefe_operativo.MapaUPJefeOperativo', compact('unidadProduccion', 'cultivos')),
-            'capturista'     => view('capturista.MapaUPCapturista', compact('unidadProduccion', 'cultivos')),
+            'root'          => view('root.MapaUPRoot', compact('unidadProduccion', 'cultivos', 'practicasImplementadas')),
+            'administrador' => view('admin.MapaUPAdmin', compact('unidadProduccion', 'cultivos', 'practicasImplementadas')),
+            'tecnico'       => view('tecnico.MapaUPTecnico', compact('unidadProduccion', 'cultivos', 'practicasImplementadas')),
+            'jefe_operativo' => view('jefe_operativo.MapaUPJefeOperativo', compact('unidadProduccion', 'cultivos', 'practicasImplementadas')),
+            'capturista'     => view('capturista.MapaUPCapturista', compact('unidadProduccion', 'cultivos', 'practicasImplementadas')),
             default         => abort(403),
         };
     }

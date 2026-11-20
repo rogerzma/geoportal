@@ -1,4 +1,15 @@
+// ========================================================
+// MAPA DE POLÍGONOS DE UNA UP — TÉCNICO
+// Basado en public/js/root/poligonoRoot.js.
+// Las rutas de consulta/edición llegan desde la vista en
+// window.rutasPoligonos, por lo que este archivo es igual
+// para todos los roles.
+// ========================================================
+
+// ========================================================
 // INICIALIZACIÓN DEL MAPA
+// ========================================================
+
 var map = L.map('map').setView(
     [22.9011, -102.6581],
     15
@@ -17,13 +28,16 @@ var drawnItems = new L.FeatureGroup();
 
 map.addLayer(drawnItems);
 
-// Polígonos que pertenecen a otras UP
+// Poligonos que pertenecen a otras UP
 
 var poligonosOcupados = new L.FeatureGroup();
 map.addLayer(poligonosOcupados);
 
 
+// ========================================================
 // COORDENADAS EN TIEMPO REAL
+// ========================================================
+
 map.on('mousemove', function (event) {
     const latitud =
         event.latlng.lat.toFixed(6);
@@ -40,7 +54,9 @@ map.on('mousemove', function (event) {
     }
 });
 
+// ========================================================
 // BUSCADOR POR COORDENADAS
+// ========================================================
 
 let marcadorBusquedaCoordenadas = null;
 
@@ -249,7 +265,10 @@ if (inputBuscadorCoordenadas) {
         limpiarMensajeBusquedaCoordenadas
     );
 }
+
+// ========================================================
 // COLORES DE CULTIVO
+// ========================================================
 
 const COLORES_CULTIVO = {
     'Alfalfa': '#00692C',
@@ -666,7 +685,9 @@ if (botonEliminar) {
 function cargarPoligonosPorUP(upId) {
     drawnItems.clearLayers();
 
-    fetch(`/api/poligonos/up/${upId}`, {
+    // Se regresa la promesa para poder esperar
+    // la recarga (por ejemplo, después de editar).
+    return fetch(`/api/poligonos/up/${upId}`, {
         headers: {
             Accept: 'application/json'
         }
@@ -754,8 +775,7 @@ function cargarPoligonosPorUP(upId) {
                             ?.nombre
                         || poligono.cultivo
                         || 'Sin cultivo';
-                        
-                    
+
                     const varianteCultivo =
                         poligono.variante_cultivo
                             ? poligono.variante_cultivo.nombre
@@ -770,25 +790,74 @@ function cargarPoligonosPorUP(upId) {
                             `
                             : '';
 
+                    const practicaImplementada =
+                        poligono.practica_implementada
+                            ? poligono.practica_implementada.nombre
+                            : null;
+
+                    const lineaPractica =
+                        practicaImplementada
+                            ? `
+            <strong>Práctica implementada:</strong>
+            ${escaparHtmlAlerta(practicaImplementada)}
+            <br>
+        `
+                            : '';
+
                     polygon.bindPopup(`
                         <div class="popup-poligono">
-                            <strong>Nombre:</strong>
-                            ${escaparHtmlAlerta(
-                                poligono.nombre
-                            )}
-                            <br>
 
-                            <strong>Cultivo:</strong>
-                            ${escaparHtmlAlerta(
-                                nombreCultivo
-                            )}
-                            <br>
-                            ${lineaVariante}
+                            <div class="popup-poligono-info">
 
-                            <strong>Fecha de creación:</strong>
-                            ${escaparHtmlAlerta(
-                                poligono.fecha_creacion
-                            )}
+                                <div>
+                                    <strong>Nombre:</strong>
+                                    ${escaparHtmlAlerta(poligono.nombre)}
+                                </div>
+
+                                <div>
+                                    <strong>Cultivo:</strong>
+                                    ${escaparHtmlAlerta(nombreCultivo)}
+                                </div>
+
+                                ${varianteCultivo ? `
+                                    <div>
+                                        <strong>Variante:</strong>
+                                        ${escaparHtmlAlerta(varianteCultivo)}
+                                    </div>
+                                ` : ''}
+
+                                ${practicaImplementada ? `
+                                    <div>
+                                        <strong>Práctica implementada:</strong>
+                                        ${escaparHtmlAlerta(practicaImplementada)}
+                                    </div>
+                                ` : ''}
+
+                                <div>
+                                    <strong>Fecha de creación:</strong>
+                                    ${escaparHtmlAlerta(poligono.fecha_creacion)}
+                                </div>
+
+                            </div>
+
+                            <div class="popup-poligono-acciones">
+
+                                <button
+                                    type="button"
+                                    class="btn-editar-poligono"
+                                    data-poligono-id="${Number(poligono.id)}"
+                                    title="Modificar datos del cultivo"
+                                    aria-label="Modificar datos del cultivo"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         width="16" height="16" viewBox="0 0 16 16"
+                                         fill="currentColor" aria-hidden="true">
+                                        <path d="M12.854.146a.5.5 0 0 0-.708 0l-1 1L14.854 4.854l1-1a.5.5 0 0 0 0-.708zM13.793 5.914 10.086 2.207 1 11.293V15h3.707zM0 11.086v4.414a.5.5 0 0 0 .5.5h4.414z"/>
+                                    </svg>
+                                </button>
+
+                            </div>
+
                         </div>
                     `);
 
@@ -848,7 +917,9 @@ function cargarPoligonosPorUP(upId) {
         });
 }
 
-// Función para cargar los polígonos que pertenecen a otras unidades de producción
+// ========================================================
+// CARGAR POLÍGONOS DE OTRAS UP
+// ========================================================
 
 function cargarPoligonosOtrasUP(upId) {
 
@@ -933,7 +1004,7 @@ function cargarPoligonosOtrasUP(upId) {
 function cargarPoligonos() {
     drawnItems.clearLayers();
 
-    fetch('/api/poligonos', {
+    return fetch('/api/poligonos', {
         headers: {
             Accept: 'application/json'
         }
@@ -1119,15 +1190,18 @@ if (upId) {
 }
 
 
-// =========================================
-// CULTIVOS Y VARIANTES
-// =========================================
+// ========================================================
+// CULTIVOS, VARIANTES Y PRÁCTICAS
+// ========================================================
 
 const selectorCultivo =
     document.getElementById('cultivo_id');
 
 const selectorVariante =
     document.getElementById('variante_cultivo_id');
+
+const selectorPractica =
+    document.getElementById('practica_implementada_id');
 
 function cargarVariantes() {
 
@@ -1138,7 +1212,7 @@ function cargarVariantes() {
     selectorVariante.innerHTML = '';
 
     const cultivo =
-        window.cultivosCatalogo.find(function(c){
+        window.cultivosCatalogo.find(function (c) {
             return Number(c.id) === Number(selectorCultivo.value);
         });
 
@@ -1167,24 +1241,79 @@ function cargarVariantes() {
     selectorVariante.innerHTML =
         '<option value="">Seleccione...</option>';
 
-    cultivo.variantes.forEach(function(v){
+    cultivo.variantes.forEach(function (v) {
 
-        selectorVariante.innerHTML += `
-            <option value="${v.id}">
-                ${v.nombre}
-            </option>
-        `;
+        const opcion = document.createElement('option');
+
+        opcion.value = v.id;
+        opcion.textContent = v.nombre;
+
+        selectorVariante.appendChild(opcion);
 
     });
 
 }
 
-if(selectorCultivo){
+function cargarPracticas() {
 
-    selectorCultivo.addEventListener(
-        'change',
-        cargarVariantes
-    );
+    if (!selectorCultivo || !selectorPractica) {
+        return;
+    }
+
+    selectorPractica.innerHTML = '';
+
+    // Esperar a que el usuario seleccione un cultivo.
+    if (!selectorCultivo.value) {
+
+        selectorPractica.disabled = true;
+
+        selectorPractica.innerHTML =
+            '<option value="">Primero seleccione un cultivo</option>';
+
+        return;
+    }
+
+    // Catálogo de prácticas obtenido desde Laravel.
+    const practicas = window.practicasCatalogo || [];
+
+    if (!practicas.length) {
+
+        selectorPractica.disabled = true;
+
+        selectorPractica.innerHTML =
+            '<option value="">No existen prácticas registradas</option>';
+
+        return;
+    }
+
+    selectorPractica.disabled = false;
+
+    selectorPractica.innerHTML =
+        '<option value="">Seleccione una práctica...</option>';
+
+    practicas.forEach(function (practica) {
+
+        const opcion = document.createElement('option');
+
+        opcion.value = practica.id;
+
+        opcion.textContent =
+            practica.clave + ' - ' + practica.nombre;
+
+        selectorPractica.appendChild(opcion);
+
+    });
+}
+
+if (selectorCultivo) {
+
+    selectorCultivo.addEventListener('change', function () {
+
+        cargarVariantes();
+
+        cargarPracticas();
+
+    });
 
 }
 
@@ -1373,6 +1502,7 @@ map.on(
             });
     }
 );
+
 
 
 // ========================================================
@@ -1592,6 +1722,9 @@ if (formularioPoligono) {
                     'cultivo'
                 );
 
+            const campoPracticaId =
+                document.getElementById('practica_implementada_id');
+
             const data = {
                 nombre:
                     document
@@ -1668,6 +1801,11 @@ if (formularioPoligono) {
                         .value
                         .trim();
             }
+
+            data.practica_implementada_id =
+                campoPracticaId && campoPracticaId.value
+                    ? Number(campoPracticaId.value)
+                    : null;
 
             const submitBtn =
                 formularioPoligono
@@ -1759,6 +1897,43 @@ if (formularioPoligono) {
                         )
                         || 'Error al guardar el polígono.';
 
+                    // Si el backend detectó que el área está ocupada
+                    if (
+                        error.message &&
+                        error.message.includes('área seleccionada ya está ocupada')
+                    ) {
+                        const modalElement =
+                            document.getElementById(
+                                'parcelaModal'
+                            );
+
+                        const modal =
+                            bootstrap.Modal.getInstance(
+                                modalElement
+                            );
+
+                        if (modal) {
+                            modal.hide();
+                        }
+
+                        // Eliminar del mapa el polígono rechazado
+                        if (drawnLayer) {
+                            drawnItems.removeLayer(
+                                drawnLayer
+                            );
+
+                            drawnLayer = null;
+                        }
+
+                        // Limpiar el formulario
+                        formularioPoligono.reset();
+
+                        // Permitir dibujar nuevamente
+                        if (drawMode && drawControl) {
+                            drawControl.enable();
+                        }
+                    }
+
                     mostrarAlerta(
                         mensaje,
                         'danger'
@@ -1800,3 +1975,281 @@ function obtenerPrimerErrorValidacion(
 
     return null;
 }
+
+// ========================================================
+// MODIFICAR INFORMACIÓN DE UN POLÍGONO
+// ========================================================
+
+function cargarVariantesEdicion(cultivoId, varianteSeleccionada = null) {
+
+    const select = document.getElementById('editar_variante_cultivo_id');
+
+    select.innerHTML = '<option value="">Sin variante</option>';
+
+    const cultivo = (window.cultivosCatalogo || []).find(
+        c => String(c.id) === String(cultivoId)
+    );
+
+    if (!cultivo) {
+        select.disabled = true;
+        return;
+    }
+
+    const variantes = cultivo.variantes || [];
+
+    variantes.forEach(variante => {
+
+        const option = document.createElement('option');
+
+        option.value = variante.id;
+        option.textContent = variante.nombre;
+
+        select.appendChild(option);
+
+    });
+
+    select.disabled = variantes.length === 0;
+
+    select.value = varianteSeleccionada || '';
+}
+
+function cargarPracticasEdicion(practicaSeleccionada = null) {
+
+    const select = document.getElementById(
+        'editar_practica_implementada_id'
+    );
+
+    select.innerHTML = '<option value="">Seleccione...</option>';
+
+    const practicas = window.practicasCatalogo || [];
+
+    practicas.forEach(practica => {
+
+        const option = document.createElement('option');
+
+        option.value = practica.id;
+
+        // Mismo formato que en el formulario de registro.
+        option.textContent = practica.clave
+            ? practica.clave + ' - ' + practica.nombre
+            : practica.nombre;
+
+        select.appendChild(option);
+
+    });
+
+    select.disabled = practicas.length === 0;
+
+    select.value = practicaSeleccionada || '';
+}
+
+async function abrirModalEditarPoligono(id) {
+
+    const errorDiv = document.getElementById('editar_poligono_error');
+
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+
+    try {
+
+        if (!window.rutasPoligonos?.show) {
+            throw new Error('No está configurada la ruta de consulta.');
+        }
+
+        const url = window.rutasPoligonos.show.replace(
+            '__ID__',
+            encodeURIComponent(id)
+        );
+
+        const respuesta = await fetch(url, {
+            headers: {
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        });
+
+        if (respuesta.status === 403) {
+            throw new Error('No tiene permisos para modificar este polígono.');
+        }
+
+        if (respuesta.status === 404) {
+            throw new Error('El polígono ya no existe. Recargue la página.');
+        }
+
+        if (!respuesta.ok) {
+            throw new Error('No fue posible consultar los datos del polígono.');
+        }
+
+        const poligono = await respuesta.json();
+
+        document.getElementById('editar_poligono_id').value =
+            poligono.id;
+
+        document.getElementById('editar_nombre').value =
+            poligono.nombre || '';
+
+        document.getElementById('editar_cultivo_id').value =
+            poligono.cultivo_id || '';
+
+        cargarVariantesEdicion(
+            poligono.cultivo_id,
+            poligono.variante_cultivo_id
+        );
+
+        cargarPracticasEdicion(
+            poligono.practica_implementada_id
+        );
+
+        const modalElement = document.getElementById(
+            'modalEditarPoligono'
+        );
+
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+    } catch (error) {
+
+        console.error('Error al cargar polígono:', error);
+
+        mostrarAlerta(error.message, 'danger');
+
+    }
+}
+
+document.addEventListener('click', function (event) {
+
+    const boton = event.target.closest('.btn-editar-poligono');
+
+    if (!boton) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (drawMode || deleteMode) {
+        mostrarAlerta(
+            'Desactive el modo dibujo o eliminación para modificar un polígono.',
+            'warning'
+        );
+
+        return;
+    }
+
+    const poligonoId = Number(boton.dataset.poligonoId);
+
+    // Cerrar el popup para que no quede encima del modal.
+    map.closePopup();
+
+    abrirModalEditarPoligono(poligonoId);
+});
+
+document.getElementById('editar_cultivo_id')
+    ?.addEventListener('change', function () {
+
+        cargarVariantesEdicion(this.value);
+
+    });
+
+document.getElementById('formEditarPoligono')
+    ?.addEventListener('submit', async function (event) {
+
+        event.preventDefault();
+
+        const id = document.getElementById('editar_poligono_id').value;
+
+        const errorDiv = document.getElementById('editar_poligono_error');
+        const botonGuardar = document.getElementById('btnGuardarEdicionPoligono');
+
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+
+        const datos = {
+            nombre: document.getElementById('editar_nombre').value.trim(),
+
+            cultivo_id: document.getElementById('editar_cultivo_id').value,
+
+            variante_cultivo_id:
+                document.getElementById('editar_variante_cultivo_id').value || null,
+
+            practica_implementada_id:
+                document.getElementById('editar_practica_implementada_id').value || null
+        };
+
+        try {
+
+            botonGuardar.disabled = true;
+            botonGuardar.textContent = 'Guardando...';
+
+            const url = window.rutasPoligonos.update.replace(
+                '__ID__',
+                encodeURIComponent(id)
+            );
+
+            const csrfToken = document.querySelector(
+                'meta[name="csrf-token"]'
+            )?.content;
+
+            if (!csrfToken) {
+                throw new Error('No se encontró el token CSRF.');
+            }
+
+            const respuesta = await fetch(url, {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(datos)
+            });
+
+            // Si la sesión expiró (419) o hubo un error del servidor,
+            // Laravel puede responder HTML en lugar de JSON.
+            const resultado = await respuesta.json().catch(() => ({}));
+
+            if (respuesta.status === 419) {
+                throw new Error('La sesión expiró. Recargue la página e intente de nuevo.');
+            }
+
+            if (respuesta.status === 403) {
+                throw new Error('No tiene permisos para modificar este polígono.');
+            }
+
+            if (!respuesta.ok) {
+
+                const errores = resultado.errors
+                    ? Object.values(resultado.errors).flat().join(' ')
+                    : resultado.message || 'No se pudo actualizar el polígono.';
+
+                throw new Error(errores);
+            }
+
+            const modalElement = document.getElementById('modalEditarPoligono');
+
+            bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+
+            // Recargar los polígonos para visualizar los datos actualizados.
+            const upId = getUpIdFromUrl();
+
+            if (upId) {
+                await cargarPoligonosPorUP(upId);
+            } else {
+                await cargarPoligonos();
+            }
+
+            mostrarAlerta('Datos del polígono actualizados correctamente.', 'success');
+
+        } catch (error) {
+
+            console.error('Error al actualizar:', error);
+
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+
+        } finally {
+
+            botonGuardar.disabled = false;
+            botonGuardar.textContent = 'Guardar cambios';
+
+        }
+
+    });

@@ -137,6 +137,14 @@
                         <small id="mensaje-variantes" class="text-muted"></small>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="practica_implementada_id" class="form-label">Práctica implementada</label>
+                        <select class="form-control" name="practica_implementada_id" id="practica_implementada_id" disabled>
+                            <option value="">Primero seleccione un cultivo</option>
+                        </select>
+                        <small id="mensaje-practicas" class="text-muted"></small>
+                    </div>
+
                     <input type="hidden" id="geom" name="geom">
                     <input type="hidden" id="coordenadas" name="coordenadas">
                     <input type="hidden" id="fecha_creacion" name="fecha_creacion">
@@ -152,6 +160,87 @@
 
             </form>
 
+        </div>
+    </div>
+</div>
+
+{{-- Modal para modificar unaa parcela ya existente --}}
+
+<div class="modal fade" id = "modalEditarPoligono" tabindex="-1" aria-labbeledby="modalEditarPoligonoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEditarPoligono">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalEditarPoligonoLabel">
+                        Modificar datos de la parcela
+                    </h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="editar_poligono_id">
+
+                    <div class="mb-3">
+                        <label for="editar_nombre" class="form-label">
+                            Nombre del polígono
+                        </label>
+                        <input type="text" class="form-control"
+                               id="editar_nombre" maxlength="255" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_cultivo_id" class="form-label">
+                            Cultivo
+                        </label>
+                        <select class="form-control" id="editar_cultivo_id" required>
+                            <option value="">Seleccione...</option>
+                            @foreach (($cultivos ?? collect()) as $cultivo)
+                                <option value="{{ $cultivo->id }}">
+                                    {{ $cultivo->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_variante_cultivo_id" class="form-label">
+                            Variante
+                        </label>
+                        <select class="form-control" id="editar_variante_cultivo_id">
+                            <option value="">Seleccione un cultivo</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_practica_implementada_id" class="form-label">
+                            Práctica implementada
+                        </label>
+                        <select class="form-control"
+                                id="editar_practica_implementada_id" required>
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+
+                    <div id="editar_poligono_error"
+                         class="alert alert-danger"
+                         style="display:none"></div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"
+                            id="btnGuardarEdicionPoligono">
+                        Guardar cambios
+                    </button>
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -193,6 +282,13 @@
             })->values()->all(),
         ];
     })->values()->all();
+    $practicasCatalogo = ($practicasImplementadas ?? collect())->map(function ($practica) {
+        return [
+            'id' => $practica->id,
+            'clave' => $practica->clave,
+            'nombre' => $practica->nombre,
+        ];
+    })->values()->all();
 @endphp
 
 @endsection
@@ -205,6 +301,11 @@
 
 <script>
     window.cultivosCatalogo = {{ Illuminate\Support\Js::from($cultivosCatalogo) }};
+    window.practicasCatalogo = {{ Illuminate\Support\Js::from($practicasCatalogo) }};
+    window.rutasPoligonos = {
+        show: @json(route('jefe_operativo.poligonos.show', ['id' => '__ID__'])),
+        update: @json(route('jefe_operativo.poligonos.update', ['id' => '__ID__']))
+    };
 </script>
 
 <script src="{{ asset('js/jefe_operativo/poligonoJefeOperativo.js') }}?v={{ time() }}"></script>

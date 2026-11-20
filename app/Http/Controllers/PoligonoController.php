@@ -8,6 +8,7 @@ use App\Models\UnidadProduccion;
 use App\Models\User;
 use App\Models\Cultivo;
 use App\Models\VarianteCultivo;
+use App\Models\PracticaImplementada;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -209,6 +210,12 @@ class PoligonoController extends Controller
                 'exists:variantes_cultivo,id'
             ],
 
+            'practica_implementada_id' => [
+                'required',
+                'integer',
+                'exists:practicas_implementadas,id'
+            ],
+
             'geom' => [
                 'required',
                 'string'
@@ -306,6 +313,9 @@ class PoligonoController extends Controller
                     $datosValidados[
                         'variante_cultivo_id'
                     ] ?? null,
+
+                'practica_implementada_id' =>
+                    $datosValidados['practica_implementada_id'],
 
                 'geom' => DB::raw(
                     "ST_GeomFromText(" .
@@ -423,6 +433,13 @@ class PoligonoController extends Controller
         )->find($id);
 
         if ($poligono) {
+            if (!$this->puedeAccederPoligono(auth()->user(), $poligono)) {
+                return response()->json([
+                    'error' =>
+                        'No tiene permisos para consultar este polígono.'
+                ], 403);
+            }
+
             return response()->json($poligono);
         } else {
             return response()->json([
@@ -463,6 +480,13 @@ class PoligonoController extends Controller
                 'exists:variantes_cultivo,id'
             ],
 
+            'practica_implementada_id' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:practicas_implementadas,id'
+            ],
+
             'geom' => [
                 'sometimes',
                 'string'
@@ -491,6 +515,13 @@ class PoligonoController extends Controller
                 'error' =>
                     'Polígono no encontrado.'
             ], 404);
+        }
+
+        if (!$this->puedeAccederPoligono(auth()->user(), $poligono)) {
+            return response()->json([
+                'message' =>
+                    'No tiene permisos para modificar este polígono.'
+            ], 403);
         }
 
         /*
@@ -581,6 +612,11 @@ class PoligonoController extends Controller
 
             'variante_cultivo_id' =>
                 $varianteId,
+            
+            'practica_implementada_id' =>
+                array_key_exists('practica_implementada_id', $datosValidados)
+                    ? $datosValidados['practica_implementada_id']
+                    : $poligono->practica_implementada_id,
 
             'fecha_creacion' =>
                 $datosValidados[
@@ -649,6 +685,136 @@ class PoligonoController extends Controller
                     'Polígono no encontrado.'
             ], 404);
         }
+    }
+
+    /**
+     * Exportar todos los polígonos del sistema
+     * a un archivo KML descargable.
+     * Solo disponible para el superusuario (root).
+     */
+    public function exportarKml()
+    {
+        $auth = auth()->user();
+
+        // Segunda barrera además del middleware role:root.
+        if (!$auth || $auth->tipo_usuario !== 'root') {
+            abort(403, 'Solo el superusuario puede exportar los polígonos.');
+        }
+
+        $poligonos = DB::table('poligono as p')
+            ->leftJoin('unidad_produccion as up', 'up.id', '=', 'p.up_id')
+            ->leftJoin('cultivos as c', 'c.id', '=', 'p.cultivo_id')
+            ->leftJoin('variantes_cultivo as v', 'v.id', '=', 'p.variante_cultivo_id')
+            ->leftJoin('practicas_implementadas as pi', 'pi.id', '=', 'p.practica_implementada_id')
+            ->leftJoin('users as u', 'u.id', '=', 'p.user_id')
+            ->whereNotNull('p.geom')
+            // La columna geom es geography; ST_IsValid/ST_AsKML trabajan sobre geometry.
+            ->whereRaw('ST_IsValid(p.geom::geometry)')
+            ->select([
+                'p.id',
+                'p.nombre',
+                'p.fecha_creacion',
+                'p.up_id',
+                'up.nombre_up',
+                'up.localidad',
+                DB::raw('COALESCE(c.nombre, p.cultivo) as cultivo'),
+                'c.color as cultivo_color',
+                'v.nombre as variante',
+                'pi.nombre as practica',
+                'u.name as usuario',
+                DB::raw('ROUND((ST_Area(p.geom::geography) / 10000)::numeric, 4) as hectareas'),
+                DB::raw('ST_AsKML(p.geom::geometry) as kml_geom'),
+            ])
+            ->orderBy('up.nombre_up')
+            ->orderBy('p.nombre')
+            ->get();
+
+        $nombreArchivo = 'poligonos_geoportal_' . now()->format('Y-m-d_His') . '.kml';
+
+        return response()->streamDownload(function () use ($poligonos) {
+            $esc = fn ($valor) => htmlspecialchars(
+                (string) ($valor ?? ''),
+                ENT_XML1 | ENT_QUOTES,
+                'UTF-8'
+            );
+
+            echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+            echo '<kml xmlns="http://www.opengis.net/kml/2.2">' . "\n";
+            echo "<Document>\n";
+            echo '<name>Polígonos Geoportal</name>' . "\n";
+            echo '<description>Exportado el ' . $esc(now()->format('Y-m-d H:i')) . "</description>\n";
+
+            // Un estilo por color de cultivo.
+            $colores = $poligonos
+                ->pluck('cultivo_color')
+                ->map(fn ($c) => $this->normalizarColorHex($c))
+                ->unique();
+
+            foreach ($colores as $hex) {
+                echo '<Style id="c_' . $hex . '">'
+                    . '<LineStyle><color>' . $this->hexAKmlColor($hex, 'ff') . '</color><width>2</width></LineStyle>'
+                    . '<PolyStyle><color>' . $this->hexAKmlColor($hex, '80') . '</color></PolyStyle>'
+                    . "</Style>\n";
+            }
+
+            // Una carpeta por Unidad de Producción.
+            foreach ($poligonos->groupBy('up_id') as $grupo) {
+                $primero = $grupo->first();
+
+                echo '<Folder><name>' . $esc($primero->nombre_up ?? 'Sin UP') . "</name>\n";
+
+                foreach ($grupo as $p) {
+                    $datos = [
+                        'Unidad de producción' => $p->nombre_up,
+                        'Localidad' => $p->localidad,
+                        'Cultivo' => $p->cultivo,
+                        'Variante' => $p->variante,
+                        'Práctica implementada' => $p->practica,
+                        'Fecha de creación' => $p->fecha_creacion,
+                        'Registrado por' => $p->usuario,
+                        'Hectáreas' => $p->hectareas,
+                    ];
+
+                    echo '<Placemark>';
+                    echo '<name>' . $esc($p->nombre) . '</name>';
+                    echo '<styleUrl>#c_' . $this->normalizarColorHex($p->cultivo_color) . '</styleUrl>';
+                    echo '<ExtendedData>';
+                    foreach ($datos as $campo => $valor) {
+                        echo '<Data name="' . $esc($campo) . '"><value>' . $esc($valor) . '</value></Data>';
+                    }
+                    echo '</ExtendedData>';
+                    // ST_AsKML ya devuelve <Polygon>/<MultiPolygon> válido.
+                    echo $p->kml_geom;
+                    echo "</Placemark>\n";
+                }
+
+                echo "</Folder>\n";
+            }
+
+            echo "</Document>\n</kml>\n";
+        }, $nombreArchivo, [
+            'Content-Type' => 'application/vnd.google-earth.kml+xml; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * Devuelve el color como RRGGBB (sin #) o un gris por defecto.
+     */
+    private function normalizarColorHex(?string $color): string
+    {
+        $hex = strtoupper(ltrim((string) $color, '#'));
+
+        return preg_match('/^[0-9A-F]{6}$/', $hex) ? $hex : '808080';
+    }
+
+    /**
+     * Convierte RRGGBB al formato de KML (aabbggrr).
+     */
+    private function hexAKmlColor(string $hex, string $alpha): string
+    {
+        return strtolower(
+            $alpha . substr($hex, 4, 2) . substr($hex, 2, 2) . substr($hex, 0, 2)
+        );
     }
 
     /**
@@ -1046,6 +1212,48 @@ class PoligonoController extends Controller
     }
 
     /**
+     * Determinar si el usuario puede consultar o modificar
+     * un polígono, siguiendo la misma jerarquía del listado:
+     *
+     * - root y administrador: cualquier polígono.
+     * - técnico / jefe operativo / capturista: polígonos
+     *   trazados por alguien de su jerarquía, o que estén
+     *   en una UP creada por alguien de su jerarquía.
+     * - capturista: además, polígonos de las UP que tiene asignadas.
+     */
+    private function puedeAccederPoligono(?User $auth, Poligono $poligono): bool
+    {
+        if (!$auth) {
+            return false;
+        }
+
+        $usuariosPermitidos =
+            $this->usuariosPermitidosPoligonos($auth);
+
+        // null = sin restricción (root y administrador).
+        if ($usuariosPermitidos === null) {
+            return true;
+        }
+
+        if ($usuariosPermitidos->contains((int) $poligono->user_id)) {
+            return true;
+        }
+
+        $unidad = $poligono->unidadProduccion;
+
+        if (!$unidad) {
+            return false;
+        }
+
+        if ($usuariosPermitidos->contains((int) $unidad->created_by)) {
+            return true;
+        }
+
+        return $auth->tipo_usuario === 'capturista'
+            && (int) $unidad->capturista_id === (int) $auth->id;
+    }
+
+    /**
      * Relaciones utilizadas al consultar polígonos.
      */
     private function relacionesPoligono(): array
@@ -1054,7 +1262,8 @@ class PoligonoController extends Controller
             'user',
             'unidadProduccion',
             'cultivoCatalogo',
-            'varianteCultivo'
+            'varianteCultivo',
+            'practicaImplementada',
         ];
     }
 }

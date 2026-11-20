@@ -144,44 +144,41 @@
                         <!-- Solo visibles -->
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre del polígono</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            <input type="text" class="form-control" id="nombre" name="nombre" maxlength="255" required>
                         </div>
                         <div class="mb-3">
-                            <label for="cultivo" class="form-label">Cultivo</label>
-                            <select class="form-control" name="cultivo" id="cultivo" required>
+                            <label for="cultivo_id" class="form-label">Cultivo</label>
+                            <select class="form-control" name="cultivo_id" id="cultivo_id" required>
                                 <option value="">Seleccione...</option>
-                                <option value="Alfalfa">Alfalfa</option>
-                                <option value="Algodon">Algodón</option>
-                                <option value="Ajo">Ajo</option>
-                                <option value="Avena">Avena</option>
-                                <option value="Cebada">Cebada</option>
-                                <option value="Cebolla">Cebolla</option>
-                                <option value="Chile">Chile</option>
-                                <option value="Ciruela">Ciruela</option>
-                                <option value="Durazno">Durazno</option>
-                                <option value="En descanso">En descanso</option>
-                                <option value="Fresa">Fresa</option>
-                                <option value="Frijol">Frijol</option>
-                                <option value="Guayaba">Guayaba</option>
-                                <option value="Maiz">Maiz</option>
-                                <option value="Manzana">Manzana</option>
-                                <option value="Nogal">Nogal</option>
-                                <option value="Nopal">Nopal</option>
-                                <option value="Pepino">Pepino</option>
-                                <option value="Sorgo">Sorgo</option>
-                                <option value="Tomate">Tomate</option>
-                                <option value="Tomatillo">Tomatillo</option>
-                                <option value="Trigo">Trigo</option>
-                                <option value="Uva">Uva</option>
-                                <option value="Zanahoria">Zanahoria</option>
+                                @forelse (($cultivos ?? collect()) as $cultivo)
+                                    <option value="{{ $cultivo->id }}">{{ $cultivo->nombre }}</option>
+                                @empty
+                                    <option value="" disabled>No existen cultivos activos registrados</option>
+                                @endforelse
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="variante_cultivo_id" class="form-label">Variante</label>
+                            <select class="form-control" name="variante_cultivo_id" id="variante_cultivo_id" disabled>
+                                <option value="">Primero seleccione un cultivo</option>
+                            </select>
+                            <small id="mensaje-variantes" class="text-muted"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="practica_implementada_id" class="form-label">Práctica implementada</label>
+                            <select class="form-control" name="practica_implementada_id" id="practica_implementada_id" disabled>
+                                <option value="">Primero seleccione un cultivo</option>
+                            </select>
+                            <small id="mensaje-practicas" class="text-muted"></small>
                         </div>
 
                         <!-- Ocultos -->
                         <input type="hidden" id="geom" name="geom">
                         <input type="hidden" id="coordenadas" name="coordenadas">
                         <input type="hidden" id="fecha_creacion" name="fecha_creacion">
-                        <input type="hidden" id="up_id" name="up_id" value="{{ $unidadId ?? 1 }}"> <!-- Si lo puedes pasar desde el backend -->
+                        <input type="hidden" id="up_id" name="up_id" value="{{ $unidadProduccion->id ?? $unidadId }}">
                         <input type="hidden" id="user_id" name="user_id" value="{{ auth()->user()->id }}">
                     </div>
                     <div class="modal-footer">
@@ -192,6 +189,87 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal para modificar unaa parcela ya existente --}}
+
+<div class="modal fade" id="modalEditarPoligono" tabindex="-1" aria-labelledby="modalEditarPoligonoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEditarPoligono">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalEditarPoligonoLabel">
+                        Modificar datos de la parcela
+                    </h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="editar_poligono_id">
+
+                    <div class="mb-3">
+                        <label for="editar_nombre" class="form-label">
+                            Nombre del polígono
+                        </label>
+                        <input type="text" class="form-control"
+                               id="editar_nombre" maxlength="255" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_cultivo_id" class="form-label">
+                            Cultivo
+                        </label>
+                        <select class="form-control" id="editar_cultivo_id" required>
+                            <option value="">Seleccione...</option>
+                            @foreach (($cultivos ?? collect()) as $cultivo)
+                                <option value="{{ $cultivo->id }}">
+                                    {{ $cultivo->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_variante_cultivo_id" class="form-label">
+                            Variante
+                        </label>
+                        <select class="form-control" id="editar_variante_cultivo_id">
+                            <option value="">Seleccione un cultivo</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_practica_implementada_id" class="form-label">
+                            Práctica implementada
+                        </label>
+                        <select class="form-control"
+                                id="editar_practica_implementada_id" required>
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+
+                    <div id="editar_poligono_error"
+                         class="alert alert-danger"
+                         style="display:none"></div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"
+                            id="btnGuardarEdicionPoligono">
+                        Guardar cambios
+                    </button>
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
     <!-- Modal de error-->
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
@@ -230,15 +308,61 @@
         </div>
     </div>
 
+    <!-- Modal de error por solapamiento con otra UP -->
+    <div class="modal fade" id="modalErrorSolapamiento" tabindex="-1" aria-labelledby="modalErrorSolapamientoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalErrorSolapamientoLabel">Error de registro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>No se puede registrar el polígono porque el área seleccionada ya está ocupada por otra unidad de producción.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Entendido</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        console.log(typeof bootstrap.Modal); // Ahora sí debería ser "function"
-    </script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <script src="{{ asset('js/capturista/poligonoCapturista.js') }}"></script>
+    @php
+        $cultivosCatalogo = ($cultivos ?? collect())->map(function ($cultivo) {
+            return [
+                'id' => $cultivo->id,
+                'nombre' => $cultivo->nombre,
+                'color' => $cultivo->color,
+                'variantes' => $cultivo->variantes->map(function ($variante) {
+                    return [
+                        'id' => $variante->id,
+                        'nombre' => $variante->nombre,
+                    ];
+                })->values()->all(),
+            ];
+        })->values()->all();
+        $practicasCatalogo = ($practicasImplementadas ?? collect())->map(function ($practica) {
+            return [
+                'id' => $practica->id,
+                'clave' => $practica->clave,
+                'nombre' => $practica->nombre,
+            ];
+        })->values()->all();
+    @endphp
+    <script>
+        window.cultivosCatalogo = {{ Illuminate\Support\Js::from($cultivosCatalogo) }};
+        window.practicasCatalogo = {{ Illuminate\Support\Js::from($practicasCatalogo) }};
+        window.rutasPoligonos = {
+            show: @json(route('capturista.poligonos.show', ['id' => '__ID__'])),
+            update: @json(route('capturista.poligonos.update', ['id' => '__ID__']))
+        };
+    </script>
+    <script src="{{ asset('js/capturista/poligonoCapturista.js') }}?v={{ time() }}"></script>
 </body>
 </html>

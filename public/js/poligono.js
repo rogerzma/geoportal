@@ -25,6 +25,43 @@ function generarColorAleatorio() {
     return color;
 }
 
+const selectorCultivoPractica = document.getElementById('cultivo_id') || document.getElementById('cultivo');
+const selectorPractica = document.getElementById('practica_implementada_id');
+
+function cargarPracticas() {
+    if (!selectorCultivoPractica || !selectorPractica) return;
+    selectorPractica.innerHTML = '';
+    if (!selectorCultivoPractica.value) {
+        selectorPractica.disabled = true;
+        selectorPractica.innerHTML = '<option value="">Primero seleccione un cultivo</option>';
+        return;
+    }
+    const practicas = window.practicasCatalogo || [];
+    if (!practicas.length) {
+        selectorPractica.disabled = true;
+        selectorPractica.innerHTML = '<option value="">No existen prácticas registradas</option>';
+        return;
+    }
+    selectorPractica.disabled = false;
+    selectorPractica.innerHTML = '<option value="">Seleccione una práctica...</option>';
+    practicas.forEach(function (practica) {
+        const opcion = document.createElement('option');
+        opcion.value = practica.id;
+        opcion.textContent = practica.clave + ' - ' + practica.nombre;
+        selectorPractica.appendChild(opcion);
+    });
+}
+
+if (selectorCultivoPractica) selectorCultivoPractica.addEventListener('change', cargarPracticas);
+
+function lineaPracticaImplementada(poligono) {
+    const nombre = poligono.practica_implementada?.nombre;
+    if (!nombre) return '';
+    const texto = document.createElement('span');
+    texto.textContent = nombre;
+    return `<strong>Práctica implementada:</strong> ${texto.innerHTML}<br>`;
+}
+
 // Obtener el parámetro up_id de la URL
 function getUpIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -117,6 +154,7 @@ function cargarPoligonosPorUP(upId) {
                     <div class="popup-poligono">
                         <strong>Nombre:</strong> ${poligono.nombre}<br>
                         <strong>Cultivo:</strong> ${poligono.cultivo}<br>
+                        ${lineaPracticaImplementada(poligono)}
                         <strong>Fecha de creación:</strong> ${poligono.fecha_creacion}<br>
                         <strong>Productor:</strong> ${poligono.user?.name ?? 'N/A'}
                     </div>
@@ -322,6 +360,7 @@ document.getElementById('poligonoForm').addEventListener('submit', function (e) 
     const data = {
         nombre: document.getElementById('nombre').value.trim(),
         cultivo: document.getElementById('cultivo').value.trim(),
+        practica_implementada_id: selectorPractica && selectorPractica.value ? Number(selectorPractica.value) : null,
         coordenadas: document.getElementById('coordenadas').value,
         geom: document.getElementById('geom').value.trim(),
         fecha_creacion: document.getElementById('fecha_creacion').value.trim(),

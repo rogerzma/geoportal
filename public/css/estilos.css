@@ -520,6 +520,64 @@
     margin-left: 12px !important;
 }
 
+.leaflet-popup-content {
+        min-width: 250px;
+        max-width: 350px;
+        margin: 15px 18px;
+    }
+
+/* Contenedor de información */
+.popup-poligono {
+    font-size: 11px;
+    line-height: 1.65;
+    color: #333;
+    min-width: 240px;
+}
+
+.popup-poligono-info strong {
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Contenedor del botón */
+    .popup-poligono-acciones {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+        padding-top: 8px;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    /* Botón para editar */
+    .btn-editar-poligono {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 34px;
+        height: 34px;
+
+        background-color: #198754;
+        color: white;
+
+        border: none;
+        border-radius: 6px;
+
+        cursor: pointer;
+        font-size: 15px;
+
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-editar-poligono:hover {
+        background-color: #146c43;
+        color: white;
+    }
+
+    .btn-editar-poligono:focus-visible {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+    }
 
 /* Vista para celulares y tabletas */
 
